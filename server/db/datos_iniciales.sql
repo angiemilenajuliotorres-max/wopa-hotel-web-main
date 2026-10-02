@@ -1,33 +1,33 @@
--- Insertar hotel OPPA (agencia de viajes)
+-- Insertar agencia de viajes WOPA Travel y su catálogo de hoteles aliados en Cartagena
 INSERT INTO hoteles (nombre, slug, descripcion, direccion, ciudad, pais, rnt, telefono, correo)
 VALUES (
-  'OPPA - Hospedajes Cartagena',
-  'oppa-hospedajes',
-  'Agencia de viajes OPPA ofrece selección de los mejores hospedajes en Cartagena de Indias',
+  'WOPA Travel - Hoteles aliados Cartagena',
+  'wopa-travel-cartagena',
+  'Agencia de viajes WOPA Travel ofrece opciones de alojamiento en Cartagena con hoteles aliados y tarifas en USD por noche',
   'Cartagena de Indias',
   'Cartagena',
   'Colombia',
-  'RNT-OPPA',
+  'RNT-WOPA',
   '50762869154',
-  'reservas@oppa.com'
+  'reservas@wopatravel.com'
 );
 
 -- Obtener el ID del hotel recién creado
 -- (En SQLite, podemos usar last_insert_rowid() en la aplicación)
 
--- Insertar tipos de habitación basados en los datos proporcionados
+-- Insertar hoteles aliados para la agencia de viajes WOPA Travel
 
 -- Hotel La Casona de Getsemaní
 INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios)
-VALUES (1, 'La Casona de Getsemaní', 'Hotel boutique en el corazón del Getsemaní', 1, 4, 'WiFi, Aire acondicionado, Desayuno incluido, Minibar');
+VALUES (1, 'Hotel La Casona de Getsemaní', 'Hotel boutique en el corazón del Getsemaní', 1, 4, 'WiFi, Aire acondicionado, Desayuno incluido, Minibar');
 
 -- Hotel Marina Suites by GEH Suites
 INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios)
-VALUES (1, 'Marina Suites by GEH Suites', 'Suites modernas con vistas al mar', 1, 4, 'WiFi, TV cable, Piscina, Gimnasio, Restaurante');
+VALUES (1, 'Hotel Marina Suites by GEH Suites', 'Suites modernas con vistas al mar', 1, 4, 'WiFi, TV cable, Piscina, Gimnasio, Restaurante');
 
 -- Hotel Dorado Centro Histórico
 INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios)
-VALUES (1, 'Dorado Centro Histórico', 'Hotel en el corazón del centro histórico', 1, 4, 'WiFi, Aire acondicionado, Concierge 24/7, Parqueo');
+VALUES (1, 'Hotel Dorado Centro Histórico', 'Hotel en el corazón del centro histórico', 1, 4, 'WiFi, Aire acondicionado, Concierge 24/7, Parqueo');
 
 -- Wala Hotel and Beach Club Bocagrande
 INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios)
@@ -39,7 +39,7 @@ VALUES (1, 'Mintaka Hotel and Lounge', 'Opción económica y acogedora', 1, 4, '
 
 -- Hotel Aixo Suites by GEH Suites
 INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios)
-VALUES (1, 'Aixo Suites by GEH Suites', 'Apartamentos amueblados con servicios hoteleros', 1, 4, 'WiFi, Cocina, Aire acondicionado, Parqueo, Lavandería');
+VALUES (1, 'Hotel Aixo Suites by GEH Suites', 'Apartamentos amueblados con servicios hoteleros', 1, 4, 'WiFi, Cocina, Aire acondicionado, Parqueo, Lavandería');
 
 -- Hotel Atlantic Luc
 INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios)
@@ -49,13 +49,13 @@ VALUES (1, 'Hotel Atlantic Luc', 'Hotel frente al mar con servicios de lujo', 1,
 INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios)
 VALUES (1, 'Hotel Regatta', 'Experiencia premium frente al Caribe', 1, 4, 'WiFi, Piscina infinita, Spa de lujo, Restaurante 5 estrellas, Concierge');
 
--- Insertar tarifas para cada tipo de habitación (1-2 personas y 3-4 personas, temporada baja)
+-- Tarifas por noche en USD para cada hotel aliado, por 1-2 personas y 3-4 personas
 
 -- Hotel La Casona de Getsemaní: $60 (1-2 pax), $90 (3-4 pax)
 INSERT INTO tarifas (tipo_id, capacidad_personas, precio_usd, temporada)
 VALUES (1, 2, 60.00, 'baja'), (1, 4, 90.00, 'baja');
 
--- Hotel Marina Suites: $60 (1-2 pax), $280 (3-4 pax)
+-- Hotel Marina Suites by GEH Suites: $60 (1-2 pax), $280 (3-4 pax)
 INSERT INTO tarifas (tipo_id, capacidad_personas, precio_usd, temporada)
 VALUES (2, 2, 60.00, 'baja'), (2, 4, 280.00, 'baja');
 
@@ -63,7 +63,7 @@ VALUES (2, 2, 60.00, 'baja'), (2, 4, 280.00, 'baja');
 INSERT INTO tarifas (tipo_id, capacidad_personas, precio_usd, temporada)
 VALUES (3, 2, 60.00, 'baja'), (3, 4, 80.00, 'baja');
 
--- Wala Hotel and Beach Club: $120 (1-2 pax), $200 (3-4 pax)
+-- Wala Hotel and Beach Club Bocagrande: $120 (1-2 pax), $200 (3-4 pax)
 INSERT INTO tarifas (tipo_id, capacidad_personas, precio_usd, temporada)
 VALUES (4, 2, 120.00, 'baja'), (4, 4, 200.00, 'baja');
 
@@ -71,7 +71,7 @@ VALUES (4, 2, 120.00, 'baja'), (4, 4, 200.00, 'baja');
 INSERT INTO tarifas (tipo_id, capacidad_personas, precio_usd, temporada)
 VALUES (5, 2, 50.00, 'baja'), (5, 4, 80.00, 'baja');
 
--- Hotel Aixo Suites: $75 (1-2 pax), $110 (3-4 pax)
+-- Hotel Aixo Suites by GEH Suites: $75 (1-2 pax), $110 (3-4 pax)
 INSERT INTO tarifas (tipo_id, capacidad_personas, precio_usd, temporada)
 VALUES (6, 2, 75.00, 'baja'), (6, 4, 110.00, 'baja');
 

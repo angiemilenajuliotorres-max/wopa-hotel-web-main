@@ -13,6 +13,7 @@ async function cargarTraducciones(idioma) {
     const traducciones = await response.json();
     window.traducciones = traducciones;
     aplicarTraducciones();
+    window.dispatchEvent(new Event("traducciones:cargadas"));
   } catch (error) {
     console.error(`Error al cargar traducciones para ${idioma}:`, error);
   }

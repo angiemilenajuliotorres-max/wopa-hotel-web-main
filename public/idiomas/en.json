@@ -1,36 +1,39 @@
 {
   "hero": {
-    "titulo": "Discover the Caribbean in Cartagena",
-    "subtitulo": "Luxury accommodations with sea views and world-class service",
-    "reservar": "Book Now"
+    "titulo": "Discover Cartagena with WOPA Travel",
+    "slogan": "Your Cartagena trip, without the hassle.",
+    "subtitulo": "Compare stays from our partner hotels and choose the one that best fits your Cartagena trip.",
+    "reservar": "Explore destinations",
+    "verhoteles": "View hotels"
   },
   "buscador": {
-    "titulo": "Find your perfect accommodation",
+    "titulo": "Compare stays for your trip",
+    "descripcion": "Check nightly rates based on the number of guests.",
     "entrada": "Check-in date",
     "salida": "Check-out date",
     "personas": "Number of guests",
-    "buscar": "Search"
+    "buscar": "View options"
   },
   "destacadas": {
-    "titulo": "Featured Accommodations"
+    "titulo": "Choose from our partner hotels"
   },
   "servicios": {
-    "titulo": "Our Services",
+    "titulo": "Our services",
     "playa": {
-      "titulo": "Beach Access",
-      "descripcion": "Accommodations with private beaches and direct access to the Caribbean"
+      "titulo": "Partner stays for every trip",
+      "descripcion": "We select accommodation options in Cartagena with excellent location and atmosphere"
     },
     "pago": {
-      "titulo": "Secure Payments",
-      "descripcion": "Safe transactions with Wompi and major credit cards"
+      "titulo": "Secure bookings",
+      "descripcion": "We help with secure payments and clear processes for your trip"
     },
     "whatsapp": {
-      "titulo": "WhatsApp 24/7",
-      "descripcion": "Customer support via WhatsApp anytime"
+      "titulo": "Personalized support",
+      "descripcion": "WhatsApp support to help you choose the best option for your itinerary"
     },
     "ubicacion": {
-      "titulo": "Historic Center",
-      "descripcion": "Located in the heart of Cartagena, a UNESCO World Heritage Site"
+      "titulo": "Cartagena and beyond",
+      "descripcion": "Trips to Cartagena with partner hotels, historic charm, and destination experience"
     }
   },
   "ubicacion": {
@@ -44,26 +47,34 @@
     "pagar": "Pay",
     "continuar": "Continue"
   },
+  "catalogo": {
+    "precio12": "1-2 guests",
+    "precio34": "3-4 guests",
+    "noche": "per night",
+    "consultar": "Ask us on WhatsApp",
+    "vacio": "There are no partner hotels to show right now.",
+    "error": "We could not load partner hotels. Please try again later."
+  },
   "whatsapp": {
     "horario": "9:00 AM - 7:00 PM"
   },
   "footer": {
-    "descripcion": "Travel agency specializing in quality accommodations in Cartagena de Indias",
+    "descripcion": "Panamanian travel agency specialized in experiences and partner hotels in Cartagena",
     "enlaces": "Links",
     "inicio": "Home",
-    "habitaciones": "Rooms",
+    "habitaciones": "Hotels",
     "reservar": "Book",
     "contacto": "Contact",
     "legal": "Legal",
     "terminos": "Terms and Conditions",
     "privacidad": "Privacy Policy",
     "cancelacion": "Cancellation Policy",
-    "copyright": "© 2026 OPPA. All rights reserved."
+    "copyright": "© 2026 WOPA Travel. All rights reserved."
   },
   "reservar": {
     "titulo": "Make a Reservation",
     "paso1": "Dates and Guests",
-    "paso2": "Select Room",
+    "paso2": "Select Hotel",
     "paso3": "Guest Information",
     "paso4": "Payment Confirmation",
     "fechaEntrada": "Check-in date",
@@ -78,7 +89,7 @@
     "subtotal": "Subtotal",
     "impuesto": "Tax (19%)",
     "total": "Total to pay",
-    "seleccionar": "Select this room"
+    "seleccionar": "Select this hotel"
   },
   "contacto": {
     "titulo": "Contact",
@@ -96,7 +107,7 @@
     "correoInvalido": "Please enter a valid email",
     "telefonoInvalido": "Please enter a valid phone number",
     "fechasInvalidas": "Check-out date must be after check-in date",
-    "habitacionNoDisponible": "This room is not available for those dates"
+    "habitacionNoDisponible": "This hotel is not available for those dates"
   },
   "exito": {
     "reservaConfirmada": "Reservation confirmed successfully",

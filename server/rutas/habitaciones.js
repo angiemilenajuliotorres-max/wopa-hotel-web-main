@@ -15,29 +15,41 @@ router.get("/", (req, res) => {
         th.capacidad_maxima,
         th.servicios,
         th.imagen_url,
-        GROUP_CONCAT(
-          json_object('capacidad', t.capacidad_personas, 'precio_usd', t.precio_usd, 'temporada', t.temporada),
-          ','
-        ) as tarifas
+        t.capacidad_personas,
+        t.precio_usd,
+        t.temporada
       FROM tipos_habitacion th
       LEFT JOIN tarifas t ON th.id = t.tipo_id
-      GROUP BY th.id
-      ORDER BY th.nombre ASC
+      ORDER BY th.nombre ASC, t.capacidad_personas ASC
     `);
 
-    const habitaciones = stmt.all();
+    const hotelesAliados = new Map();
+    for (const fila of stmt.all()) {
+      if (!hotelesAliados.has(fila.id)) {
+        hotelesAliados.set(fila.id, {
+          id: fila.id,
+          nombre: fila.nombre,
+          descripcion: fila.descripcion,
+          capacidad_minima: fila.capacidad_minima,
+          capacidad_maxima: fila.capacidad_maxima,
+          servicios: fila.servicios,
+          imagen_url: fila.imagen_url,
+          tarifas: [],
+        });
+      }
 
-    // Parsear las tarifas de JSON
-    const habitacionesConTarifas = habitaciones.map((hab) => ({
-      ...hab,
-      tarifas: hab.tarifas
-        ? hab.tarifas.split(",").map((t) => JSON.parse(t))
-        : [],
-    }));
+      if (fila.capacidad_personas !== null) {
+        hotelesAliados.get(fila.id).tarifas.push({
+          capacidad: fila.capacidad_personas,
+          precio_usd: fila.precio_usd,
+          temporada: fila.temporada,
+        });
+      }
+    }
 
     res.json({
       ok: true,
-      data: habitacionesConTarifas,
+      data: [...hotelesAliados.values()],
     });
   } catch (error) {
     console.error("Error al obtener habitaciones:", error);

@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OPPA - Hospedajes en Cartagena de Indias</title>
+    <title>WOPA Travel | Agencia de viajes Panamá</title>
     <meta
       name="description"
-      content="Agencia de viajes OPPA ofrece los mejores hospedajes en Cartagena de Indias con reservas en línea y pagos seguros."
+      content="WOPA Travel es una agencia de viajes en Panamá que te ayuda a viajar a Cartagena con hoteles aliados y opciones de alojamiento para cada estilo de viaje."
     />
     <meta name="theme-color" content="#25A88A" />
     <link rel="stylesheet" href="/css/estilos.css" />
@@ -16,15 +16,20 @@
     <nav class="navbar">
       <div class="container">
         <div class="navbar-content">
-          <div class="logo">
-            <h1>OPPA</h1>
-            <p class="tagline">Hospedajes en Cartagena</p>
+          <div class="logo" aria-label="WOPA Travel logo">
+            <div class="brand-wordmark" aria-label="WOPA Travel">
+              <span class="brand-wordmark-wopa">wopa</span>
+              <span class="brand-wordmark-travel">Travel</span>
+            </div>
+            <p class="tagline">Viajes a Cartagena</p>
           </div>
           <ul class="nav-links">
             <li><a href="/" class="active">Inicio</a></li>
-            <li><a href="/habitaciones.html">Habitaciones</a></li>
-            <li><a href="/reservar.html">Reservar</a></li>
-            <li><a href="/contacto.html">Contacto</a></li>
+            <li><a href="#destacadas">Hoteles aliados</a></li>
+            <li><a href="#reserva">Reservar</a></li>
+            <li><a href="#experiencias">Tours</a></li>
+            <li><a href="#cotizacion">Cotizar</a></li>
+            <li><a href="#contacto">Contacto</a></li>
           </ul>
           <div class="idioma-selector">
             <button class="idioma-btn" data-idioma="es">ES</button>
@@ -37,65 +42,180 @@
     <!-- Hero Section -->
     <section class="hero">
       <div class="hero-content">
-        <h2 data-i18n="hero.titulo">Descubre el Caribe en Cartagena</h2>
+        <span class="hero-badge">Agencia de viajes en Panamá</span>
+        <h2 data-i18n="hero.titulo">Descubre Cartagena con WOPA Travel</h2>
+        <p class="hero-slogan" data-i18n="hero.slogan">Tu viaje a Cartagena, sin complicaciones.</p>
         <p data-i18n="hero.subtitulo">
-          Hospedajes de lujo con vistas al mar y servicios de clase mundial
+          Te ayudamos a elegir entre hoteles aliados y experiencias de viaje para vivir Cartagena a tu manera.
         </p>
-        <a href="/reservar.html" class="btn btn-primary" data-i18n="hero.reservar"
-          >Reservar Ahora</a
-        >
+        <div class="hero-actions">
+          <a href="/reservar.html" class="btn btn-primary" data-i18n="hero.reservar"
+            >Explorar destinos</a
+          >
+          <a href="#destacadas" class="btn btn-outline" data-i18n="hero.verhoteles"
+            >Ver hoteles</a
+          >
+        </div>
+        <div class="hero-metrics">
+          <div>
+            <strong>8</strong>
+            <span>opciones aliadas</span>
+          </div>
+          <div>
+            <strong>24/7</strong>
+            <span>atención</span>
+          </div>
+          <div>
+            <strong>USD</strong>
+            <span>precios por noche</span>
+          </div>
+        </div>
       </div>
       <div class="hero-image">
-        <img
-          src="https://via.placeholder.com/600x400/25A88A/FFFFFF?text=Cartagena"
-          alt="Cartagena de Indias"
-          loading="lazy"
-        />
+        <div class="hero-visual-card">
+          <img
+            src="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=900&q=80"
+            alt="Cartagena de Indias"
+            loading="lazy"
+          />
+          <div class="visual-badge">
+            <span>Cartagena</span>
+            <strong>Colombia</strong>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- Buscador Rápido -->
     <section class="buscador">
       <div class="container">
-        <h3 data-i18n="buscador.titulo">Busca tu hospedaje perfecto</h3>
-        <form id="formulario-buscador" class="buscador-form">
-          <div class="form-group">
-            <label for="fecha-entrada" data-i18n="buscador.entrada"
-              >Entrada</label
-            >
-            <input type="date" id="fecha-entrada" required />
-          </div>
-          <div class="form-group">
-            <label for="fecha-salida" data-i18n="buscador.salida"
-              >Salida</label
-            >
-            <input type="date" id="fecha-salida" required />
-          </div>
-          <div class="form-group">
-            <label for="numero-personas" data-i18n="buscador.personas"
-              >Personas</label
-            >
-            <select id="numero-personas" required>
-              <option value="1">1</option>
-              <option value="2" selected>2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-            </select>
-          </div>
-          <button type="submit" class="btn btn-primary" data-i18n="buscador.buscar">
-            Buscar
-          </button>
-        </form>
+        <h3 data-i18n="buscador.titulo">Compara opciones de hospedaje para tu viaje</h3>
+        <p data-i18n="buscador.descripcion">Consulta las tarifas por noche según la cantidad de personas.</p>
+        <a href="#destacadas" class="btn btn-primary" data-i18n="buscador.buscar">
+          Ver opciones
+        </a>
+      </div>
+    </section>
+
+    <!-- Beneficios -->
+    <section class="beneficios">
+      <div class="container">
+        <div class="section-intro">
+          <span>¿Por qué elegir WOPA Travel?</span>
+          <h2>Tu viaje a Cartagena, pensado sin complicaciones</h2>
+        </div>
+        <div class="beneficios-grid">
+          <article class="beneficio-card">
+            <div class="beneficio-icon">✨</div>
+            <h3>Selección curada</h3>
+            <p>Hoteles aliados en Cartagena con calidad, estilo y buena ubicación.</p>
+          </article>
+          <article class="beneficio-card">
+            <div class="beneficio-icon">🧳</div>
+            <h3>Experiencia integrada</h3>
+            <p>Te ayudamos a reservar con claridad y asesoría personalizada antes del viaje.</p>
+          </article>
+          <article class="beneficio-card">
+            <div class="beneficio-icon">🔒</div>
+            <h3>Condiciones claras</h3>
+            <p>Conocés el anticipo, la penalización por cancelación y el proceso de reserva.</p>
+          </article>
+        </div>
       </div>
     </section>
 
     <!-- Habitaciones Destacadas -->
-    <section class="habitaciones-destacadas">
+    <section id="destacadas" class="habitaciones-destacadas">
       <div class="container">
-        <h2 data-i18n="destacadas.titulo">Hospedajes Destacados</h2>
+        <h2 data-i18n="destacadas.titulo">Elige entre nuestros hoteles aliados</h2>
         <div id="habitaciones-list" class="habitaciones-grid">
           <!-- Se llena con JavaScript -->
         </div>
+      </div>
+    </section>
+
+    <section id="reserva" class="solicitud-section">
+      <div class="container solicitud-layout">
+        <div class="solicitud-intro">
+          <span class="section-kicker">WOPA TRAVEL · CARTAGENA</span>
+          <h2>Solicita tu hospedaje</h2>
+          <p>Elige un hotel aliado y envíanos tus fechas. Confirmaremos disponibilidad y precio antes de confirmar o cobrar.</p>
+          <p class="politica-nota">El anticipo estimado es del 25% del hospedaje, sujeto a confirmación. La solicitud no confirma una reserva.</p>
+        </div>
+        <form id="form-reserva" class="formulario-agencia">
+          <label>Hotel aliado<select name="tipoId" id="reserva-hotel" required></select></label>
+          <div class="form-grid">
+            <label>Entrada<input type="date" name="fechaEntrada" required /></label>
+            <label>Salida<input type="date" name="fechaSalida" required /></label>
+            <label>Personas<select name="numeroPersonas" required><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option></select></label>
+            <label>Nombre completo<input name="nombre" autocomplete="name" required maxlength="120" /></label>
+            <label>Correo electrónico<input type="email" name="correo" autocomplete="email" required maxlength="160" /></label>
+            <label>Teléfono / WhatsApp<input type="tel" name="telefono" autocomplete="tel" required maxlength="40" /></label>
+          </div>
+          <label>Solicitudes especiales<textarea name="solicitudesEspeciales" rows="3" maxlength="1000"></textarea></label>
+          <button class="btn btn-primary" type="submit">Enviar solicitud de reserva</button>
+          <p class="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="experiencias" class="experiencias-section">
+      <div class="container">
+        <div class="section-heading">
+          <span class="section-kicker">MÁS QUE HOSPEDAJE</span>
+          <h2>Vive Cartagena a tu manera</h2>
+          <p>Explora ideas para tu itinerario. Operador, cupos, inclusiones y tarifa se confirman antes de contratar.</p>
+        </div>
+        <div id="experiencias-list" class="experiencias-grid" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="cotizacion" class="solicitud-section cotizacion-section">
+      <div class="container solicitud-layout">
+        <div class="solicitud-intro">
+          <span class="section-kicker">ARMA TU VIAJE</span>
+          <h2>Solicita una cotización</h2>
+          <p>Combina hospedaje y experiencias o cuéntanos qué itinerario tienes en mente. Te enviaremos una propuesta personalizada.</p>
+          <p class="politica-nota">Las excursiones no tienen precio publicado: confirmaremos operador, disponibilidad e inclusiones contigo.</p>
+        </div>
+        <form id="form-cotizacion" class="formulario-agencia">
+          <div class="form-grid">
+            <label>Hotel aliado (opcional)<select name="tipoId" id="cotizacion-hotel"></select></label>
+            <label>Experiencia / tour (opcional)<select name="experienciaId" id="cotizacion-experiencia"></select></label>
+            <label>Entrada<input type="date" name="fechaEntrada" /></label>
+            <label>Salida<input type="date" name="fechaSalida" /></label>
+            <label>Personas<select name="numeroPersonas" required><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></label>
+            <label>Nombre completo<input name="nombre" autocomplete="name" required maxlength="120" /></label>
+            <label>Correo electrónico<input type="email" name="correo" autocomplete="email" required maxlength="160" /></label>
+            <label>Teléfono / WhatsApp<input type="tel" name="telefono" autocomplete="tel" required maxlength="40" /></label>
+          </div>
+          <label>Cuéntanos qué te gustaría incluir<textarea name="notas" rows="4" maxlength="1500" placeholder="Fechas flexibles, tipo de paseo, preferencias..."></textarea></label>
+          <button class="btn btn-primary" type="submit">Pedir cotización</button>
+          <p class="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="contacto" class="contacto-section">
+      <div class="container contacto-layout">
+        <div>
+          <span class="section-kicker">HABLEMOS DE TU VIAJE</span>
+          <h2>¿Necesitas ayuda?</h2>
+          <p>Cuéntanos qué estás buscando y el equipo de WOPA Travel te responderá.</p>
+          <a href="https://wa.me/50762869154" class="contacto-directo" target="_blank" rel="noopener noreferrer">WhatsApp · +507 6286-9154</a>
+          <a href="mailto:reservas@wopatravel.com" class="contacto-directo">reservas@wopatravel.com</a>
+        </div>
+        <form id="form-contacto" class="formulario-agencia">
+          <div class="form-grid">
+            <label>Nombre<input name="nombre" autocomplete="name" required maxlength="120" /></label>
+            <label>Correo electrónico<input type="email" name="correo" autocomplete="email" required maxlength="160" /></label>
+            <label>Teléfono (opcional)<input type="tel" name="telefono" autocomplete="tel" maxlength="40" /></label>
+            <label>Asunto<input name="asunto" required maxlength="160" /></label>
+          </div>
+          <label>Mensaje<textarea name="mensaje" rows="4" required minlength="10" maxlength="2000"></textarea></label>
+          <button class="btn btn-primary" type="submit">Enviar mensaje</button>
+          <p class="form-status" role="status" aria-live="polite"></p>
+        </form>
       </div>
     </section>
 
@@ -106,30 +226,30 @@
         <div class="servicios-grid">
           <div class="servicio-card">
             <div class="servicio-icon">🏖️</div>
-            <h3 data-i18n="servicios.playa.titulo">Acceso a Playa</h3>
+            <h3 data-i18n="servicios.playa.titulo">Hoteles con estilo</h3>
             <p data-i18n="servicios.playa.descripcion">
-              Hospedajes con playas privadas y acceso directo al Caribe
+              Seleccionamos opciones de alojamiento en Cartagena con excelente ubicación y ambiente.
             </p>
           </div>
           <div class="servicio-card">
             <div class="servicio-icon">💳</div>
-            <h3 data-i18n="servicios.pago.titulo">Pagos Seguros</h3>
+            <h3 data-i18n="servicios.pago.titulo">Reservas seguras</h3>
             <p data-i18n="servicios.pago.descripcion">
-              Transacciones seguras con Wompi y principales tarjetas de crédito
+              Te ayudamos con pagos seguros y procesos claros para tu viaje.
             </p>
           </div>
           <div class="servicio-card">
             <div class="servicio-icon">📱</div>
-            <h3 data-i18n="servicios.whatsapp.titulo">WhatsApp 24/7</h3>
+            <h3 data-i18n="servicios.whatsapp.titulo">Atención personalizada</h3>
             <p data-i18n="servicios.whatsapp.descripcion">
-              Soporte por WhatsApp en cualquier momento
+              Soporte por WhatsApp para ayudarte a elegir la mejor opción para tu itinerario.
             </p>
           </div>
           <div class="servicio-card">
             <div class="servicio-icon">🗺️</div>
-            <h3 data-i18n="servicios.ubicacion.titulo">Centro Histórico</h3>
+            <h3 data-i18n="servicios.ubicacion.titulo">Cartagena y más</h3>
             <p data-i18n="servicios.ubicacion.descripcion">
-              Ubicados en el corazón de Cartagena, patrimonio de la humanidad
+              Viajes a Cartagena con hoteles aliados, cercanía a la historia y experiencia de destino.
             </p>
           </div>
         </div>
@@ -158,7 +278,7 @@
 
     <!-- Botón flotante de WhatsApp -->
     <div id="whatsapp-btn" class="whatsapp-flotante">
-      <a href="https://wa.me/50762869154?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20los%20hospedajes"
+      <a href="https://wa.me/50762869154?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20viajes%20a%20Cartagena"
         target="_blank"
         rel="noopener noreferrer"
       >
@@ -174,10 +294,9 @@
       <div class="container">
         <div class="footer-content">
           <div class="footer-section">
-            <h4>OPPA</h4>
+            <h4>WOPA Travel</h4>
             <p data-i18n="footer.descripcion">
-              Agencia de viajes especializada en hospedajes de calidad en
-              Cartagena de Indias
+              Agencia de viajes en Panamá especializada en experiencias y hoteles aliados en Cartagena.
             </p>
           </div>
           <div class="footer-section">
@@ -185,21 +304,42 @@
             <ul>
               <li><a href="/" data-i18n="footer.inicio">Inicio</a></li>
               <li>
-                <a href="/habitaciones.html" data-i18n="footer.habitaciones"
-                  >Habitaciones</a
+                <a href="#destacadas" data-i18n="footer.habitaciones"
+                  >Hoteles aliados</a
                 >
               </li>
-              <li><a href="/reservar.html" data-i18n="footer.reservar">Reservar</a></li>
+              <li><a href="#reserva" data-i18n="footer.reservar">Reservar</a></li>
               <li>
-                <a href="/contacto.html" data-i18n="footer.contacto">Contacto</a>
+                <a href="#contacto" data-i18n="footer.contacto">Contacto</a>
               </li>
             </ul>
           </div>
           <div class="footer-section">
             <h4 data-i18n="footer.contacto">Contacto</h4>
-            <p>📧 reservas@oppa.com</p>
+            <p>📧 reservas@wopatravel.com</p>
             <p>📱 +507 6286-9154</p>
-            <p>📍 Cartagena de Indias, Colombia</p>
+            <p>📍 Tierras Altas, Provincia de Chiriquí, República de Panamá</p>
+            <p>⛔ Penalización del 100% de lo abonado por cancelación</p>
+            <p>💳 Anticipo del 25%</p>
+            <p class="social-label">Síguenos</p>
+            <div class="social-links">
+              <a
+                class="social-link"
+                href="https://www.facebook.com/share/1UV4tCd4SZ/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                >f</a
+              >
+              <a
+                class="social-link"
+                href="https://www.instagram.com/bambitos_cafe?stkn=MXd4ZHl6eXE3ZjR4Mg=="
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                >◎</a
+              >
+            </div>
           </div>
           <div class="footer-section">
             <h4 data-i18n="footer.legal">Legal</h4>
@@ -224,7 +364,7 @@
         </div>
         <div class="footer-bottom">
           <p data-i18n="footer.copyright">
-            &copy; 2026 OPPA. Todos los derechos reservados.
+            &copy; 2026 WOPA Travel. Todos los derechos reservados.
           </p>
         </div>
       </div>

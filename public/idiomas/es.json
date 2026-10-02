@@ -1,36 +1,39 @@
 {
   "hero": {
-    "titulo": "Descubre el Caribe en Cartagena",
-    "subtitulo": "Hospedajes de lujo con vistas al mar y servicios de clase mundial",
-    "reservar": "Reservar Ahora"
+    "titulo": "Descubre Cartagena con WOPA Travel",
+    "slogan": "Tu viaje a Cartagena, sin complicaciones.",
+    "subtitulo": "Compara opciones de hospedaje de nuestros hoteles aliados y elige la que mejor acompaña tu viaje a Cartagena.",
+    "reservar": "Explorar destinos",
+    "verhoteles": "Ver hoteles"
   },
   "buscador": {
-    "titulo": "Busca tu hospedaje perfecto",
+    "titulo": "Compara opciones de hospedaje para tu viaje",
+    "descripcion": "Consulta las tarifas por noche según la cantidad de personas.",
     "entrada": "Fecha de entrada",
     "salida": "Fecha de salida",
     "personas": "Número de personas",
-    "buscar": "Buscar"
+    "buscar": "Ver opciones"
   },
   "destacadas": {
-    "titulo": "Hospedajes Destacados"
+    "titulo": "Elige entre nuestros hoteles aliados"
   },
   "servicios": {
-    "titulo": "Nuestros Servicios",
+    "titulo": "Nuestros servicios",
     "playa": {
-      "titulo": "Acceso a Playa",
-      "descripcion": "Hospedajes con playas privadas y acceso directo al Caribe"
+      "titulo": "Opciones aliadas para cada viaje",
+      "descripcion": "Seleccionamos opciones de alojamiento en Cartagena con excelente ubicación y ambiente"
     },
     "pago": {
-      "titulo": "Pagos Seguros",
-      "descripcion": "Transacciones seguras con Wompi y principales tarjetas de crédito"
+      "titulo": "Reservas seguras",
+      "descripcion": "Te ayudamos con pagos seguros y procesos claros para tu viaje"
     },
     "whatsapp": {
-      "titulo": "WhatsApp 24/7",
-      "descripcion": "Soporte por WhatsApp en cualquier momento"
+      "titulo": "Atención personalizada",
+      "descripcion": "Soporte por WhatsApp para ayudarte a elegir la mejor opción para tu itinerario"
     },
     "ubicacion": {
-      "titulo": "Centro Histórico",
-      "descripcion": "Ubicados en el corazón de Cartagena, patrimonio de la humanidad"
+      "titulo": "Cartagena y más",
+      "descripcion": "Viajes a Cartagena con hoteles aliados, cercanía a la historia y experiencia de destino"
     }
   },
   "ubicacion": {
@@ -44,26 +47,34 @@
     "pagar": "Pagar",
     "continuar": "Continuar"
   },
+  "catalogo": {
+    "precio12": "1-2 personas",
+    "precio34": "3-4 personas",
+    "noche": "por noche",
+    "consultar": "Consultar por WhatsApp",
+    "vacio": "En este momento no hay hoteles aliados para mostrar.",
+    "error": "No pudimos cargar los hoteles aliados. Inténtalo nuevamente más tarde."
+  },
   "whatsapp": {
     "horario": "9:00 AM - 7:00 PM"
   },
   "footer": {
-    "descripcion": "Agencia de viajes especializada en hospedajes de calidad en Cartagena de Indias",
+    "descripcion": "Agencia de viajes en Panamá especializada en experiencias y hoteles aliados en Cartagena",
     "enlaces": "Enlaces",
     "inicio": "Inicio",
-    "habitaciones": "Habitaciones",
+    "habitaciones": "Hoteles",
     "reservar": "Reservar",
     "contacto": "Contacto",
     "legal": "Legal",
     "terminos": "Términos y Condiciones",
     "privacidad": "Política de Privacidad",
     "cancelacion": "Política de Cancelación",
-    "copyright": "© 2026 OPPA. Todos los derechos reservados."
+    "copyright": "© 2026 WOPA Travel. Todos los derechos reservados."
   },
   "reservar": {
     "titulo": "Realizar Reserva",
     "paso1": "Fechas y Personas",
-    "paso2": "Seleccionar Habitación",
+    "paso2": "Seleccionar Hotel",
     "paso3": "Datos del Huésped",
     "paso4": "Confirmación de Pago",
     "fechaEntrada": "Fecha de entrada",
@@ -78,7 +89,7 @@
     "subtotal": "Subtotal",
     "impuesto": "Impuesto (19%)",
     "total": "Total a pagar",
-    "seleccionar": "Seleccionar esta habitación"
+    "seleccionar": "Seleccionar este hotel"
   },
   "contacto": {
     "titulo": "Contacto",
@@ -96,7 +107,7 @@
     "correoInvalido": "Ingresa un correo válido",
     "telefonoInvalido": "Ingresa un teléfono válido",
     "fechasInvalidas": "La fecha de salida debe ser posterior a la de entrada",
-    "habitacionNoDisponible": "Esta habitación no está disponible para esas fechas"
+    "habitacionNoDisponible": "Este hotel no está disponible para esas fechas"
   },
   "exito": {
     "reservaConfirmada": "Reserva confirmada exitosamente",

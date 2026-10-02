@@ -98,6 +98,76 @@ CREATE TABLE IF NOT EXISTS bloqueos (
   FOREIGN KEY (hotel_id) REFERENCES hoteles(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS experiencias (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  slug TEXT NOT NULL UNIQUE,
+  nombre TEXT NOT NULL,
+  categoria TEXT NOT NULL,
+  descripcion TEXT NOT NULL,
+  duracion TEXT,
+  imagen_url TEXT,
+  precio_usd DECIMAL(10, 2),
+  activa INTEGER NOT NULL DEFAULT 1,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS solicitudes_reserva (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  codigo TEXT NOT NULL UNIQUE,
+  tipo_id INTEGER NOT NULL,
+  nombre TEXT NOT NULL,
+  correo TEXT NOT NULL,
+  telefono TEXT NOT NULL,
+  numero_personas INTEGER NOT NULL,
+  fecha_entrada DATE NOT NULL,
+  fecha_salida DATE NOT NULL,
+  noches INTEGER NOT NULL,
+  tarifa_noche_usd DECIMAL(10, 2) NOT NULL,
+  subtotal_usd DECIMAL(10, 2) NOT NULL,
+  anticipo_usd DECIMAL(10, 2) NOT NULL,
+  solicitudes_especiales TEXT,
+  estado TEXT NOT NULL DEFAULT 'pendiente_confirmacion',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (tipo_id) REFERENCES tipos_habitacion(id)
+);
+
+CREATE TABLE IF NOT EXISTS solicitudes_cotizacion (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  codigo TEXT NOT NULL UNIQUE,
+  nombre TEXT NOT NULL,
+  correo TEXT NOT NULL,
+  telefono TEXT NOT NULL,
+  tipo_id INTEGER,
+  experiencia_id INTEGER,
+  numero_personas INTEGER NOT NULL,
+  fecha_entrada DATE,
+  fecha_salida DATE,
+  notas TEXT,
+  subtotal_hospedaje_usd DECIMAL(10, 2),
+  anticipo_hospedaje_usd DECIMAL(10, 2),
+  estado TEXT NOT NULL DEFAULT 'pendiente',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (tipo_id) REFERENCES tipos_habitacion(id),
+  FOREIGN KEY (experiencia_id) REFERENCES experiencias(id)
+);
+
+CREATE TABLE IF NOT EXISTS mensajes_contacto (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  codigo TEXT NOT NULL UNIQUE,
+  nombre TEXT NOT NULL,
+  correo TEXT NOT NULL,
+  telefono TEXT,
+  asunto TEXT NOT NULL,
+  mensaje TEXT NOT NULL,
+  estado TEXT NOT NULL DEFAULT 'nuevo',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_solicitudes_reserva_fecha ON solicitudes_reserva(fecha_entrada, fecha_salida);
+CREATE INDEX IF NOT EXISTS idx_solicitudes_reserva_estado ON solicitudes_reserva(estado);
+CREATE INDEX IF NOT EXISTS idx_solicitudes_cotizacion_estado ON solicitudes_cotizacion(estado);
+CREATE INDEX IF NOT EXISTS idx_mensajes_contacto_estado ON mensajes_contacto(estado);
+
 -- Índices para optimizar búsquedas
 CREATE INDEX IF NOT EXISTS idx_reservas_hotel ON reservas(hotel_id);
 CREATE INDEX IF NOT EXISTS idx_reservas_habitacion ON reservas(habitacion_id);

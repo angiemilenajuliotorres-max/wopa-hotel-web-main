@@ -37,8 +37,7 @@ function inicializarBaseDatos() {
 
 // Cargar datos iniciales
 function cargarDatosIniciales() {
-  // Verificar si ya existen datos
-  const stmt = db.prepare("SELECT COUNT(*) as count FROM habitaciones");
+  const stmt = db.prepare("SELECT COUNT(*) as count FROM tipos_habitacion");
   const result = stmt.get();
 
   if (result.count === 0) {
@@ -50,11 +49,17 @@ function cargarDatosIniciales() {
       .map((s) => s.trim())
       .filter((s) => s.length > 0);
 
-    for (const sentencia of sentencias) {
-      db.exec(sentencia);
-    }
+    const cargar = db.transaction(() => {
+      for (const sentencia of sentencias) db.exec(sentencia);
+    });
+    cargar();
 
     console.log("✅ Datos iniciales cargados correctamente");
+  }
+
+  const experienciasPath = path.join(__dirname, "experiencias_iniciales.sql");
+  if (fs.existsSync(experienciasPath)) {
+    db.exec(fs.readFileSync(experienciasPath, "utf-8"));
   }
 }
 

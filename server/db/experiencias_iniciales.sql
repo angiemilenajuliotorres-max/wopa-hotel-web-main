@@ -1,0 +1,6 @@
+INSERT OR IGNORE INTO experiencias (slug, nombre, categoria, descripcion, duracion, imagen_url)
+VALUES
+  ('centro-historico-getsemani', 'Centro Histórico y Getsemaní', 'Cultura', 'Recorrido cultural sujeto a disponibilidad. Consulta horarios, punto de encuentro, guía e inclusiones antes de confirmar.', 'Medio día', 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=900&q=80'),
+  ('islas-del-rosario', 'Islas del Rosario', 'Mar y naturaleza', 'Experiencia de playa sujeta a clima, cupos y operador. Solicita el detalle del transporte, tasas e inclusiones.', 'Día completo', 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=900&q=80'),
+  ('atardecer-en-la-bahia', 'Atardecer en la bahía', 'Navegación', 'Alternativas de paseo al atardecer sujetas a disponibilidad. Consulta embarcación, duración y servicios incluidos.', 'Por confirmar', 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=900&q=80'),
+  ('sabores-de-cartagena', 'Sabores de Cartagena', 'Gastronomía', 'Opciones gastronómicas locales bajo solicitud. Consulta menú, restricciones alimentarias, lugar y tarifa.', 'Por confirmar', 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=900&q=80');

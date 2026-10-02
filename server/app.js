@@ -50,8 +50,8 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/api/health", (req, res) => {
   res.json({
     ok: true,
-    message: "API de OPPA funcionando correctamente",
-    app: "OPPA Hotel",
+    message: "API de WOPA Travel funcionando correctamente",
+    app: "WOPA Travel",
     timestamp: new Date().toISOString(),
   });
 });
@@ -59,19 +59,27 @@ app.get("/api/health", (req, res) => {
 app.get("/api/info", (req, res) => {
   res.json({
     ok: true,
-    proyecto: "OPPA Hotel Web",
+    proyecto: "WOPA Travel Web",
     pais: "Panamá",
-    ciudad_hospedajes: "Cartagena de Indias",
-    marca: "OPPA",
+    provincia: "Chiriquí",
+    direccion: "Tierras Altas, Provincia de Chiriquí, República de Panamá",
+    ciudad_hospedajes: "Cartagena de Indias, Colombia",
+    marca: "WOPA Travel",
     version: "1.0.0",
-    descripcion: "Agencia de viajes OPPA - Reservas de hospedajes en Cartagena",
+    descripcion: "Agencia de viajes WOPA Travel - Viajes a Cartagena con hoteles aliados",
+    politica_cancelacion: {
+      anticipo: "25%",
+      penalizacion: "100% de lo abonado por cancelación",
+    },
   });
 });
 
 // Rutas de API
 const habitacionesRouter = require("./rutas/habitaciones");
+const solicitudesRouter = require("./rutas/solicitudes");
 
 app.use("/api/habitaciones", habitacionesRouter);
+app.use("/api", solicitudesRouter);
 
 // Servir archivos estáticos del frontend
 app.use(express.static(path.join(__dirname, "../public")));
@@ -98,7 +106,7 @@ app.use((err, req, res, next) => {
 
 // Iniciar servidor
 app.listen(PORT, () => {
-  console.log(`✅ Servidor OPPA corriendo en http://localhost:${PORT}`);
+  console.log(`✅ Servidor WOPA Travel corriendo en http://localhost:${PORT}`);
   console.log(`📍 Ambiente: ${process.env.NODE_ENV || "development"}`);
   console.log(`🏨 Base de datos: ${process.env.DB_PATH || "./server/db/hotel.db"}`);
 });
