@@ -92,7 +92,7 @@ function noEncontrado(res, entidad) {
 router.post("/login", loginLimiter, (req, res) => {
   const usuario = texto(req.body.usuario, 100);
   const clave = typeof req.body.clave === "string" ? req.body.clave : "";
-  const configurado = process.env.ADMIN_USER && process.env.ADMIN_PASSWORD?.length >= 14 && process.env.ADMIN_SESSION_SECRET?.length >= 32;
+  const configurado = process.env.ADMIN_USER && process.env.ADMIN_PASSWORD?.length >= 6 && process.env.ADMIN_SESSION_SECRET?.length >= 32;
   const valido = configurado && safeEqual(usuario, process.env.ADMIN_USER) && safeEqual(clave, process.env.ADMIN_PASSWORD);
 
   if (!valido) {

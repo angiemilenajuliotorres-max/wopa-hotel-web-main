@@ -12,7 +12,7 @@ La base SQLite y el catálogo inicial se crean automáticamente al iniciar el se
 ## Panel de administración
 
 1. Copia `.env.example` como `.env` y configura `ADMIN_USER`, `ADMIN_PASSWORD` y `ADMIN_SESSION_SECRET` con valores privados; no subas `.env` al repositorio.
-2. Genera valores aleatorios localmente con `node -e "const c=require('crypto'); console.log('ADMIN_PASSWORD='+c.randomBytes(18).toString('base64url')); console.log('ADMIN_SESSION_SECRET='+c.randomBytes(48).toString('base64url'))"` y pégalos en `.env`. La contraseña debe tener al menos 14 caracteres y el secreto de sesión al menos 32.
+2. Configura una contraseña administrativa de al menos 6 caracteres. Genera un secreto de sesión aleatorio con `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"` y pégalo en `.env`; ese secreto debe tener al menos 32 caracteres.
 3. Reinicia el servidor y abre `http://localhost:3000/admin.html`.
 
 El panel permite revisar reservas, cotizaciones y mensajes; registrar pagos y gastos; actualizar las tarifas publicadas y gestionar tours. Para cada tour se puede configurar un precio por persona o un precio fijo por grupo. La cancelación registra como penalización el 100% de los pagos recibidos en esa reserva. No se crea un movimiento adicional por la penalización, para no duplicar ingresos.
