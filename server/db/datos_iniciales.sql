@@ -9,7 +9,7 @@ VALUES (
   'Colombia',
   'RNT-WOPA',
   '50762869154',
-  'reservas@wopatravel.com'
+  'wondersofpty@gmail.com'
 );
 
 -- Obtener el ID del hotel recién creado

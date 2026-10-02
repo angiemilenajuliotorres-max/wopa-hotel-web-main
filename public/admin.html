@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Administración | WOPA Travel</title>
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <main id="login-view" class="login-shell" hidden>
+      <form id="login-form" class="login-form">
+        <a class="login-brand" href="/">wopa<span>Travel</span></a>
+        <p class="eyebrow">ÁREA PRIVADA</p>
+        <h1>Administración</h1>
+        <label>Usuario<input name="usuario" autocomplete="username" required /></label>
+        <label>Contraseña<input name="clave" type="password" autocomplete="current-password" required /></label>
+        <button class="button button-primary" type="submit">Iniciar sesión</button>
+        <p id="login-status" class="status" role="status" aria-live="polite"></p>
+        <a class="back-link" href="/">Volver al sitio</a>
+      </form>
+    </main>
+
+    <div id="admin-app" class="admin-app" hidden>
+      <header class="topbar">
+        <a class="topbar-brand" href="/">wopa<span>Travel</span><small>ADMIN</small></a>
+        <div class="topbar-actions"><span id="admin-user"></span><button id="logout-button" class="button button-quiet" type="button">Cerrar sesión</button></div>
+      </header>
+      <div class="workspace">
+        <aside class="sidebar" aria-label="Navegación administrativa">
+          <button class="nav-tab active" data-view="resumen" type="button">Resumen</button>
+          <button class="nav-tab" data-view="reservas" type="button">Reservas</button>
+          <button class="nav-tab" data-view="cotizaciones" type="button">Cotizaciones</button>
+          <button class="nav-tab" data-view="contactos" type="button">Mensajes</button>
+          <button class="nav-tab" data-view="finanzas" type="button">Finanzas</button>
+          <button class="nav-tab" data-view="catalogo" type="button">Catálogo</button>
+        </aside>
+
+        <div class="content-area">
+          <section id="view-resumen" class="admin-view">
+            <div class="page-heading"><div><p class="eyebrow">OPERACIÓN WOPA TRAVEL</p><h1>Resumen</h1><p>Solicitudes y control financiero de la agencia.</p></div><button class="button button-primary" data-download-report type="button">Descargar informe Excel</button></div>
+            <div id="summary-grid" class="summary-grid"></div>
+            <section class="panel"><div class="panel-heading"><h2>Actividad reciente</h2><button class="button button-quiet" data-view-link="reservas" type="button">Ver reservas</button></div><div id="recent-reservations" class="table-wrap"></div></section>
+          </section>
+
+          <section id="view-reservas" class="admin-view" hidden>
+            <div class="page-heading"><div><p class="eyebrow">HOSPEDAJE</p><h1>Solicitudes de reserva</h1><p>Verifica fechas y disponibilidad con el aliado antes de confirmar.</p></div><button class="button button-primary" data-download-report type="button">Descargar Excel</button></div>
+            <div id="reservations-table" class="panel table-wrap"></div>
+          </section>
+
+          <section id="view-cotizaciones" class="admin-view" hidden>
+            <div class="page-heading"><div><p class="eyebrow">PROPUESTAS DE VIAJE</p><h1>Cotizaciones</h1><p>Seguimiento a combinaciones de hospedaje, tours e itinerarios.</p></div></div>
+            <div id="quotes-table" class="panel table-wrap"></div>
+          </section>
+
+          <section id="view-contactos" class="admin-view" hidden>
+            <div class="page-heading"><div><p class="eyebrow">ATENCIÓN AL CLIENTE</p><h1>Mensajes</h1><p>Gestiona consultas recibidas desde la web.</p></div></div>
+            <div id="contacts-table" class="panel table-wrap"></div>
+          </section>
+
+          <section id="view-finanzas" class="admin-view" hidden>
+            <div class="page-heading"><div><p class="eyebrow">CONTROL FINANCIERO</p><h1>Ingresos y gastos</h1><p>La utilidad refleja únicamente movimientos registrados en este panel.</p></div><button class="button button-primary" data-download-report type="button">Descargar informe Excel</button></div>
+            <div id="finance-summary" class="summary-grid"></div>
+            <form id="movement-form" class="panel movement-form">
+              <h2>Registrar movimiento</h2>
+              <div class="form-grid">
+                <label>Tipo<select name="tipo" required><option value="ingreso">Ingreso</option><option value="egreso">Gasto</option></select></label>
+                <label>Categoría<input name="categoria" maxlength="100" required placeholder="Transporte, comisión..." /></label>
+                <label>Descripción<input name="descripcion" maxlength="500" required /></label>
+                <label>Monto USD<input name="montoUsd" type="number" min="0.01" step="0.01" required /></label>
+                <label>Fecha<input name="fecha" type="date" required /></label>
+              </div>
+              <button class="button button-primary" type="submit">Guardar movimiento</button><p class="status" role="status"></p>
+            </form>
+            <div id="movements-table" class="panel table-wrap"></div>
+          </section>
+
+          <section id="view-catalogo" class="admin-view" hidden>
+            <div class="page-heading"><div><p class="eyebrow">PRODUCTOS</p><h1>Catálogo</h1><p>Actualiza tarifas aliadas y contenido de experiencias.</p></div></div>
+            <form id="new-hotel-form" class="panel movement-form">
+              <h2>Añadir hotel aliado</h2>
+              <div class="form-grid">
+                <label>Nombre<input name="nombre" required maxlength="160" /></label>
+                <label>Tarifa 1–2 personas (USD)<input name="precioDosUsd" type="number" min="0.01" step="0.01" required /></label>
+                <label>Tarifa 3–4 personas (USD)<input name="precioCuatroUsd" type="number" min="0.01" step="0.01" required /></label>
+                <label>Descripción<input name="descripcion" required maxlength="1000" /></label>
+                <label>Servicios separados por comas<input name="servicios" maxlength="800" /></label>
+              </div>
+              <button class="button button-primary" type="submit">Crear aliado</button><p class="status" role="status"></p>
+            </form>
+            <section class="panel"><h2>Ficha de hoteles aliados</h2><div id="hotels-admin-list" class="experiences-admin-list"></div></section>
+            <section class="panel"><h2>Tarifas de hoteles aliados</h2><div id="rates-table" class="table-wrap"></div></section>
+            <section class="panel"><h2>Experiencias y tours</h2>
+              <form id="new-experience-form" class="movement-form">
+                <h3>Añadir experiencia</h3>
+                <div class="form-grid">
+                  <label>Nombre<input name="nombre" required maxlength="140" /></label>
+                  <label>Categoría<input name="categoria" required maxlength="100" /></label>
+                  <label>Duración<input name="duracion" maxlength="100" /></label>
+                  <label>Precio USD (opcional)<input name="precioUsd" type="number" min="0.01" step="0.01" /></label>
+                  <label>La tarifa del tour es<select name="unidadPrecio"><option value="persona">Por persona</option><option value="grupo">Por grupo completo</option></select></label>
+                  <label>Imagen URL<input name="imagenUrl" maxlength="500" /></label>
+                  <label>Descripción<input name="descripcion" required maxlength="1000" /></label>
+                </div>
+                <button class="button button-primary" type="submit">Crear experiencia</button><p class="status" role="status"></p>
+              </form>
+              <div id="experiences-list" class="experiences-admin-list"></div>
+            </section>
+          </section>
+          <p id="global-status" class="global-status" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </div>
+
+    <dialog id="payment-dialog" class="dialog">
+      <form id="payment-form" method="dialog">
+        <h2>Registrar pago de hospedaje</h2>
+        <p id="payment-reservation-label"></p>
+        <input type="hidden" name="reservaId" />
+        <label>Monto recibido (USD)<input name="montoUsd" type="number" min="0.01" step="0.01" required /></label>
+        <label>Referencia de pago (opcional)<input name="referencia" maxlength="160" /></label>
+        <div class="dialog-actions"><button class="button button-quiet" value="cancel">Cancelar</button><button class="button button-primary" id="payment-submit" value="save">Guardar pago</button></div>
+        <p class="status" role="status"></p>
+      </form>
+    </dialog>
+    <script src="/js/admin.js"></script>
+  </body>
+</html>

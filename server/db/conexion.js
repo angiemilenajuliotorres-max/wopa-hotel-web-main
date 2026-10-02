@@ -32,6 +32,31 @@ function inicializarBaseDatos() {
     db.exec(sentencia);
   }
 
+  const asegurarColumna = (tabla, columna, definicion) => {
+    const columnas = db.prepare(`PRAGMA table_info(${tabla})`).all();
+    if (!columnas.some((item) => item.name === columna)) {
+      db.exec(`ALTER TABLE ${tabla} ADD COLUMN ${columna} ${definicion}`);
+    }
+  };
+
+  asegurarColumna("solicitudes_reserva", "nota_admin", "TEXT");
+  asegurarColumna("solicitudes_reserva", "monto_penalizacion_usd", "DECIMAL(10, 2) NOT NULL DEFAULT 0");
+  asegurarColumna("solicitudes_reserva", "fecha_cancelacion", "DATETIME");
+  asegurarColumna("solicitudes_reserva", "motivo_cancelacion", "TEXT");
+  asegurarColumna("solicitudes_cotizacion", "nota_admin", "TEXT");
+  asegurarColumna("solicitudes_cotizacion", "subtotal_experiencias_usd", "DECIMAL(10, 2)");
+  asegurarColumna("solicitudes_cotizacion", "unidad_experiencia", "TEXT");
+  asegurarColumna("solicitudes_cotizacion", "total_estimado_usd", "DECIMAL(10, 2)");
+  asegurarColumna("solicitudes_cotizacion", "cotizacion_completa", "INTEGER NOT NULL DEFAULT 0");
+  asegurarColumna("experiencias", "unidad_precio", "TEXT NOT NULL DEFAULT 'persona'");
+  asegurarColumna("mensajes_contacto", "nota_admin", "TEXT");
+
+  db.prepare(`
+    UPDATE hoteles
+    SET correo = ?
+    WHERE slug = 'wopa-travel-cartagena'
+  `).run("wondersofpty@gmail.com");
+
   console.log("✅ Base de datos inicializada correctamente");
 }
 

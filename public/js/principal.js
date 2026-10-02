@@ -139,6 +139,12 @@ function crearTarjetaExperiencia(experiencia) {
   contenido.append(crearTexto("span", "section-kicker", experiencia.categoria));
   contenido.append(crearTexto("h3", "", experiencia.nombre));
   contenido.append(crearTexto("p", "", experiencia.descripcion));
+  if (experiencia.precio_usd !== null && experiencia.precio_usd !== undefined) {
+    const unidad = experiencia.unidad_precio === "grupo" ? "por grupo" : "por persona";
+    contenido.append(crearTexto("strong", "experiencia-precio", `$${Number(experiencia.precio_usd).toFixed(2)} USD ${unidad}`));
+  } else {
+    contenido.append(crearTexto("small", "experiencia-duracion", "Precio pendiente de publicar"));
+  }
   contenido.append(crearTexto("small", "experiencia-duracion", `Duración estimada: ${experiencia.duracion || "por confirmar"}`));
   const enlace = document.createElement("a");
   enlace.className = "btn btn-outline";
@@ -181,10 +187,35 @@ async function enviarFormulario(formulario, endpoint) {
     if (!respuesta.ok || !resultado.ok) throw new Error(resultado.error || "No pudimos enviar la solicitud.");
     estado.classList.add("form-status-exito");
     estado.textContent = `${resultado.mensaje} Código: ${resultado.codigo}.`;
-    if (resultado.resumen?.subtotalUsd !== undefined) {
+    if (endpoint !== "/api/cotizaciones" && resultado.resumen?.subtotalUsd !== undefined) {
       estado.textContent += ` Estimado de hospedaje: $${resultado.resumen.subtotalUsd} USD; anticipo estimado: $${resultado.resumen.anticipoEstimadoUsd} USD.`;
-    } else if (resultado.resumen?.hospedajeEstimadoUsd !== undefined) {
+    } else if (endpoint !== "/api/cotizaciones" && resultado.resumen?.hospedajeEstimadoUsd !== undefined) {
       estado.textContent += ` Hospedaje estimado: $${resultado.resumen.hospedajeEstimadoUsd} USD; anticipo estimado: $${resultado.resumen.anticipoHospedajeEstimadoUsd} USD.`;
+    }
+    if (endpoint === "/api/cotizaciones") {
+      const resumen = resultado.resumen || {};
+      const formatoMonto = (valor) => valor === null || valor === undefined
+        ? "Pendiente"
+        : `$${Number(valor).toFixed(2)} USD`;
+      const lineas = [
+        `Hospedaje: ${formatoMonto(resumen.hospedajeEstimadoUsd)}.`,
+      ];
+      if (formulario.elements.experienciaId?.value) {
+        lineas.push(`Tour: ${formatoMonto(resumen.experienciasEstimadasUsd)}.`);
+      }
+      lineas.push(resultado.cotizacionCompleta
+        ? `Total automático: ${formatoMonto(resumen.totalEstimadoUsd)}.`
+        : `Subtotal de conceptos tarifados: ${formatoMonto(resumen.totalEstimadoUsd)}. Los productos sin precio no están incluidos.`);
+      lineas.push(`Anticipo estimado (25% del hospedaje): ${formatoMonto(resumen.anticipoHospedajeEstimadoUsd)}.`);
+      estado.append(document.createElement("br"), document.createTextNode(lineas.join(" ")));
+    }
+    if (endpoint === "/api/cotizaciones") {
+      const descarga = document.createElement("a");
+      descarga.className = "btn btn-primary quote-pdf-download";
+      descarga.href = `/api/cotizaciones/${encodeURIComponent(resultado.codigo)}/pdf`;
+      descarga.textContent = "Descargar cotización en PDF";
+      descarga.setAttribute("download", "");
+      estado.append(document.createElement("br"), descarga);
     }
     formulario.reset();
   } catch (error) {

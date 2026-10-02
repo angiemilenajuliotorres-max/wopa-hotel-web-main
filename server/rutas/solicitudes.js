@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const express = require("express");
+const PDFDocument = require("pdfkit");
 const db = require("../db/conexion");
 
 const router = express.Router();
@@ -27,7 +28,7 @@ function nochesEntre(entrada, salida) {
 }
 
 function codigo(prefijo) {
-  return `${prefijo}-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
+  return `${prefijo}-${crypto.randomBytes(8).toString("hex").toUpperCase()}`;
 }
 
 function errorValidacion(res, mensaje) {
@@ -37,7 +38,7 @@ function errorValidacion(res, mensaje) {
 router.get("/experiencias", (req, res) => {
   try {
     const experiencias = db.prepare(`
-      SELECT id, slug, nombre, categoria, descripcion, duracion, imagen_url
+      SELECT id, slug, nombre, categoria, descripcion, duracion, imagen_url, precio_usd, unidad_precio
       FROM experiencias
       WHERE activa = 1
       ORDER BY id
@@ -46,6 +47,114 @@ router.get("/experiencias", (req, res) => {
   } catch (error) {
     console.error("Error al consultar experiencias:", error);
     res.status(500).json({ ok: false, error: "No se pudieron consultar las experiencias." });
+  }
+});
+
+router.get("/cotizaciones/:codigo/pdf", (req, res) => {
+  const codigoCotizacion = texto(req.params.codigo, 32).toUpperCase();
+  if (!/^WOPA-C-[A-F0-9]{16}$/.test(codigoCotizacion)) {
+    return res.status(404).json({ ok: false, error: "No encontramos esa cotización." });
+  }
+
+  try {
+    const cotizacion = db.prepare(`
+      SELECT c.codigo, c.nombre, c.correo, c.telefono, c.numero_personas,
+        c.fecha_entrada, c.fecha_salida, c.notas, c.subtotal_hospedaje_usd,
+        c.anticipo_hospedaje_usd, c.subtotal_experiencias_usd, c.unidad_experiencia, c.total_estimado_usd,
+        c.cotizacion_completa, c.estado, c.created_at,
+        t.nombre AS hotel, e.nombre AS experiencia
+      FROM solicitudes_cotizacion c
+      LEFT JOIN tipos_habitacion t ON t.id = c.tipo_id
+      LEFT JOIN experiencias e ON e.id = c.experiencia_id
+      WHERE c.codigo = ?
+    `).get(codigoCotizacion);
+
+    if (!cotizacion) return res.status(404).json({ ok: false, error: "No encontramos esa cotización." });
+
+    const filename = `wopa-cotizacion-${cotizacion.codigo.toLowerCase()}.pdf`;
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.setHeader("Cache-Control", "private, no-store");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+
+    const pdf = new PDFDocument({ size: "A4", margin: 54, info: { Title: `Cotización WOPA Travel ${cotizacion.codigo}`, Author: "WOPA Travel" } });
+    pdf.on("error", (error) => {
+      console.error("Error al generar PDF de cotización:", error);
+      if (!res.headersSent) res.status(500).end();
+      else res.destroy(error);
+    });
+    pdf.pipe(res);
+
+    const verde = "147B68";
+    pdf.font("Helvetica-Bold").fontSize(25).fillColor("0D3B8F").text("wopa", { continued: true });
+    pdf.fillColor("DF4C91").text(" Travel");
+    pdf.moveDown(0.35);
+    pdf.font("Helvetica").fontSize(9).fillColor("62737A").text("AGENCIA DE VIAJES · PANAMÁ");
+    pdf.moveDown(1.5);
+    pdf.font("Helvetica-Bold").fontSize(21).fillColor("172C32").text(cotizacion.cotizacion_completa ? "Cotización automática" : "Estimado automático parcial");
+    pdf.moveDown(0.35);
+    pdf.font("Helvetica").fontSize(10).fillColor("62737A").text(`Código: ${cotizacion.codigo}    Estado: ${cotizacion.estado.replaceAll("_", " ")}`);
+    pdf.text(`Solicitada: ${cotizacion.created_at}`);
+    pdf.moveDown(1.2);
+
+    const seccion = (titulo) => {
+      pdf.font("Helvetica-Bold").fontSize(12).fillColor(verde).text(titulo);
+      pdf.moveDown(0.45);
+    };
+    const fila = (etiqueta, valor) => {
+      pdf.font("Helvetica-Bold").fontSize(10).fillColor("172C32").text(`${etiqueta}: `, { continued: true });
+      pdf.font("Helvetica").fillColor("34494F").text(String(valor || "Por definir"));
+      pdf.moveDown(0.4);
+    };
+
+    seccion("Datos del viajero");
+    fila("Nombre", cotizacion.nombre);
+    fila("Correo", cotizacion.correo);
+    fila("Teléfono", cotizacion.telefono);
+    fila("Viajeros", cotizacion.numero_personas);
+    pdf.moveDown(0.5);
+
+    seccion("Opciones solicitadas");
+    fila("Hotel aliado", cotizacion.hotel || "No solicitado");
+    fila("Experiencia / tour", cotizacion.experiencia || "No solicitado");
+    fila("Entrada", cotizacion.fecha_entrada || "Por definir");
+    fila("Salida", cotizacion.fecha_salida || "Por definir");
+    if (cotizacion.notas) fila("Preferencias", cotizacion.notas);
+    pdf.moveDown(0.5);
+
+    seccion("Desglose automático");
+    if (cotizacion.subtotal_hospedaje_usd !== null) {
+      pdf.font("Helvetica").fontSize(10).fillColor("34494F").text(`Hospedaje estimado: ${Number(cotizacion.subtotal_hospedaje_usd).toFixed(2)} USD`);
+      pdf.text(`Anticipo estimado (25% del hospedaje): ${Number(cotizacion.anticipo_hospedaje_usd).toFixed(2)} USD`);
+    } else {
+      pdf.font("Helvetica").fontSize(10).fillColor("34494F").text("Hospedaje: no solicitado.");
+    }
+    if (cotizacion.experiencia && cotizacion.subtotal_experiencias_usd !== null) {
+      pdf.text(`Experiencia (${cotizacion.unidad_experiencia === "persona" ? "por persona" : "precio por grupo"}): ${Number(cotizacion.subtotal_experiencias_usd).toFixed(2)} USD`);
+    } else if (cotizacion.experiencia) {
+      pdf.text("Experiencia: precio pendiente de publicar; no incluido en el estimado.");
+    }
+    if (cotizacion.total_estimado_usd !== null) {
+      pdf.moveDown(0.4);
+      pdf.font("Helvetica-Bold").fontSize(13).fillColor("147B68").text(`${cotizacion.cotizacion_completa ? "Total estimado" : "Subtotal estimado (sin componentes pendientes)"}: ${Number(cotizacion.total_estimado_usd).toFixed(2)} USD`);
+    }
+    pdf.moveDown(1.2);
+
+    pdf.roundedRect(54, pdf.y, 487, 93, 6).fill("F2F6F5");
+    pdf.fillColor("172C32").font("Helvetica-Bold").fontSize(10).text("Importante", 68, pdf.y + 13, { lineBreak: false });
+    pdf.font("Helvetica").fontSize(9).fillColor("455A5F").text(
+      "Cotización calculada automáticamente con las tarifas cargadas. Si es parcial, los productos sin precio publicado no están incluidos. No confirma disponibilidad ni reserva de hospedaje; esta se confirma al solicitar la reserva.",
+      68,
+      pdf.y + 31,
+      { width: 457, height: 55, lineGap: 2 },
+    );
+    pdf.moveDown(5.5);
+    pdf.font("Helvetica-Bold").fontSize(9).fillColor("0D3B8F").text("WOPA Travel · Tierras Altas, Chiriquí, Panamá");
+    pdf.font("Helvetica").fontSize(9).fillColor("62737A").text("wondersofpty@gmail.com · +507 6286-9154");
+    pdf.end();
+  } catch (error) {
+    console.error("Error al consultar cotización para PDF:", error);
+    if (!res.headersSent) res.status(500).json({ ok: false, error: "No se pudo generar el PDF de la cotización." });
   }
 });
 
@@ -136,8 +245,12 @@ router.post("/cotizaciones", (req, res) => {
   try {
     let totalHospedaje = null;
     let anticipoHospedaje = null;
+    let totalExperiencias = null;
+    let totalEstimado = 0;
+    let cotizacionCompleta = true;
+    const conceptosPendientes = [];
     if (tipoId) {
-      const aliado = db.prepare("SELECT id, capacidad_maxima FROM tipos_habitacion WHERE id = ?").get(tipoId);
+      const aliado = db.prepare("SELECT id, nombre, capacidad_maxima FROM tipos_habitacion WHERE id = ?").get(tipoId);
       if (!aliado || personas > aliado.capacidad_maxima) return errorValidacion(res, "Revisa el hotel aliado y la cantidad de personas.");
       const tarifa = db.prepare(`
         SELECT precio_usd FROM tarifas
@@ -147,26 +260,56 @@ router.post("/cotizaciones", (req, res) => {
       if (!tarifa) return errorValidacion(res, "No hay tarifa publicada para ese grupo; contáctanos para una cotización personalizada.");
       totalHospedaje = Math.round(Number(tarifa.precio_usd) * nochesEntre(entrada, salida) * 100) / 100;
       anticipoHospedaje = Math.round(totalHospedaje * 25) / 100;
+      totalEstimado += totalHospedaje;
     }
-    if (experienciaId && !db.prepare("SELECT id FROM experiencias WHERE id = ? AND activa = 1").get(experienciaId)) {
-      return errorValidacion(res, "La experiencia seleccionada ya no está disponible para cotizar.");
+    let experiencia = null;
+    if (experienciaId) {
+      experiencia = db.prepare(`
+        SELECT id, nombre, precio_usd, unidad_precio
+        FROM experiencias
+        WHERE id = ? AND activa = 1
+      `).get(experienciaId);
+      if (!experiencia) return errorValidacion(res, "La experiencia seleccionada ya no está disponible para cotizar.");
+      if (experiencia.precio_usd === null) {
+        cotizacionCompleta = false;
+        conceptosPendientes.push(`tour: ${experiencia.nombre}`);
+      } else {
+        const multiplicador = experiencia.unidad_precio === "persona" ? personas : 1;
+        totalExperiencias = Math.round(Number(experiencia.precio_usd) * multiplicador * 100) / 100;
+        totalEstimado += totalExperiencias;
+      }
     }
 
+    const totalEstimadoGuardado = totalHospedaje !== null || totalExperiencias !== null
+      ? Math.round(totalEstimado * 100) / 100
+      : null;
+    const estadoCotizacion = cotizacionCompleta ? "generada_automatica" : "estimado_parcial";
     const cotizacionCodigo = codigo("WOPA-C");
     db.prepare(`
       INSERT INTO solicitudes_cotizacion (
         codigo, nombre, correo, telefono, tipo_id, experiencia_id, numero_personas,
-        fecha_entrada, fecha_salida, notas, subtotal_hospedaje_usd, anticipo_hospedaje_usd
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        fecha_entrada, fecha_salida, notas, subtotal_hospedaje_usd, anticipo_hospedaje_usd,
+        subtotal_experiencias_usd, unidad_experiencia, total_estimado_usd, cotizacion_completa, estado
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(cotizacionCodigo, nombre, correo, telefono, tipoId, experienciaId, personas,
-      entrada || null, salida || null, notas || null, totalHospedaje, anticipoHospedaje);
+      entrada || null, salida || null, notas || null, totalHospedaje, anticipoHospedaje,
+      totalExperiencias, experiencia?.unidad_precio || null, totalEstimadoGuardado, cotizacionCompleta ? 1 : 0, estadoCotizacion);
 
     res.status(201).json({
       ok: true,
       codigo: cotizacionCodigo,
-      estado: "pendiente",
-      mensaje: "Recibimos tu solicitud de cotización. Te contactaremos para confirmar servicios, disponibilidad y precios finales.",
-      resumen: totalHospedaje === null ? null : { hospedajeEstimadoUsd: totalHospedaje, anticipoHospedajeEstimadoUsd: anticipoHospedaje },
+      estado: estadoCotizacion,
+      cotizacionCompleta,
+      conceptosPendientes,
+      mensaje: cotizacionCompleta
+        ? "Tu cotización automática está lista con las tarifas cargadas en el catálogo. La disponibilidad del hospedaje se confirma al solicitar la reserva."
+        : "Generamos automáticamente el estimado con los precios disponibles. Los productos sin tarifa publicada no se incluyen en el total.",
+      resumen: {
+        hospedajeEstimadoUsd: totalHospedaje,
+        experienciasEstimadasUsd: totalExperiencias,
+        totalEstimadoUsd: totalEstimadoGuardado,
+        anticipoHospedajeEstimadoUsd: anticipoHospedaje,
+      },
     });
   } catch (error) {
     console.error("Error al guardar solicitud de cotización:", error);

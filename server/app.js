@@ -77,9 +77,11 @@ app.get("/api/info", (req, res) => {
 // Rutas de API
 const habitacionesRouter = require("./rutas/habitaciones");
 const solicitudesRouter = require("./rutas/solicitudes");
+const adminRouter = require("./rutas/admin");
 
 app.use("/api/habitaciones", habitacionesRouter);
 app.use("/api", solicitudesRouter);
+app.use("/api/admin", adminRouter);
 
 // Servir archivos estáticos del frontend
 app.use(express.static(path.join(__dirname, "../public")));

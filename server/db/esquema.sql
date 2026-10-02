@@ -107,6 +107,7 @@ CREATE TABLE IF NOT EXISTS experiencias (
   duracion TEXT,
   imagen_url TEXT,
   precio_usd DECIMAL(10, 2),
+  unidad_precio TEXT NOT NULL DEFAULT 'persona' CHECK (unidad_precio IN ('persona', 'grupo')),
   activa INTEGER NOT NULL DEFAULT 1,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -127,6 +128,10 @@ CREATE TABLE IF NOT EXISTS solicitudes_reserva (
   anticipo_usd DECIMAL(10, 2) NOT NULL,
   solicitudes_especiales TEXT,
   estado TEXT NOT NULL DEFAULT 'pendiente_confirmacion',
+  nota_admin TEXT,
+  monto_penalizacion_usd DECIMAL(10, 2) NOT NULL DEFAULT 0,
+  fecha_cancelacion DATETIME,
+  motivo_cancelacion TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (tipo_id) REFERENCES tipos_habitacion(id)
 );
@@ -145,7 +150,12 @@ CREATE TABLE IF NOT EXISTS solicitudes_cotizacion (
   notas TEXT,
   subtotal_hospedaje_usd DECIMAL(10, 2),
   anticipo_hospedaje_usd DECIMAL(10, 2),
+  subtotal_experiencias_usd DECIMAL(10, 2),
+  unidad_experiencia TEXT,
+  total_estimado_usd DECIMAL(10, 2),
+  cotizacion_completa INTEGER NOT NULL DEFAULT 0,
   estado TEXT NOT NULL DEFAULT 'pendiente',
+  nota_admin TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (tipo_id) REFERENCES tipos_habitacion(id),
   FOREIGN KEY (experiencia_id) REFERENCES experiencias(id)
@@ -160,13 +170,29 @@ CREATE TABLE IF NOT EXISTS mensajes_contacto (
   asunto TEXT NOT NULL,
   mensaje TEXT NOT NULL,
   estado TEXT NOT NULL DEFAULT 'nuevo',
+  nota_admin TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS movimientos_financieros (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  tipo TEXT NOT NULL CHECK (tipo IN ('ingreso', 'egreso')),
+  categoria TEXT NOT NULL,
+  descripcion TEXT NOT NULL,
+  monto_usd DECIMAL(12, 2) NOT NULL CHECK (monto_usd > 0),
+  solicitud_reserva_id INTEGER,
+  fecha DATE NOT NULL DEFAULT (date('now')),
+  creado_por TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (solicitud_reserva_id) REFERENCES solicitudes_reserva(id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_solicitudes_reserva_fecha ON solicitudes_reserva(fecha_entrada, fecha_salida);
 CREATE INDEX IF NOT EXISTS idx_solicitudes_reserva_estado ON solicitudes_reserva(estado);
 CREATE INDEX IF NOT EXISTS idx_solicitudes_cotizacion_estado ON solicitudes_cotizacion(estado);
 CREATE INDEX IF NOT EXISTS idx_mensajes_contacto_estado ON mensajes_contacto(estado);
+CREATE INDEX IF NOT EXISTS idx_movimientos_tipo_fecha ON movimientos_financieros(tipo, fecha);
+CREATE INDEX IF NOT EXISTS idx_movimientos_reserva ON movimientos_financieros(solicitud_reserva_id);
 
 -- Índices para optimizar búsquedas
 CREATE INDEX IF NOT EXISTS idx_reservas_hotel ON reservas(hotel_id);

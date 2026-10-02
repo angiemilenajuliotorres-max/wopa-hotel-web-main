@@ -85,67 +85,39 @@ textarea {
 .logo {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 0.15rem;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .brand-wordmark {
-  position: relative;
   display: inline-flex;
   align-items: baseline;
-  gap: 0.1em;
+  gap: 0.16em;
+  white-space: nowrap;
+  font-family: "Trebuchet MS", "Arial Rounded MT Bold", sans-serif;
   font-weight: 900;
-  line-height: 0.8;
-  letter-spacing: -0.05em;
+  line-height: 1;
+  letter-spacing: 0;
   text-transform: lowercase;
-}
-
-.brand-wordmark::before {
-  content: "";
-  position: absolute;
-  left: -0.55rem;
-  top: 0.15rem;
-  width: 3.1rem;
-  height: 2rem;
-  border-radius: 46% 54% 52% 48% / 62% 38% 62% 38%;
-  background: var(--color-primario);
-  transform: rotate(-12deg);
-  box-shadow: 0 0 0 0.4rem rgba(13, 59, 143, 0.12);
-  z-index: -1;
-}
-
-.brand-wordmark::after {
-  content: "";
-  position: absolute;
-  right: -1.1rem;
-  top: 0.9rem;
-  width: 1.3rem;
-  height: 1.3rem;
-  border-radius: 50%;
-  background: var(--color-primario);
-  box-shadow: 0 0 0 0.3rem rgba(13, 59, 143, 0.08);
-  z-index: -1;
 }
 
 .brand-wordmark-wopa {
   color: var(--color-primario);
-  font-size: clamp(2rem, 3vw, 3.2rem);
-  text-shadow: 0 4px 14px rgba(13, 59, 143, 0.12);
+  font-size: 2.5rem;
 }
 
 .brand-wordmark-travel {
   color: var(--color-primario-2);
-  font-size: clamp(1.6rem, 2.4vw, 2.8rem);
+  font-size: 2.05rem;
   font-style: italic;
-  text-shadow: 0 4px 14px rgba(244, 58, 154, 0.18);
 }
 
 .tagline {
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   color: var(--color-texto-claro);
   margin: 0;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -1075,6 +1047,11 @@ textarea {
 .experiencia-duracion {
   color: var(--color-secundario);
   font-weight: 700;
+}
+
+.experiencia-precio {
+  color: var(--color-primario);
+  font-size: 0.95rem;
 }
 
 .experiencia-card-content .btn {
