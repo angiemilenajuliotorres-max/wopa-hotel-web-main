@@ -1,0 +1,106 @@
+{
+  "hero": {
+    "titulo": "Discover the Caribbean in Cartagena",
+    "subtitulo": "Luxury accommodations with sea views and world-class service",
+    "reservar": "Book Now"
+  },
+  "buscador": {
+    "titulo": "Find your perfect accommodation",
+    "entrada": "Check-in date",
+    "salida": "Check-out date",
+    "personas": "Number of guests",
+    "buscar": "Search"
+  },
+  "destacadas": {
+    "titulo": "Featured Accommodations"
+  },
+  "servicios": {
+    "titulo": "Our Services",
+    "playa": {
+      "titulo": "Beach Access",
+      "descripcion": "Accommodations with private beaches and direct access to the Caribbean"
+    },
+    "pago": {
+      "titulo": "Secure Payments",
+      "descripcion": "Safe transactions with Wompi and major credit cards"
+    },
+    "whatsapp": {
+      "titulo": "WhatsApp 24/7",
+      "descripcion": "Customer support via WhatsApp anytime"
+    },
+    "ubicacion": {
+      "titulo": "Historic Center",
+      "descripcion": "Located in the heart of Cartagena, a UNESCO World Heritage Site"
+    }
+  },
+  "ubicacion": {
+    "titulo": "Location",
+    "descripcion": "Cartagena de Indias, Colombia - UNESCO World Heritage Site"
+  },
+  "boton": {
+    "reservar": "Book",
+    "preguntar": "Ask",
+    "cancelar": "Cancel",
+    "pagar": "Pay",
+    "continuar": "Continue"
+  },
+  "whatsapp": {
+    "horario": "9:00 AM - 7:00 PM"
+  },
+  "footer": {
+    "descripcion": "Travel agency specializing in quality accommodations in Cartagena de Indias",
+    "enlaces": "Links",
+    "inicio": "Home",
+    "habitaciones": "Rooms",
+    "reservar": "Book",
+    "contacto": "Contact",
+    "legal": "Legal",
+    "terminos": "Terms and Conditions",
+    "privacidad": "Privacy Policy",
+    "cancelacion": "Cancellation Policy",
+    "copyright": "© 2026 OPPA. All rights reserved."
+  },
+  "reservar": {
+    "titulo": "Make a Reservation",
+    "paso1": "Dates and Guests",
+    "paso2": "Select Room",
+    "paso3": "Guest Information",
+    "paso4": "Payment Confirmation",
+    "fechaEntrada": "Check-in date",
+    "fechaSalida": "Check-out date",
+    "numeroPersonas": "Number of guests",
+    "nombre": "Full name",
+    "correo": "Email address",
+    "telefono": "Phone number",
+    "pais": "Country",
+    "solicitudesEspeciales": "Special requests",
+    "horaLlegada": "Estimated arrival time",
+    "subtotal": "Subtotal",
+    "impuesto": "Tax (19%)",
+    "total": "Total to pay",
+    "seleccionar": "Select this room"
+  },
+  "contacto": {
+    "titulo": "Contact",
+    "nombre": "Name",
+    "correo": "Email address",
+    "telefono": "Phone number",
+    "mensaje": "Message",
+    "enviar": "Send message",
+    "telefono_label": "Contact phone",
+    "horario": "Hours of operation",
+    "redes": "Follow us on social media"
+  },
+  "errores": {
+    "campoRequerido": "This field is required",
+    "correoInvalido": "Please enter a valid email",
+    "telefonoInvalido": "Please enter a valid phone number",
+    "fechasInvalidas": "Check-out date must be after check-in date",
+    "habitacionNoDisponible": "This room is not available for those dates"
+  },
+  "exito": {
+    "reservaConfirmada": "Reservation confirmed successfully",
+    "correoEnviado": "Confirmation email sent",
+    "numeroReserva": "Reservation number"
+  }
+}

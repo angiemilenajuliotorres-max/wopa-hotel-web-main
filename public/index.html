@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OPPA - Hospedajes en Cartagena de Indias</title>
+    <meta
+      name="description"
+      content="Agencia de viajes OPPA ofrece los mejores hospedajes en Cartagena de Indias con reservas en línea y pagos seguros."
+    />
+    <meta name="theme-color" content="#25A88A" />
+    <link rel="stylesheet" href="/css/estilos.css" />
+  </head>
+  <body>
+    <!-- Navegación -->
+    <nav class="navbar">
+      <div class="container">
+        <div class="navbar-content">
+          <div class="logo">
+            <h1>OPPA</h1>
+            <p class="tagline">Hospedajes en Cartagena</p>
+          </div>
+          <ul class="nav-links">
+            <li><a href="/" class="active">Inicio</a></li>
+            <li><a href="/habitaciones.html">Habitaciones</a></li>
+            <li><a href="/reservar.html">Reservar</a></li>
+            <li><a href="/contacto.html">Contacto</a></li>
+          </ul>
+          <div class="idioma-selector">
+            <button class="idioma-btn" data-idioma="es">ES</button>
+            <button class="idioma-btn" data-idioma="en">EN</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h2 data-i18n="hero.titulo">Descubre el Caribe en Cartagena</h2>
+        <p data-i18n="hero.subtitulo">
+          Hospedajes de lujo con vistas al mar y servicios de clase mundial
+        </p>
+        <a href="/reservar.html" class="btn btn-primary" data-i18n="hero.reservar"
+          >Reservar Ahora</a
+        >
+      </div>
+      <div class="hero-image">
+        <img
+          src="https://via.placeholder.com/600x400/25A88A/FFFFFF?text=Cartagena"
+          alt="Cartagena de Indias"
+          loading="lazy"
+        />
+      </div>
+    </section>
+
+    <!-- Buscador Rápido -->
+    <section class="buscador">
+      <div class="container">
+        <h3 data-i18n="buscador.titulo">Busca tu hospedaje perfecto</h3>
+        <form id="formulario-buscador" class="buscador-form">
+          <div class="form-group">
+            <label for="fecha-entrada" data-i18n="buscador.entrada"
+              >Entrada</label
+            >
+            <input type="date" id="fecha-entrada" required />
+          </div>
+          <div class="form-group">
+            <label for="fecha-salida" data-i18n="buscador.salida"
+              >Salida</label
+            >
+            <input type="date" id="fecha-salida" required />
+          </div>
+          <div class="form-group">
+            <label for="numero-personas" data-i18n="buscador.personas"
+              >Personas</label
+            >
+            <select id="numero-personas" required>
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary" data-i18n="buscador.buscar">
+            Buscar
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Habitaciones Destacadas -->
+    <section class="habitaciones-destacadas">
+      <div class="container">
+        <h2 data-i18n="destacadas.titulo">Hospedajes Destacados</h2>
+        <div id="habitaciones-list" class="habitaciones-grid">
+          <!-- Se llena con JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Servicios -->
+    <section class="servicios">
+      <div class="container">
+        <h2 data-i18n="servicios.titulo">Nuestros Servicios</h2>
+        <div class="servicios-grid">
+          <div class="servicio-card">
+            <div class="servicio-icon">🏖️</div>
+            <h3 data-i18n="servicios.playa.titulo">Acceso a Playa</h3>
+            <p data-i18n="servicios.playa.descripcion">
+              Hospedajes con playas privadas y acceso directo al Caribe
+            </p>
+          </div>
+          <div class="servicio-card">
+            <div class="servicio-icon">💳</div>
+            <h3 data-i18n="servicios.pago.titulo">Pagos Seguros</h3>
+            <p data-i18n="servicios.pago.descripcion">
+              Transacciones seguras con Wompi y principales tarjetas de crédito
+            </p>
+          </div>
+          <div class="servicio-card">
+            <div class="servicio-icon">📱</div>
+            <h3 data-i18n="servicios.whatsapp.titulo">WhatsApp 24/7</h3>
+            <p data-i18n="servicios.whatsapp.descripcion">
+              Soporte por WhatsApp en cualquier momento
+            </p>
+          </div>
+          <div class="servicio-card">
+            <div class="servicio-icon">🗺️</div>
+            <h3 data-i18n="servicios.ubicacion.titulo">Centro Histórico</h3>
+            <p data-i18n="servicios.ubicacion.descripcion">
+              Ubicados en el corazón de Cartagena, patrimonio de la humanidad
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ubicación -->
+    <section class="ubicacion">
+      <div class="container">
+        <h2 data-i18n="ubicacion.titulo">Ubicación</h2>
+        <p data-i18n="ubicacion.descripcion">
+          Cartagena de Indias, Colombia - Patrimonio de la Humanidad
+        </p>
+        <iframe
+          class="mapa"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3925.833247876542!2d-75.51111!3d10.39972!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8ef5277a6e6e6e6d%3A0x1234567890123456!2sCartagena%20de%20Indias!5e0!3m2!1ses!2sco!4v1234567890"
+          width="100%"
+          height="400"
+          style="border: 0"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </div>
+    </section>
+
+    <!-- Botón flotante de WhatsApp -->
+    <div id="whatsapp-btn" class="whatsapp-flotante">
+      <a href="https://wa.me/50762869154?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20los%20hospedajes"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        💬 WhatsApp
+      </a>
+      <p class="whatsapp-horario" data-i18n="whatsapp.horario">
+        9:00 AM - 7:00 PM
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h4>OPPA</h4>
+            <p data-i18n="footer.descripcion">
+              Agencia de viajes especializada en hospedajes de calidad en
+              Cartagena de Indias
+            </p>
+          </div>
+          <div class="footer-section">
+            <h4 data-i18n="footer.enlaces">Enlaces</h4>
+            <ul>
+              <li><a href="/" data-i18n="footer.inicio">Inicio</a></li>
+              <li>
+                <a href="/habitaciones.html" data-i18n="footer.habitaciones"
+                  >Habitaciones</a
+                >
+              </li>
+              <li><a href="/reservar.html" data-i18n="footer.reservar">Reservar</a></li>
+              <li>
+                <a href="/contacto.html" data-i18n="footer.contacto">Contacto</a>
+              </li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4 data-i18n="footer.contacto">Contacto</h4>
+            <p>📧 reservas@oppa.com</p>
+            <p>📱 +507 6286-9154</p>
+            <p>📍 Cartagena de Indias, Colombia</p>
+          </div>
+          <div class="footer-section">
+            <h4 data-i18n="footer.legal">Legal</h4>
+            <ul>
+              <li>
+                <a href="/legal/terminos.html" data-i18n="footer.terminos"
+                  >Términos y Condiciones</a
+                >
+              </li>
+              <li>
+                <a href="/legal/privacidad.html" data-i18n="footer.privacidad"
+                  >Política de Privacidad</a
+                >
+              </li>
+              <li>
+                <a href="/legal/cancelacion.html" data-i18n="footer.cancelacion"
+                  >Política de Cancelación</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p data-i18n="footer.copyright">
+            &copy; 2026 OPPA. Todos los derechos reservados.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/js/idioma.js"></script>
+    <script src="/js/principal.js"></script>
+  </body>
+</html>

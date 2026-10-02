@@ -1,0 +1,106 @@
+{
+  "hero": {
+    "titulo": "Descubre el Caribe en Cartagena",
+    "subtitulo": "Hospedajes de lujo con vistas al mar y servicios de clase mundial",
+    "reservar": "Reservar Ahora"
+  },
+  "buscador": {
+    "titulo": "Busca tu hospedaje perfecto",
+    "entrada": "Fecha de entrada",
+    "salida": "Fecha de salida",
+    "personas": "Número de personas",
+    "buscar": "Buscar"
+  },
+  "destacadas": {
+    "titulo": "Hospedajes Destacados"
+  },
+  "servicios": {
+    "titulo": "Nuestros Servicios",
+    "playa": {
+      "titulo": "Acceso a Playa",
+      "descripcion": "Hospedajes con playas privadas y acceso directo al Caribe"
+    },
+    "pago": {
+      "titulo": "Pagos Seguros",
+      "descripcion": "Transacciones seguras con Wompi y principales tarjetas de crédito"
+    },
+    "whatsapp": {
+      "titulo": "WhatsApp 24/7",
+      "descripcion": "Soporte por WhatsApp en cualquier momento"
+    },
+    "ubicacion": {
+      "titulo": "Centro Histórico",
+      "descripcion": "Ubicados en el corazón de Cartagena, patrimonio de la humanidad"
+    }
+  },
+  "ubicacion": {
+    "titulo": "Ubicación",
+    "descripcion": "Cartagena de Indias, Colombia - Patrimonio de la Humanidad"
+  },
+  "boton": {
+    "reservar": "Reservar",
+    "preguntar": "Preguntar",
+    "cancelar": "Cancelar",
+    "pagar": "Pagar",
+    "continuar": "Continuar"
+  },
+  "whatsapp": {
+    "horario": "9:00 AM - 7:00 PM"
+  },
+  "footer": {
+    "descripcion": "Agencia de viajes especializada en hospedajes de calidad en Cartagena de Indias",
+    "enlaces": "Enlaces",
+    "inicio": "Inicio",
+    "habitaciones": "Habitaciones",
+    "reservar": "Reservar",
+    "contacto": "Contacto",
+    "legal": "Legal",
+    "terminos": "Términos y Condiciones",
+    "privacidad": "Política de Privacidad",
+    "cancelacion": "Política de Cancelación",
+    "copyright": "© 2026 OPPA. Todos los derechos reservados."
+  },
+  "reservar": {
+    "titulo": "Realizar Reserva",
+    "paso1": "Fechas y Personas",
+    "paso2": "Seleccionar Habitación",
+    "paso3": "Datos del Huésped",
+    "paso4": "Confirmación de Pago",
+    "fechaEntrada": "Fecha de entrada",
+    "fechaSalida": "Fecha de salida",
+    "numeroPersonas": "Número de personas",
+    "nombre": "Nombre completo",
+    "correo": "Correo electrónico",
+    "telefono": "Teléfono",
+    "pais": "País",
+    "solicitudesEspeciales": "Solicitudes especiales",
+    "horaLlegada": "Hora estimada de llegada",
+    "subtotal": "Subtotal",
+    "impuesto": "Impuesto (19%)",
+    "total": "Total a pagar",
+    "seleccionar": "Seleccionar esta habitación"
+  },
+  "contacto": {
+    "titulo": "Contacto",
+    "nombre": "Nombre",
+    "correo": "Correo electrónico",
+    "telefono": "Teléfono",
+    "mensaje": "Mensaje",
+    "enviar": "Enviar mensaje",
+    "telefono_label": "Teléfono de contacto",
+    "horario": "Horario de atención",
+    "redes": "Síguenos en redes sociales"
+  },
+  "errores": {
+    "campoRequerido": "Este campo es requerido",
+    "correoInvalido": "Ingresa un correo válido",
+    "telefonoInvalido": "Ingresa un teléfono válido",
+    "fechasInvalidas": "La fecha de salida debe ser posterior a la de entrada",
+    "habitacionNoDisponible": "Esta habitación no está disponible para esas fechas"
+  },
+  "exito": {
+    "reservaConfirmada": "Reserva confirmada exitosamente",
+    "correoEnviado": "Correo de confirmación enviado",
+    "numeroReserva": "Número de reserva"
+  }
+}
