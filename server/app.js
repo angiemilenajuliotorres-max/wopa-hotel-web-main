@@ -84,6 +84,10 @@ app.get("/api/info", (req, res) => {
 const habitacionesRouter = require("./rutas/habitaciones");
 const solicitudesRouter = require("./rutas/solicitudes");
 const adminRouter = require("./rutas/admin");
+app.get("/api/admin/test", (req, res) => {
+  res.json({ ok: true, mensaje: "ADMIN funciona" });
+});
+
 
 app.use("/api/habitaciones", habitacionesRouter);
 app.use("/api", solicitudesRouter);
