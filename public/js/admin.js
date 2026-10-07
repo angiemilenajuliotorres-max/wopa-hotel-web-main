@@ -124,7 +124,7 @@ async function cargarResumen() {
     celda(row, money.format(item.subtotal_usd));
     return row;
   });
-  tabla(document.getElementById("recent-reservations"), ["Código", "Cliente", "Hotel aliado", "Entrada", "Estado", "Total"], rows);
+  tabla(document.getElementById("recent-reservations"), ["Código", "Cliente", "Opción de viaje", "Entrada", "Estado", "Total"], rows);
 }
 
 async function cargarReservas() {
@@ -169,7 +169,7 @@ async function cargarReservas() {
     actions.append(controls);
     return row;
   });
-  tabla(document.getElementById("reservations-table"), ["Código", "Cliente", "Hotel", "Fechas / grupo", "Importes", "Estado", "Acciones"], rows);
+  tabla(document.getElementById("reservations-table"), ["Código", "Cliente", "Opción", "Fechas / grupo", "Importes", "Estado", "Acciones"], rows);
 }
 
 function abrirPago(reserva) {
@@ -306,7 +306,7 @@ async function cargarCatalogo() {
           method: "PUT", headers: { "Content-Type": "application/json" },
           body: JSON.stringify(Object.fromEntries(new FormData(form).entries())),
         });
-        mensajeGlobal("Ficha del hotel aliado actualizada.");
+        mensajeGlobal("Ficha de la opción de viaje actualizada.");
       } catch (error) { mensajeGlobal(error.message, true); }
     });
     return form;
@@ -341,7 +341,7 @@ async function cargarCatalogo() {
       rateRows.push(row);
     }
   }
-  tabla(document.getElementById("rates-table"), ["Hotel aliado", "Temporada", "Capacidad", "Precio USD / noche", "Acción"], rateRows);
+  tabla(document.getElementById("rates-table"), ["Opción de viaje", "Temporada", "Capacidad", "Precio USD / noche", "Acción"], rateRows);
 
   const list = document.getElementById("experiences-list");
   const forms = data.experiencias.map((experience) => {
@@ -416,7 +416,9 @@ async function cargarVista(view) {
 
 async function descargarInforme() {
   try {
-    const response = await fetch("/api/admin/informe.xlsx", { credentials: "same-origin" });
+    const semana = document.getElementById("report-week").value;
+    if (!semana) throw new Error("Selecciona la semana que quieres incluir en el informe.");
+    const response = await fetch(`/api/admin/informe.xlsx?semana=${encodeURIComponent(semana)}`, { credentials: "same-origin" });
     if (response.status === 401) { mostrarLogin(); throw new Error("Inicia sesión para descargar el informe."); }
     if (!response.ok) {
       const error = await response.json();
@@ -425,10 +427,10 @@ async function descargarInforme() {
     const blob = await response.blob();
     const link = elemento("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `wopa-informe-${new Date().toISOString().slice(0, 10)}.xlsx`;
+    link.download = `wopa-informe-${semana}.xlsx`;
     link.click();
-    URL.revokeObjectURL(link.href);
-    mensajeGlobal("Informe Excel descargado.");
+    setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+    mensajeGlobal(`Informe semanal ${semana} descargado.`);
   } catch (error) { mensajeGlobal(error.message, true); }
 }
 
@@ -468,7 +470,7 @@ document.getElementById("movement-form").addEventListener("submit", async (event
 });
 
 for (const [formId, endpoint, successMessage] of [
-  ["new-hotel-form", "/api/admin/hoteles", "Hotel aliado creado con sus dos tarifas."],
+  ["new-hotel-form", "/api/admin/hoteles", "Opción de viaje creada con sus dos tarifas."],
   ["new-experience-form", "/api/admin/experiencias", "Experiencia creada."],
 ]) {
   document.getElementById(formId).addEventListener("submit", async (event) => {
@@ -502,6 +504,15 @@ document.getElementById("payment-form").addEventListener("submit", async (event)
 
 document.addEventListener("DOMContentLoaded", async () => {
   document.querySelectorAll("input[type='date']").forEach((input) => { if (!input.value) input.value = new Date().toISOString().slice(0, 10); });
+  const reportWeek = document.getElementById("report-week");
+  if (reportWeek && !reportWeek.value) {
+    const thursday = new Date();
+    thursday.setHours(0, 0, 0, 0);
+    thursday.setDate(thursday.getDate() + 4 - (thursday.getDay() || 7));
+    const yearStart = new Date(thursday.getFullYear(), 0, 1);
+    const week = Math.ceil(((thursday - yearStart) / 86400000 + 1) / 7);
+    reportWeek.value = `${thursday.getFullYear()}-W${String(week).padStart(2, "0")}`;
+  }
   try {
     const result = await api("/api/admin/me");
     mostrarPanel(result.usuario);

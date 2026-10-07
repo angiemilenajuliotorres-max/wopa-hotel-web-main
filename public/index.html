@@ -6,7 +6,7 @@
     <title>WOPA Travel | Agencia de viajes Panamá</title>
     <meta
       name="description"
-      content="WOPA Travel es una agencia de viajes en Panamá que te ayuda a viajar a Cartagena con hoteles aliados y opciones de alojamiento para cada estilo de viaje."
+      content="WOPA Travel es una agencia de viajes en Panamá que te ayuda a diseñar experiencias y opciones de viaje en Cartagena para cada estilo de viaje."
     />
     <meta name="theme-color" content="#25A88A" />
     <link rel="stylesheet" href="/css/estilos.css" />
@@ -25,7 +25,7 @@
           </div>
           <ul class="nav-links">
             <li><a href="/" class="active">Inicio</a></li>
-            <li><a href="#destacadas">Hoteles aliados</a></li>
+            <li><a href="#destacadas">Opciones de viaje</a></li>
             <li><a href="#reserva">Reservar</a></li>
             <li><a href="#experiencias">Tours</a></li>
             <li><a href="#cotizacion">Cotizar</a></li>
@@ -46,14 +46,14 @@
         <h2 data-i18n="hero.titulo">Descubre Cartagena con WOPA Travel</h2>
         <p class="hero-slogan" data-i18n="hero.slogan">Tu viaje a Cartagena, sin complicaciones.</p>
         <p data-i18n="hero.subtitulo">
-          Te ayudamos a elegir entre hoteles aliados y experiencias de viaje para vivir Cartagena a tu manera.
+          Te ayudamos a elegir entre opciones de viaje y experiencias para vivir Cartagena a tu manera.
         </p>
         <div class="hero-actions">
           <a href="#reserva" class="btn btn-primary" data-i18n="hero.reservar"
             >Explorar destinos</a
           >
           <a href="#destacadas" class="btn btn-outline" data-i18n="hero.verhoteles"
-            >Ver hoteles</a
+            >Ver opciones</a
           >
         </div>
         <div class="hero-metrics">
@@ -108,7 +108,7 @@
           <article class="beneficio-card">
             <div class="beneficio-icon">✨</div>
             <h3>Selección curada</h3>
-            <p>Hoteles aliados en Cartagena con calidad, estilo y buena ubicación.</p>
+            <p>Opciones de viaje en Cartagena con calidad, estilo y buena ubicación.</p>
           </article>
           <article class="beneficio-card">
             <div class="beneficio-icon">🧳</div>
@@ -124,13 +124,44 @@
       </div>
     </section>
 
-    <!-- Habitaciones Destacadas -->
+    <!-- Opciones Destacadas -->
     <section id="destacadas" class="habitaciones-destacadas">
       <div class="container">
-        <h2 data-i18n="destacadas.titulo">Elige entre nuestros hoteles aliados</h2>
+        <h2 data-i18n="destacadas.titulo">Elige la mejor opción para tu viaje</h2>
         <div id="habitaciones-list" class="habitaciones-grid">
           <!-- Se llena con JavaScript -->
         </div>
+      </div>
+    </section>
+
+    <section class="tarifas-referencia">
+      <div class="container">
+        <div class="section-intro">
+          <span>HOSPEDAJES EN CARTAGENA</span>
+          <h2>Tarifas de referencia por noche en USD</h2>
+        </div>
+        <div class="table-wrap">
+          <table class="tabla-precios">
+            <thead>
+              <tr>
+                <th>Hotel</th>
+                <th>1–2 personas</th>
+                <th>3–4 personas</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Hotel La Casona de Getsemaní</td><td>$60</td><td>$90</td></tr>
+              <tr><td>Hotel Marina Suites by GEH Suites</td><td>$60</td><td>$280</td></tr>
+              <tr><td>Hotel Dorado Centro Histórico</td><td>$60</td><td>$80</td></tr>
+              <tr><td>Wala Hotel and Beach Club Bocagrande</td><td>$120</td><td>$200</td></tr>
+              <tr><td>Mintaka Hotel and Lounge</td><td>$50</td><td>$80</td></tr>
+              <tr><td>Hotel Aixo Suites by GEH Suites</td><td>$75</td><td>$110</td></tr>
+              <tr><td>Hotel Atlantic Luc</td><td>$110</td><td>$210</td></tr>
+              <tr><td>Hotel Regatta</td><td>$160</td><td>$240</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="politica-nota">Tarifas de referencia sujetas a disponibilidad, temporada y tipo de habitación. Se recomienda confirmar la tarifa vigente antes de cerrar la reserva.</p>
       </div>
     </section>
 
@@ -138,12 +169,12 @@
       <div class="container solicitud-layout">
         <div class="solicitud-intro">
           <span class="section-kicker">WOPA TRAVEL · CARTAGENA</span>
-          <h2>Solicita tu hospedaje</h2>
-          <p>Elige un hotel aliado y envíanos tus fechas. Confirmaremos disponibilidad y precio antes de confirmar o cobrar.</p>
-          <p class="politica-nota">El anticipo estimado es del 25% del hospedaje, sujeto a confirmación. La solicitud no confirma una reserva.</p>
+          <h2>Solicita tu viaje</h2>
+          <p>Elige la opción de viaje que mejor te convenga y envíanos tus fechas. Confirmaremos disponibilidad y precio antes de confirmar o cobrar.</p>
+          <p class="politica-nota">El anticipo estimado es del 25% del servicio, sujeto a confirmación. La solicitud no confirma una reserva.</p>
         </div>
         <form id="form-reserva" class="formulario-agencia">
-          <label>Hotel aliado<select name="tipoId" id="reserva-hotel" required></select></label>
+          <label>Opción de viaje<select name="tipoId" id="reserva-hotel" required></select></label>
           <div class="form-grid">
             <label>Entrada<input type="date" name="fechaEntrada" required /></label>
             <label>Salida<input type="date" name="fechaSalida" required /></label>
@@ -180,7 +211,7 @@
         </div>
         <form id="form-cotizacion" class="formulario-agencia">
           <div class="form-grid">
-            <label>Hotel aliado (opcional)<select name="tipoId" id="cotizacion-hotel"></select></label>
+            <label>Opción de viaje (opcional)<select name="tipoId" id="cotizacion-hotel"></select></label>
             <label>Experiencia / tour (opcional)<select name="experienciaId" id="cotizacion-experiencia"></select></label>
             <label>Entrada<input type="date" name="fechaEntrada" /></label>
             <label>Salida<input type="date" name="fechaSalida" /></label>
@@ -226,9 +257,9 @@
         <div class="servicios-grid">
           <div class="servicio-card">
             <div class="servicio-icon">🏖️</div>
-            <h3 data-i18n="servicios.playa.titulo">Hoteles con estilo</h3>
+            <h3 data-i18n="servicios.playa.titulo">Experiencias con estilo</h3>
             <p data-i18n="servicios.playa.descripcion">
-              Seleccionamos opciones de alojamiento en Cartagena con excelente ubicación y ambiente.
+              Diseñamos opciones de viaje en Cartagena con excelente ubicación, encanto y atención.
             </p>
           </div>
           <div class="servicio-card">
@@ -249,7 +280,7 @@
             <div class="servicio-icon">🗺️</div>
             <h3 data-i18n="servicios.ubicacion.titulo">Cartagena y más</h3>
             <p data-i18n="servicios.ubicacion.descripcion">
-              Viajes a Cartagena con hoteles aliados, cercanía a la historia y experiencia de destino.
+              Experiencias en Cartagena con cercanía a la historia y una propuesta de destino pensada para ti.
             </p>
           </div>
         </div>
@@ -296,7 +327,7 @@
           <div class="footer-section">
             <h4>WOPA Travel</h4>
             <p data-i18n="footer.descripcion">
-              Agencia de viajes en Panamá especializada en experiencias y hoteles aliados en Cartagena.
+              Agencia de viajes en Panamá especializada en experiencias y opciones de viaje en Cartagena.
             </p>
           </div>
           <div class="footer-section">
@@ -305,7 +336,7 @@
               <li><a href="/" data-i18n="footer.inicio">Inicio</a></li>
               <li>
                 <a href="#destacadas" data-i18n="footer.habitaciones"
-                  >Hoteles aliados</a
+                  >Opciones de viaje</a
                 >
               </li>
               <li><a href="#reserva" data-i18n="footer.reservar">Reservar</a></li>

@@ -187,12 +187,26 @@ CREATE TABLE IF NOT EXISTS movimientos_financieros (
   FOREIGN KEY (solicitud_reserva_id) REFERENCES solicitudes_reserva(id)
 );
 
+CREATE TABLE IF NOT EXISTS actividad_sitio (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  tipo_evento TEXT NOT NULL,
+  entidad TEXT NOT NULL,
+  codigo_entidad TEXT,
+  detalle TEXT,
+  estado_anterior TEXT,
+  estado_nuevo TEXT,
+  monto_usd DECIMAL(12, 2),
+  realizado_por TEXT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX IF NOT EXISTS idx_solicitudes_reserva_fecha ON solicitudes_reserva(fecha_entrada, fecha_salida);
 CREATE INDEX IF NOT EXISTS idx_solicitudes_reserva_estado ON solicitudes_reserva(estado);
 CREATE INDEX IF NOT EXISTS idx_solicitudes_cotizacion_estado ON solicitudes_cotizacion(estado);
 CREATE INDEX IF NOT EXISTS idx_mensajes_contacto_estado ON mensajes_contacto(estado);
 CREATE INDEX IF NOT EXISTS idx_movimientos_tipo_fecha ON movimientos_financieros(tipo, fecha);
 CREATE INDEX IF NOT EXISTS idx_movimientos_reserva ON movimientos_financieros(solicitud_reserva_id);
+CREATE INDEX IF NOT EXISTS idx_actividad_sitio_fecha ON actividad_sitio(created_at, tipo_evento);
 
 -- Índices para optimizar búsquedas
 CREATE INDEX IF NOT EXISTS idx_reservas_hotel ON reservas(hotel_id);

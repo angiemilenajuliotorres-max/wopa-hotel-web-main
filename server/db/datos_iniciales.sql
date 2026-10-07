@@ -18,36 +18,100 @@ VALUES (
 -- Insertar hoteles aliados para la agencia de viajes WOPA Travel
 
 -- Hotel La Casona de Getsemaní
-INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios)
-VALUES (1, 'Hotel La Casona de Getsemaní', 'Hotel boutique en el corazón del Getsemaní', 1, 4, 'WiFi, Aire acondicionado, Desayuno incluido, Minibar');
+INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios, imagen_url)
+VALUES (
+  1,
+  'Hotel La Casona de Getsemaní',
+  'Hotel boutique en el corazón del Getsemaní',
+  1,
+  4,
+  'WiFi, Aire acondicionado, Desayuno incluido, Minibar',
+  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80'
+);
 
 -- Hotel Marina Suites by GEH Suites
-INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios)
-VALUES (1, 'Hotel Marina Suites by GEH Suites', 'Suites modernas con vistas al mar', 1, 4, 'WiFi, TV cable, Piscina, Gimnasio, Restaurante');
+INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios, imagen_url)
+VALUES (
+  1,
+  'Hotel Marina Suites by GEH Suites',
+  'Suites modernas con vistas al mar',
+  1,
+  4,
+  'WiFi, TV cable, Piscina, Gimnasio, Restaurante',
+  'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=80'
+);
 
 -- Hotel Dorado Centro Histórico
-INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios)
-VALUES (1, 'Hotel Dorado Centro Histórico', 'Hotel en el corazón del centro histórico', 1, 4, 'WiFi, Aire acondicionado, Concierge 24/7, Parqueo');
+INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios, imagen_url)
+VALUES (
+  1,
+  'Hotel Dorado Centro Histórico',
+  'Hotel en el corazón del centro histórico',
+  1,
+  4,
+  'WiFi, Aire acondicionado, Concierge 24/7, Parqueo',
+  'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=1200&q=80'
+);
 
 -- Wala Hotel and Beach Club Bocagrande
-INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios)
-VALUES (1, 'Wala Hotel and Beach Club Bocagrande', 'Resort de lujo frente al mar en Bocagrande', 1, 4, 'WiFi, Piscina, Playa privada, Spa, Restaurante gourmet');
+INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios, imagen_url)
+VALUES (
+  1,
+  'Wala Hotel and Beach Club Bocagrande',
+  'Resort de lujo frente al mar en Bocagrande',
+  1,
+  4,
+  'WiFi, Piscina, Playa privada, Spa, Restaurante gourmet',
+  'https://images.unsplash.com/photo-1493558103817-58b2924b5713?auto=format&fit=crop&w=1200&q=80'
+);
 
 -- Mintaka Hotel and Lounge
-INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios)
-VALUES (1, 'Mintaka Hotel and Lounge', 'Opción económica y acogedora', 1, 4, 'WiFi, Aire acondicionado, Recepción 24/7, Terraza');
+INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios, imagen_url)
+VALUES (
+  1,
+  'Mintaka Hotel and Lounge',
+  'Opción económica y acogedora',
+  1,
+  4,
+  'WiFi, Aire acondicionado, Recepción 24/7, Terraza',
+  'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80'
+);
 
 -- Hotel Aixo Suites by GEH Suites
-INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios)
-VALUES (1, 'Hotel Aixo Suites by GEH Suites', 'Apartamentos amueblados con servicios hoteleros', 1, 4, 'WiFi, Cocina, Aire acondicionado, Parqueo, Lavandería');
+INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios, imagen_url)
+VALUES (
+  1,
+  'Hotel Aixo Suites by GEH Suites',
+  'Apartamentos amueblados con servicios hoteleros',
+  1,
+  4,
+  'WiFi, Cocina, Aire acondicionado, Parqueo, Lavandería',
+  'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80'
+);
 
 -- Hotel Atlantic Luc
-INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios)
-VALUES (1, 'Hotel Atlantic Luc', 'Hotel frente al mar con servicios de lujo', 1, 4, 'WiFi, Piscina, Playa privada, Restaurante, Gimnasio');
+INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios, imagen_url)
+VALUES (
+  1,
+  'Hotel Atlantic Luc',
+  'Hotel frente al mar con servicios de lujo',
+  1,
+  4,
+  'WiFi, Piscina, Playa privada, Restaurante, Gimnasio',
+  'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80'
+);
 
 -- Hotel Regatta
-INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios)
-VALUES (1, 'Hotel Regatta', 'Experiencia premium frente al Caribe', 1, 4, 'WiFi, Piscina infinita, Spa de lujo, Restaurante 5 estrellas, Concierge');
+INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios, imagen_url)
+VALUES (
+  1,
+  'Hotel Regatta',
+  'Experiencia premium frente al Caribe',
+  1,
+  4,
+  'WiFi, Piscina infinita, Spa de lujo, Restaurante 5 estrellas, Concierge',
+  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80'
+);
 
 -- Tarifas por noche en USD para cada hotel aliado, por 1-2 personas y 3-4 personas
 

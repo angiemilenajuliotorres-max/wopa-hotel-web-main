@@ -17,7 +17,7 @@ La base SQLite y el catálogo inicial se crean automáticamente al iniciar el se
 
 El panel permite revisar reservas, cotizaciones y mensajes; registrar pagos y gastos; actualizar las tarifas publicadas y gestionar tours. Para cada tour se puede configurar un precio por persona o un precio fijo por grupo. La cancelación registra como penalización el 100% de los pagos recibidos en esa reserva. No se crea un movimiento adicional por la penalización, para no duplicar ingresos.
 
-El informe descargable es un archivo `.xlsx` con resumen, reservas, cotizaciones, contactos y movimientos financieros. La utilidad neta se calcula a partir de ingresos y gastos registrados, por lo que no reemplaza la contabilidad fiscal.
+El informe descargable es un archivo `.xlsx` para la semana ISO seleccionada en el panel. Incluye resumen, bitácora de actividad, reservas recibidas, cancelaciones, cotizaciones, mensajes y movimientos financieros. La bitácora registra nuevas solicitudes, cambios de estado, cancelaciones, pagos y mantenimiento del catálogo; su historial comienza al activar esta versión, mientras que los registros anteriores conservan solo los estados y fechas que ya estaban guardados. El informe no mide visitas o navegación anónima. La utilidad neta se calcula a partir de ingresos y gastos registrados, por lo que no reemplaza la contabilidad fiscal.
 
 ## Solicitudes desde la web
 

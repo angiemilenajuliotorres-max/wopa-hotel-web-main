@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const express = require("express");
 const PDFDocument = require("pdfkit");
 const db = require("../db/conexion");
+const registrarActividad = require("../db/actividad");
 
 const router = express.Router();
 
@@ -200,14 +201,21 @@ router.post("/reservas", (req, res) => {
     const total = Math.round(Number(tarifa.precio_usd) * noches * 100) / 100;
     const anticipo = Math.round(total * 25) / 100;
     const reservaCodigo = codigo("WOPA-R");
-    db.prepare(`
+    const guardarReserva = db.transaction(() => {
+      db.prepare(`
       INSERT INTO solicitudes_reserva (
         codigo, tipo_id, nombre, correo, telefono, numero_personas,
         fecha_entrada, fecha_salida, noches, tarifa_noche_usd,
         subtotal_usd, anticipo_usd, solicitudes_especiales
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(reservaCodigo, tipoId, nombre, correo, telefono, personas, entrada, salida, noches,
-      tarifa.precio_usd, total, anticipo, especiales || null);
+      `).run(reservaCodigo, tipoId, nombre, correo, telefono, personas, entrada, salida, noches,
+        tarifa.precio_usd, total, anticipo, especiales || null);
+      registrarActividad({
+        tipoEvento: "reserva_solicitada", entidad: "reserva", codigoEntidad: reservaCodigo,
+        detalle: `Solicitud recibida para ${aliado.nombre}.`, estadoNuevo: "pendiente_confirmacion", montoUsd: total,
+      });
+    });
+    guardarReserva();
 
     res.status(201).json({
       ok: true,
@@ -285,15 +293,21 @@ router.post("/cotizaciones", (req, res) => {
       : null;
     const estadoCotizacion = cotizacionCompleta ? "generada_automatica" : "estimado_parcial";
     const cotizacionCodigo = codigo("WOPA-C");
-    db.prepare(`
+    db.transaction(() => {
+      db.prepare(`
       INSERT INTO solicitudes_cotizacion (
         codigo, nombre, correo, telefono, tipo_id, experiencia_id, numero_personas,
         fecha_entrada, fecha_salida, notas, subtotal_hospedaje_usd, anticipo_hospedaje_usd,
         subtotal_experiencias_usd, unidad_experiencia, total_estimado_usd, cotizacion_completa, estado
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(cotizacionCodigo, nombre, correo, telefono, tipoId, experienciaId, personas,
-      entrada || null, salida || null, notas || null, totalHospedaje, anticipoHospedaje,
-      totalExperiencias, experiencia?.unidad_precio || null, totalEstimadoGuardado, cotizacionCompleta ? 1 : 0, estadoCotizacion);
+      `).run(cotizacionCodigo, nombre, correo, telefono, tipoId, experienciaId, personas,
+        entrada || null, salida || null, notas || null, totalHospedaje, anticipoHospedaje,
+        totalExperiencias, experiencia?.unidad_precio || null, totalEstimadoGuardado, cotizacionCompleta ? 1 : 0, estadoCotizacion);
+      registrarActividad({
+        tipoEvento: "cotizacion_solicitada", entidad: "cotizacion", codigoEntidad: cotizacionCodigo,
+        detalle: "Solicitud de cotización recibida.", estadoNuevo: estadoCotizacion, montoUsd: totalEstimadoGuardado,
+      });
+    })();
 
     res.status(201).json({
       ok: true,
@@ -330,10 +344,16 @@ router.post("/contacto", (req, res) => {
 
   try {
     const contactoCodigo = codigo("WOPA-M");
-    db.prepare(`
+    db.transaction(() => {
+      db.prepare(`
       INSERT INTO mensajes_contacto (codigo, nombre, correo, telefono, asunto, mensaje)
       VALUES (?, ?, ?, ?, ?, ?)
-    `).run(contactoCodigo, nombre, correo, telefono || null, asunto, mensaje);
+      `).run(contactoCodigo, nombre, correo, telefono || null, asunto, mensaje);
+      registrarActividad({
+        tipoEvento: "mensaje_recibido", entidad: "contacto", codigoEntidad: contactoCodigo,
+        detalle: `Mensaje recibido: ${asunto}.`, estadoNuevo: "nuevo",
+      });
+    })();
     res.status(201).json({
       ok: true,
       codigo: contactoCodigo,

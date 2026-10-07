@@ -37,14 +37,18 @@
         </aside>
 
         <div class="content-area">
+          <div class="report-toolbar">
+            <label for="report-week">Semana del informe<input id="report-week" type="week" required /></label>
+            <button class="button button-primary" data-download-report type="button">Descargar informe semanal Excel</button>
+          </div>
           <section id="view-resumen" class="admin-view">
-            <div class="page-heading"><div><p class="eyebrow">OPERACIÓN WOPA TRAVEL</p><h1>Resumen</h1><p>Solicitudes y control financiero de la agencia.</p></div><button class="button button-primary" data-download-report type="button">Descargar informe Excel</button></div>
+            <div class="page-heading"><div><p class="eyebrow">OPERACIÓN WOPA TRAVEL</p><h1>Resumen</h1><p>Solicitudes y control financiero de la agencia.</p></div></div>
             <div id="summary-grid" class="summary-grid"></div>
             <section class="panel"><div class="panel-heading"><h2>Actividad reciente</h2><button class="button button-quiet" data-view-link="reservas" type="button">Ver reservas</button></div><div id="recent-reservations" class="table-wrap"></div></section>
           </section>
 
           <section id="view-reservas" class="admin-view" hidden>
-            <div class="page-heading"><div><p class="eyebrow">HOSPEDAJE</p><h1>Solicitudes de reserva</h1><p>Verifica fechas y disponibilidad con el aliado antes de confirmar.</p></div><button class="button button-primary" data-download-report type="button">Descargar Excel</button></div>
+            <div class="page-heading"><div><p class="eyebrow">HOSPEDAJE</p><h1>Solicitudes de reserva</h1><p>Verifica fechas y disponibilidad con el aliado antes de confirmar.</p></div></div>
             <div id="reservations-table" class="panel table-wrap"></div>
           </section>
 
@@ -59,7 +63,7 @@
           </section>
 
           <section id="view-finanzas" class="admin-view" hidden>
-            <div class="page-heading"><div><p class="eyebrow">CONTROL FINANCIERO</p><h1>Ingresos y gastos</h1><p>La utilidad refleja únicamente movimientos registrados en este panel.</p></div><button class="button button-primary" data-download-report type="button">Descargar informe Excel</button></div>
+            <div class="page-heading"><div><p class="eyebrow">CONTROL FINANCIERO</p><h1>Ingresos y gastos</h1><p>La utilidad refleja únicamente movimientos registrados en este panel.</p></div></div>
             <div id="finance-summary" class="summary-grid"></div>
             <form id="movement-form" class="panel movement-form">
               <h2>Registrar movimiento</h2>
@@ -76,9 +80,9 @@
           </section>
 
           <section id="view-catalogo" class="admin-view" hidden>
-            <div class="page-heading"><div><p class="eyebrow">PRODUCTOS</p><h1>Catálogo</h1><p>Actualiza tarifas aliadas y contenido de experiencias.</p></div></div>
+            <div class="page-heading"><div><p class="eyebrow">PRODUCTOS</p><h1>Catálogo</h1><p>Actualiza opciones de viaje y contenido de experiencias.</p></div></div>
             <form id="new-hotel-form" class="panel movement-form">
-              <h2>Añadir hotel aliado</h2>
+              <h2>Añadir opción de viaje</h2>
               <div class="form-grid">
                 <label>Nombre<input name="nombre" required maxlength="160" /></label>
                 <label>Tarifa 1–2 personas (USD)<input name="precioDosUsd" type="number" min="0.01" step="0.01" required /></label>
@@ -86,10 +90,10 @@
                 <label>Descripción<input name="descripcion" required maxlength="1000" /></label>
                 <label>Servicios separados por comas<input name="servicios" maxlength="800" /></label>
               </div>
-              <button class="button button-primary" type="submit">Crear aliado</button><p class="status" role="status"></p>
+              <button class="button button-primary" type="submit">Crear opción</button><p class="status" role="status"></p>
             </form>
-            <section class="panel"><h2>Ficha de hoteles aliados</h2><div id="hotels-admin-list" class="experiences-admin-list"></div></section>
-            <section class="panel"><h2>Tarifas de hoteles aliados</h2><div id="rates-table" class="table-wrap"></div></section>
+            <section class="panel"><h2>Ficha de opciones de viaje</h2><div id="hotels-admin-list" class="experiences-admin-list"></div></section>
+            <section class="panel"><h2>Tarifas de opciones de viaje</h2><div id="rates-table" class="table-wrap"></div></section>
             <section class="panel"><h2>Experiencias y tours</h2>
               <form id="new-experience-form" class="movement-form">
                 <h3>Añadir experiencia</h3>

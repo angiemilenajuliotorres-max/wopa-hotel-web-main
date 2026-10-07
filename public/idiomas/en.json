@@ -2,26 +2,26 @@
   "hero": {
     "titulo": "Discover Cartagena with WOPA Travel",
     "slogan": "Your Cartagena trip, without the hassle.",
-    "subtitulo": "Compare stays from our partner hotels and choose the one that best fits your Cartagena trip.",
+    "subtitulo": "Compare travel options and experiences to design the Cartagena trip that suits you best.",
     "reservar": "Explore destinations",
-    "verhoteles": "View hotels"
+    "verhoteles": "View options"
   },
   "buscador": {
-    "titulo": "Compare stays for your trip",
-    "descripcion": "Check nightly rates based on the number of guests.",
+    "titulo": "Compare trip options",
+    "descripcion": "Check availability and prices based on the number of guests.",
     "entrada": "Check-in date",
     "salida": "Check-out date",
     "personas": "Number of guests",
     "buscar": "View options"
   },
   "destacadas": {
-    "titulo": "Choose from our partner hotels"
+    "titulo": "Choose the best option for your trip"
   },
   "servicios": {
     "titulo": "Our services",
     "playa": {
-      "titulo": "Partner stays for every trip",
-      "descripcion": "We select accommodation options in Cartagena with excellent location and atmosphere"
+      "titulo": "Travel options for every trip",
+      "descripcion": "We design Cartagena experiences with comfort, style, and personal attention"
     },
     "pago": {
       "titulo": "Secure bookings",
@@ -33,7 +33,7 @@
     },
     "ubicacion": {
       "titulo": "Cartagena and beyond",
-      "descripcion": "Trips to Cartagena with partner hotels, historic charm, and destination experience"
+      "descripcion": "Travel experiences in Cartagena with history, charm, and destination expertise"
     }
   },
   "ubicacion": {
@@ -52,17 +52,17 @@
     "precio34": "3-4 guests",
     "noche": "per night",
     "consultar": "Ask us on WhatsApp",
-    "vacio": "There are no partner hotels to show right now.",
-    "error": "We could not load partner hotels. Please try again later."
+    "vacio": "There are no travel options available right now.",
+    "error": "We could not load the available travel options. Please try again later."
   },
   "whatsapp": {
     "horario": "9:00 AM - 7:00 PM"
   },
   "footer": {
-    "descripcion": "Panamanian travel agency specialized in experiences and partner hotels in Cartagena",
+    "descripcion": "Panamanian travel agency specialized in experiences and travel options in Cartagena",
     "enlaces": "Links",
     "inicio": "Home",
-    "habitaciones": "Hotels",
+    "habitaciones": "Trips",
     "reservar": "Book",
     "contacto": "Contact",
     "legal": "Legal",
@@ -74,7 +74,7 @@
   "reservar": {
     "titulo": "Make a Reservation",
     "paso1": "Dates and Guests",
-    "paso2": "Select Hotel",
+    "paso2": "Select option",
     "paso3": "Guest Information",
     "paso4": "Payment Confirmation",
     "fechaEntrada": "Check-in date",
@@ -89,7 +89,7 @@
     "subtotal": "Subtotal",
     "impuesto": "Tax (19%)",
     "total": "Total to pay",
-    "seleccionar": "Select this hotel"
+    "seleccionar": "Select this option"
   },
   "contacto": {
     "titulo": "Contact",
@@ -107,7 +107,7 @@
     "correoInvalido": "Please enter a valid email",
     "telefonoInvalido": "Please enter a valid phone number",
     "fechasInvalidas": "Check-out date must be after check-in date",
-    "habitacionNoDisponible": "This hotel is not available for those dates"
+    "habitacionNoDisponible": "This option is not available for those dates"
   },
   "exito": {
     "reservaConfirmada": "Reservation confirmed successfully",

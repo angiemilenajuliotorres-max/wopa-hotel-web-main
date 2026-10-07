@@ -2,26 +2,26 @@
   "hero": {
     "titulo": "Descubre Cartagena con WOPA Travel",
     "slogan": "Tu viaje a Cartagena, sin complicaciones.",
-    "subtitulo": "Compara opciones de hospedaje de nuestros hoteles aliados y elige la que mejor acompaña tu viaje a Cartagena.",
+    "subtitulo": "Compara opciones de viaje y experiencias para vivir Cartagena a tu manera.",
     "reservar": "Explorar destinos",
-    "verhoteles": "Ver hoteles"
+    "verhoteles": "Ver opciones"
   },
   "buscador": {
-    "titulo": "Compara opciones de hospedaje para tu viaje",
-    "descripcion": "Consulta las tarifas por noche según la cantidad de personas.",
+    "titulo": "Compara opciones para tu viaje",
+    "descripcion": "Consulta tarifas y disponibilidad según la cantidad de personas.",
     "entrada": "Fecha de entrada",
     "salida": "Fecha de salida",
     "personas": "Número de personas",
     "buscar": "Ver opciones"
   },
   "destacadas": {
-    "titulo": "Elige entre nuestros hoteles aliados"
+    "titulo": "Elige la mejor opción para tu viaje"
   },
   "servicios": {
     "titulo": "Nuestros servicios",
     "playa": {
-      "titulo": "Opciones aliadas para cada viaje",
-      "descripcion": "Seleccionamos opciones de alojamiento en Cartagena con excelente ubicación y ambiente"
+      "titulo": "Opciones para cada viaje",
+      "descripcion": "Diseñamos experiencias en Cartagena con estilo, comodidad y atención personalizada"
     },
     "pago": {
       "titulo": "Reservas seguras",
@@ -33,7 +33,7 @@
     },
     "ubicacion": {
       "titulo": "Cartagena y más",
-      "descripcion": "Viajes a Cartagena con hoteles aliados, cercanía a la historia y experiencia de destino"
+      "descripcion": "Experiencias en Cartagena con estilo, historia y recomendaciones de destino"
     }
   },
   "ubicacion": {
@@ -52,17 +52,17 @@
     "precio34": "3-4 personas",
     "noche": "por noche",
     "consultar": "Consultar por WhatsApp",
-    "vacio": "En este momento no hay hoteles aliados para mostrar.",
-    "error": "No pudimos cargar los hoteles aliados. Inténtalo nuevamente más tarde."
+    "vacio": "En este momento no hay opciones disponibles para mostrar.",
+    "error": "No pudimos cargar las opciones de viaje. Inténtalo nuevamente más tarde."
   },
   "whatsapp": {
     "horario": "9:00 AM - 7:00 PM"
   },
   "footer": {
-    "descripcion": "Agencia de viajes en Panamá especializada en experiencias y hoteles aliados en Cartagena",
+    "descripcion": "Agencia de viajes en Panamá especializada en experiencias y opciones de viaje en Cartagena",
     "enlaces": "Enlaces",
     "inicio": "Inicio",
-    "habitaciones": "Hoteles",
+    "habitaciones": "Viajes",
     "reservar": "Reservar",
     "contacto": "Contacto",
     "legal": "Legal",
@@ -74,7 +74,7 @@
   "reservar": {
     "titulo": "Realizar Reserva",
     "paso1": "Fechas y Personas",
-    "paso2": "Seleccionar Hotel",
+    "paso2": "Seleccionar opción",
     "paso3": "Datos del Huésped",
     "paso4": "Confirmación de Pago",
     "fechaEntrada": "Fecha de entrada",
@@ -89,7 +89,7 @@
     "subtotal": "Subtotal",
     "impuesto": "Impuesto (19%)",
     "total": "Total a pagar",
-    "seleccionar": "Seleccionar este hotel"
+    "seleccionar": "Seleccionar esta opción"
   },
   "contacto": {
     "titulo": "Contacto",
@@ -107,7 +107,7 @@
     "correoInvalido": "Ingresa un correo válido",
     "telefonoInvalido": "Ingresa un teléfono válido",
     "fechasInvalidas": "La fecha de salida debe ser posterior a la de entrada",
-    "habitacionNoDisponible": "Este hotel no está disponible para esas fechas"
+    "habitacionNoDisponible": "Esta opción no está disponible para esas fechas"
   },
   "exito": {
     "reservaConfirmada": "Reserva confirmada exitosamente",

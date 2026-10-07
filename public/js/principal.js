@@ -1,6 +1,17 @@
 const catalogo = document.getElementById("habitaciones-list");
 let hotelesAliados = [];
 
+const imagenesPorHotel = {
+  "Hotel La Casona de Getsemaní": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+  "Hotel Marina Suites by GEH Suites": "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=80",
+  "Hotel Dorado Centro Histórico": "https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=1200&q=80",
+  "Wala Hotel and Beach Club Bocagrande": "https://images.unsplash.com/photo-1493558103817-58b2924b5713?auto=format&fit=crop&w=1200&q=80",
+  "Mintaka Hotel and Lounge": "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80",
+  "Hotel Aixo Suites by GEH Suites": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+  "Hotel Atlantic Luc": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+  "Hotel Regatta": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80",
+};
+
 function textoCatalogo(clave, respaldo) {
   return window.obtenerTexto?.(`catalogo.${clave}`) || respaldo;
 }
@@ -26,7 +37,7 @@ function crearTarjeta(hotel) {
 
   const imagen = document.createElement("img");
   imagen.className = "habitacion-card-image";
-  imagen.src = hotel.imagen_url ||
+  imagen.src = hotel.imagen_url || imagenesPorHotel[hotel.nombre] ||
     "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=900&q=80";
   imagen.alt = hotel.nombre;
   imagen.loading = "lazy";
@@ -61,15 +72,6 @@ function crearTarjeta(hotel) {
     }
   }
 
-  if (hotel.servicios) {
-    const servicios = document.createElement("div");
-    servicios.className = "habitacion-card-servicios";
-    for (const servicio of hotel.servicios.split(",").map((item) => item.trim()).filter(Boolean)) {
-      servicios.append(crearTexto("span", "servicio-tag", servicio));
-    }
-    contenido.append(servicios);
-  }
-
   const acciones = document.createElement("div");
   acciones.className = "habitacion-card-botones";
   const consulta = document.createElement("a");
@@ -87,12 +89,12 @@ function crearTarjeta(hotel) {
 function renderizarHoteles() {
   if (!catalogo) return;
   if (!hotelesAliados.length) {
-    mostrarEstadoCatalogo("vacio", "En este momento no hay hoteles aliados para mostrar.");
+    mostrarEstadoCatalogo("vacio", "En este momento no hay opciones disponibles para mostrar.");
     return;
   }
   catalogo.replaceChildren(...hotelesAliados.map(crearTarjeta));
-  llenarSelector(document.getElementById("reserva-hotel"), hotelesAliados, "Selecciona un hotel aliado", false);
-  llenarSelector(document.getElementById("cotizacion-hotel"), hotelesAliados, "Sin hospedaje por ahora", true);
+  llenarSelector(document.getElementById("reserva-hotel"), hotelesAliados, "Selecciona una opción de viaje", false);
+  llenarSelector(document.getElementById("cotizacion-hotel"), hotelesAliados, "Sin opción por ahora", true);
 }
 
 async function cargarHotelesAliados() {
@@ -104,8 +106,8 @@ async function cargarHotelesAliados() {
     hotelesAliados = resultado.data;
     renderizarHoteles();
   } catch (error) {
-    mostrarEstadoCatalogo("error", "No pudimos cargar los hoteles aliados. Inténtalo nuevamente más tarde.");
-    console.error("Error al cargar hoteles aliados:", error);
+    mostrarEstadoCatalogo("error", "No pudimos cargar las opciones de viaje. Inténtalo nuevamente más tarde.");
+    console.error("Error al cargar opciones de viaje:", error);
   }
 }
 

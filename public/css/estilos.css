@@ -329,7 +329,7 @@ textarea {
 }
 
 .btn-secondary:hover {
-  background-color: #1d8968;
+  background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-primario-2) 100%);
   transform: translateY(-2px);
 }
 
@@ -557,6 +557,68 @@ textarea {
   text-align: center;
 }
 
+.tarifas-referencia {
+  padding: 1rem 0 3rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f7ff 100%);
+}
+
+.tarifas-referencia .section-intro {
+  margin-bottom: 1.5rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid rgba(13, 59, 143, 0.08);
+  border-radius: 22px;
+  box-shadow: var(--sombra);
+}
+
+.tabla-precios {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+
+.tabla-precios th,
+.tabla-precios td {
+  padding: 1rem 1.2rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(13, 59, 143, 0.08);
+}
+
+.tabla-precios th {
+  background: linear-gradient(135deg, rgba(13, 59, 143, 0.06), rgba(244, 58, 154, 0.06));
+  color: var(--color-secundario);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tabla-precios td {
+  color: var(--color-texto);
+  font-weight: 500;
+}
+
+.tabla-precios tbody tr:hover {
+  background: rgba(13, 59, 143, 0.02);
+}
+
+.tabla-precios td:nth-child(2),
+.tabla-precios td:nth-child(3) {
+  font-weight: 700;
+  color: var(--color-primario);
+}
+
+.tarifas-referencia .politica-nota {
+  margin-top: 1rem;
+  text-align: center;
+  border-left: 0;
+  padding-left: 0;
+  color: var(--color-texto-claro);
+}
+
 /* Sección Servicios */
 .servicios {
   background-color: var(--color-fondo);
@@ -633,7 +695,7 @@ textarea {
   position: fixed;
   bottom: 2rem;
   right: 2rem;
-  background-color: #25d366;
+  background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-primario-2) 100%);
   border-radius: 50px;
   box-shadow: var(--sombra-fuerte);
   overflow: hidden;
@@ -653,7 +715,7 @@ textarea {
 }
 
 .whatsapp-flotante a:hover {
-  background-color: #20ba5f;
+  filter: brightness(1.05);
 }
 
 .whatsapp-horario {
@@ -667,10 +729,10 @@ textarea {
 @keyframes pulse {
   0%,
   100% {
-    box-shadow: 0 4px 16px rgba(37, 211, 102, 0.3);
+    box-shadow: 0 4px 16px rgba(13, 59, 143, 0.22);
   }
   50% {
-    box-shadow: 0 4px 24px rgba(37, 211, 102, 0.5);
+    box-shadow: 0 4px 24px rgba(244, 58, 154, 0.32);
   }
 }
 
@@ -905,7 +967,7 @@ textarea {
 }
 
 .section-kicker {
-  color: #14836d;
+  color: var(--color-primario-2);
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -922,7 +984,7 @@ textarea {
 .politica-nota {
   margin-top: 1.25rem;
   padding-left: 1rem;
-  border-left: 3px solid #14836d;
+  border-left: 3px solid var(--color-primario-2);
   font-size: 0.9rem;
 }
 
@@ -969,8 +1031,8 @@ textarea {
 .formulario-agencia input:focus,
 .formulario-agencia select:focus,
 .formulario-agencia textarea:focus {
-  outline: 2px solid rgba(20, 131, 109, 0.22);
-  border-color: #14836d;
+  outline: 2px solid rgba(244, 58, 154, 0.18);
+  border-color: var(--color-primario-2);
 }
 
 .formulario-agencia button:disabled {
@@ -986,11 +1048,11 @@ textarea {
 }
 
 .form-status-exito {
-  color: #14764c;
+  color: var(--color-primario);
 }
 
 .form-status-error {
-  color: #a83232;
+  color: var(--color-primario-2);
 }
 
 .section-heading {
@@ -1000,7 +1062,7 @@ textarea {
 }
 
 .experiencias-section {
-  background: #edf5f2;
+  background: linear-gradient(180deg, rgba(13, 59, 143, 0.04), rgba(244, 58, 154, 0.04));
 }
 
 .experiencias-grid {
