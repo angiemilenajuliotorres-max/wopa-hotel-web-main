@@ -93,6 +93,12 @@ app.use("/api/admin", adminRouter);
 app.use(express.static(path.join(__dirname, "../public")));
 
 // SPA - Redirigir todas las rutas no API a index.html
+// Páginas del sitio
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(__dirname, "../public/admin.html"));
+});
+
+// SPA - Rutas del sitio público
 app.get("*", (req, res, next) => {
   if (req.path.startsWith("/api")) {
     return next();
@@ -100,6 +106,7 @@ app.get("*", (req, res, next) => {
 
   res.sendFile(path.join(__dirname, "../public/index.html"));
 });
+
 
 // Middleware de manejo de errores
 app.use((err, req, res, next) => {
