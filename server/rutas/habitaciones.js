@@ -4,7 +4,7 @@ const db = require("../db/conexion");
 const router = express.Router();
 
 // GET /api/habitaciones - Obtener todos los tipos de habitación con tarifas
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const stmt = db.prepare(`
       SELECT 
@@ -24,7 +24,7 @@ router.get("/", (req, res) => {
     `);
 
     const hotelesAliados = new Map();
-    for (const fila of stmt.all()) {
+    for (const fila of await stmt.all()) {
       if (!hotelesAliados.has(fila.id)) {
         hotelesAliados.set(fila.id, {
           id: fila.id,
@@ -61,7 +61,7 @@ router.get("/", (req, res) => {
 });
 
 // GET /api/habitaciones/:id - Obtener detalle de una habitación específica
-router.get("/:id", (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -74,17 +74,24 @@ router.get("/:id", (req, res) => {
         th.capacidad_maxima,
         th.servicios,
         th.imagen_url,
-        GROUP_CONCAT(
-          json_object('capacidad', t.capacidad_personas, 'precio_usd', t.precio_usd, 'temporada', t.temporada),
-          ','
-        ) as tarifas
+        t.capacidad_personas,
+        t.precio_usd,
+        t.temporada
       FROM tipos_habitacion th
       LEFT JOIN tarifas t ON th.id = t.tipo_id
       WHERE th.id = ?
-      GROUP BY th.id
+      ORDER BY t.capacidad_personas ASC
     `);
 
-    const habitacion = stmt.get(id);
+    const filas = await stmt.all(id);
+    const habitacion = filas[0] && {
+      ...filas[0],
+      tarifas: filas.filter((fila) => fila.capacidad_personas !== null).map((fila) => ({
+        capacidad: fila.capacidad_personas,
+        precio_usd: fila.precio_usd,
+        temporada: fila.temporada,
+      })),
+    };
 
     if (!habitacion) {
       return res.status(404).json({
@@ -92,10 +99,6 @@ router.get("/:id", (req, res) => {
         error: "Habitación no encontrada",
       });
     }
-
-    habitacion.tarifas = habitacion.tarifas
-      ? habitacion.tarifas.split(",").map((t) => JSON.parse(t))
-      : [];
 
     res.json({
       ok: true,
@@ -112,7 +115,7 @@ router.get("/:id", (req, res) => {
 
 // POST /api/habitaciones/disponibilidad - Verificar disponibilidad
 // Body esperado: { fechaEntrada: "YYYY-MM-DD", fechaSalida: "YYYY-MM-DD", numeroPeople: 2 }
-router.post("/disponibilidad", (req, res) => {
+router.post("/disponibilidad", async (req, res) => {
   try {
     const { fechaEntrada, fechaSalida, numeroPersonas } = req.body;
 
@@ -172,7 +175,7 @@ router.post("/disponibilidad", (req, res) => {
       ORDER BY t.precio_usd ASC
     `);
 
-    const disponibles = stmt.all(grupoCapacidad, numeroPersonas, fechaSalida, fechaEntrada);
+    const disponibles = await stmt.all(grupoCapacidad, numeroPersonas, fechaSalida, fechaEntrada);
 
     if (disponibles.length === 0) {
       return res.json({

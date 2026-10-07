@@ -36,9 +36,9 @@ function errorValidacion(res, mensaje) {
   return res.status(400).json({ ok: false, error: mensaje });
 }
 
-router.get("/experiencias", (req, res) => {
+router.get("/experiencias", async (req, res) => {
   try {
-    const experiencias = db.prepare(`
+    const experiencias = await db.prepare(`
       SELECT id, slug, nombre, categoria, descripcion, duracion, imagen_url, precio_usd, unidad_precio
       FROM experiencias
       WHERE activa = 1
@@ -51,14 +51,14 @@ router.get("/experiencias", (req, res) => {
   }
 });
 
-router.get("/cotizaciones/:codigo/pdf", (req, res) => {
+router.get("/cotizaciones/:codigo/pdf", async (req, res) => {
   const codigoCotizacion = texto(req.params.codigo, 32).toUpperCase();
   if (!/^WOPA-C-[A-F0-9]{16}$/.test(codigoCotizacion)) {
     return res.status(404).json({ ok: false, error: "No encontramos esa cotización." });
   }
 
   try {
-    const cotizacion = db.prepare(`
+    const cotizacion = await db.prepare(`
       SELECT c.codigo, c.nombre, c.correo, c.telefono, c.numero_personas,
         c.fecha_entrada, c.fecha_salida, c.notas, c.subtotal_hospedaje_usd,
         c.anticipo_hospedaje_usd, c.subtotal_experiencias_usd, c.unidad_experiencia, c.total_estimado_usd,
@@ -159,7 +159,7 @@ router.get("/cotizaciones/:codigo/pdf", (req, res) => {
   }
 });
 
-router.post("/reservas", (req, res) => {
+router.post("/reservas", async (req, res) => {
   const nombre = texto(req.body.nombre, 120);
   const correo = texto(req.body.correo, 160).toLowerCase();
   const telefono = texto(req.body.telefono, 40);
@@ -180,7 +180,7 @@ router.post("/reservas", (req, res) => {
   }
 
   try {
-    const aliado = db.prepare(`
+    const aliado = await db.prepare(`
       SELECT th.id, th.nombre, th.capacidad_maxima
       FROM tipos_habitacion th
       WHERE th.id = ?
@@ -189,7 +189,7 @@ router.post("/reservas", (req, res) => {
       return errorValidacion(res, "El hotel aliado seleccionado no admite esa cantidad de personas.");
     }
 
-    const tarifa = db.prepare(`
+    const tarifa = await db.prepare(`
       SELECT precio_usd FROM tarifas
       WHERE tipo_id = ? AND capacidad_personas = ?
       ORDER BY CASE temporada WHEN 'baja' THEN 0 ELSE 1 END
@@ -201,8 +201,8 @@ router.post("/reservas", (req, res) => {
     const total = Math.round(Number(tarifa.precio_usd) * noches * 100) / 100;
     const anticipo = Math.round(total * 25) / 100;
     const reservaCodigo = codigo("WOPA-R");
-    const guardarReserva = db.transaction(() => {
-      db.prepare(`
+    await db.transaction(async (tx) => {
+      await tx.prepare(`
       INSERT INTO solicitudes_reserva (
         codigo, tipo_id, nombre, correo, telefono, numero_personas,
         fecha_entrada, fecha_salida, noches, tarifa_noche_usd,
@@ -210,12 +210,11 @@ router.post("/reservas", (req, res) => {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).run(reservaCodigo, tipoId, nombre, correo, telefono, personas, entrada, salida, noches,
         tarifa.precio_usd, total, anticipo, especiales || null);
-      registrarActividad({
+      await registrarActividad({
         tipoEvento: "reserva_solicitada", entidad: "reserva", codigoEntidad: reservaCodigo,
         detalle: `Solicitud recibida para ${aliado.nombre}.`, estadoNuevo: "pendiente_confirmacion", montoUsd: total,
-      });
+      }, tx);
     });
-    guardarReserva();
 
     res.status(201).json({
       ok: true,
@@ -230,7 +229,7 @@ router.post("/reservas", (req, res) => {
   }
 });
 
-router.post("/cotizaciones", (req, res) => {
+router.post("/cotizaciones", async (req, res) => {
   const nombre = texto(req.body.nombre, 120);
   const correo = texto(req.body.correo, 160).toLowerCase();
   const telefono = texto(req.body.telefono, 40);
@@ -258,9 +257,9 @@ router.post("/cotizaciones", (req, res) => {
     let cotizacionCompleta = true;
     const conceptosPendientes = [];
     if (tipoId) {
-      const aliado = db.prepare("SELECT id, nombre, capacidad_maxima FROM tipos_habitacion WHERE id = ?").get(tipoId);
+      const aliado = await db.prepare("SELECT id, nombre, capacidad_maxima FROM tipos_habitacion WHERE id = ?").get(tipoId);
       if (!aliado || personas > aliado.capacidad_maxima) return errorValidacion(res, "Revisa el hotel aliado y la cantidad de personas.");
-      const tarifa = db.prepare(`
+      const tarifa = await db.prepare(`
         SELECT precio_usd FROM tarifas
         WHERE tipo_id = ? AND capacidad_personas = ?
         ORDER BY CASE temporada WHEN 'baja' THEN 0 ELSE 1 END LIMIT 1
@@ -272,7 +271,7 @@ router.post("/cotizaciones", (req, res) => {
     }
     let experiencia = null;
     if (experienciaId) {
-      experiencia = db.prepare(`
+      experiencia = await db.prepare(`
         SELECT id, nombre, precio_usd, unidad_precio
         FROM experiencias
         WHERE id = ? AND activa = 1
@@ -293,8 +292,8 @@ router.post("/cotizaciones", (req, res) => {
       : null;
     const estadoCotizacion = cotizacionCompleta ? "generada_automatica" : "estimado_parcial";
     const cotizacionCodigo = codigo("WOPA-C");
-    db.transaction(() => {
-      db.prepare(`
+    await db.transaction(async (tx) => {
+      await tx.prepare(`
       INSERT INTO solicitudes_cotizacion (
         codigo, nombre, correo, telefono, tipo_id, experiencia_id, numero_personas,
         fecha_entrada, fecha_salida, notas, subtotal_hospedaje_usd, anticipo_hospedaje_usd,
@@ -303,11 +302,11 @@ router.post("/cotizaciones", (req, res) => {
       `).run(cotizacionCodigo, nombre, correo, telefono, tipoId, experienciaId, personas,
         entrada || null, salida || null, notas || null, totalHospedaje, anticipoHospedaje,
         totalExperiencias, experiencia?.unidad_precio || null, totalEstimadoGuardado, cotizacionCompleta ? 1 : 0, estadoCotizacion);
-      registrarActividad({
+      await registrarActividad({
         tipoEvento: "cotizacion_solicitada", entidad: "cotizacion", codigoEntidad: cotizacionCodigo,
         detalle: "Solicitud de cotización recibida.", estadoNuevo: estadoCotizacion, montoUsd: totalEstimadoGuardado,
-      });
-    })();
+      }, tx);
+    });
 
     res.status(201).json({
       ok: true,
@@ -331,7 +330,7 @@ router.post("/cotizaciones", (req, res) => {
   }
 });
 
-router.post("/contacto", (req, res) => {
+router.post("/contacto", async (req, res) => {
   const nombre = texto(req.body.nombre, 120);
   const correo = texto(req.body.correo, 160).toLowerCase();
   const telefono = texto(req.body.telefono, 40);
@@ -344,16 +343,16 @@ router.post("/contacto", (req, res) => {
 
   try {
     const contactoCodigo = codigo("WOPA-M");
-    db.transaction(() => {
-      db.prepare(`
+    await db.transaction(async (tx) => {
+      await tx.prepare(`
       INSERT INTO mensajes_contacto (codigo, nombre, correo, telefono, asunto, mensaje)
       VALUES (?, ?, ?, ?, ?, ?)
       `).run(contactoCodigo, nombre, correo, telefono || null, asunto, mensaje);
-      registrarActividad({
+      await registrarActividad({
         tipoEvento: "mensaje_recibido", entidad: "contacto", codigoEntidad: contactoCodigo,
         detalle: `Mensaje recibido: ${asunto}.`, estadoNuevo: "nuevo",
-      });
-    })();
+      }, tx);
+    });
     res.status(201).json({
       ok: true,
       codigo: contactoCodigo,

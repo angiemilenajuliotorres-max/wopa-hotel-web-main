@@ -7,15 +7,26 @@ Agencia de viajes de Panamá especializada en experiencias a Cartagena de Indias
 2. Ejecuta `npm install` en la carpeta del proyecto.
 3. Ejecuta `npm start` y abre `http://localhost:3000`.
 
-La base SQLite y el catálogo inicial se crean automáticamente al iniciar el servidor. Se puede cambiar su ubicación con la variable de entorno `DB_PATH`.
+La base SQLite y el catálogo inicial se crean automáticamente al iniciar el servidor. Se puede cambiar su ubicación con `DB_PATH`. Si `DATABASE_URL` está definida, el servidor usa PostgreSQL; para conservar SQLite local, deja esa variable sin configurar y usa `DB_PATH`.
 
 ## Panel de administración
 
 1. Copia `.env.example` como `.env` y configura `ADMIN_USER`, `ADMIN_PASSWORD` y `ADMIN_SESSION_SECRET` con valores privados; no subas `.env` al repositorio.
-2. Configura una contraseña administrativa de al menos 6 caracteres. Genera un secreto de sesión aleatorio con `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"` y pégalo en `.env`; ese secreto debe tener al menos 32 caracteres.
+2. Usa una contraseña administrativa larga. Genera un secreto de sesión aleatorio localmente con `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`; debe tener al menos 32 caracteres.
 3. Reinicia el servidor y abre `http://localhost:3000/admin.html`.
 
 El panel permite revisar reservas, cotizaciones y mensajes; registrar pagos y gastos; actualizar las tarifas publicadas y gestionar tours. Para cada tour se puede configurar un precio por persona o un precio fijo por grupo. La cancelación registra como penalización el 100% de los pagos recibidos en esa reserva. No se crea un movimiento adicional por la penalización, para no duplicar ingresos.
+
+## Desplegar en Vercel con Neon
+
+1. Crea una base PostgreSQL en Neon y copia su connection string pooled (`DATABASE_URL`). No es necesario copiar ni subir el archivo SQLite local.
+2. Importa el repositorio en Vercel con la carpeta raíz del proyecto. `vercel.json` publica `public/` como contenido estático y `api/[...path].js` enruta las rutas `/api/*` al servidor Express.
+3. En Vercel, abre **Project Settings > Environment Variables** y agrega `DATABASE_URL`, `ADMIN_USER`, `ADMIN_PASSWORD` y `ADMIN_SESSION_SECRET` para Production (y Preview si corresponde). Configúralas manualmente en el Dashboard; no las agregues al repositorio ni a `vercel.json`.
+4. Usa un usuario administrativo propio, una contraseña larga y un secreto aleatorio de al menos 32 caracteres. Después despliega y verifica `/api/health`.
+
+En el primer arranque cloud se crean idempotentemente las tablas, las columnas actuales y el catálogo base de hoteles, tarifas y experiencias. La inicialización no importa registros de `server/db/hotel.db`: cualquier migración de datos locales a Neon debe planificarse, respaldarse y ejecutarse por separado.
+
+Las pruebas locales usan una base SQLite temporal y no modifican `server/db/hotel.db`. Ejecuta `npm test`.
 
 El informe descargable es un archivo `.xlsx` para la semana ISO seleccionada en el panel. Incluye resumen, bitácora de actividad, reservas recibidas, cancelaciones, cotizaciones, mensajes y movimientos financieros. La bitácora registra nuevas solicitudes, cambios de estado, cancelaciones, pagos y mantenimiento del catálogo; su historial comienza al activar esta versión, mientras que los registros anteriores conservan solo los estados y fechas que ya estaban guardados. El informe no mide visitas o navegación anónima. La utilidad neta se calcula a partir de ingresos y gastos registrados, por lo que no reemplaza la contabilidad fiscal.
 

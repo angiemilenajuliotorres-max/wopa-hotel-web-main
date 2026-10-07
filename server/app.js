@@ -1,3 +1,4 @@
+require("express-async-errors");
 const express = require("express");
 const path = require("path");
 const dotenv = require("dotenv");
@@ -13,6 +14,11 @@ const db = require("./db/conexion");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+app.set("trust proxy", 1);
+
+app.use((req, res, next) => {
+  db.inicializarBaseDatos().then(() => next(), next);
+});
 
 // Middleware de seguridad
 app.use(
@@ -106,9 +112,17 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`✅ Servidor WOPA Travel corriendo en http://localhost:${PORT}`);
-  console.log(`📍 Ambiente: ${process.env.NODE_ENV || "development"}`);
-  console.log(`🏨 Base de datos: ${process.env.DB_PATH || "./server/db/hotel.db"}`);
-});
+if (require.main === module) {
+  db.inicializarBaseDatos().then(() => {
+    app.listen(PORT, () => {
+      console.log(`✅ Servidor WOPA Travel corriendo en http://localhost:${PORT}`);
+      console.log(`📍 Ambiente: ${process.env.NODE_ENV || "development"}`);
+      console.log(`🏨 Base de datos: ${db.esPostgres ? "Neon PostgreSQL" : (process.env.DB_PATH || "./server/db/hotel.db")}`);
+    });
+  }).catch((error) => {
+    console.error("No se pudo inicializar la base de datos.", error.message);
+    process.exitCode = 1;
+  });
+}
+
+module.exports = app;

@@ -140,9 +140,9 @@ router.use(autenticar, validarOrigen);
 
 router.get("/me", (req, res) => res.json({ ok: true, usuario: req.admin.usuario }));
 
-router.get("/resumen", (req, res) => {
+router.get("/resumen", async (req, res) => {
   try {
-    const solicitudes = db.prepare(`
+    const resumen = await db.prepare(`
       SELECT
         (SELECT COUNT(*) FROM solicitudes_reserva) AS reservas,
         (SELECT COUNT(*) FROM solicitudes_reserva WHERE estado = 'pendiente_confirmacion') AS reservas_pendientes,
@@ -152,29 +152,29 @@ router.get("/resumen", (req, res) => {
         (SELECT COALESCE(SUM(monto_usd), 0) FROM movimientos_financieros WHERE tipo = 'egreso') AS gastos_usd,
         (SELECT COALESCE(SUM(monto_penalizacion_usd), 0) FROM solicitudes_reserva WHERE estado = 'cancelada') AS penalizaciones_usd
     `).get();
-    solicitudes.ingresos_usd = Number(solicitudes.ingresos_usd);
-    solicitudes.gastos_usd = Number(solicitudes.gastos_usd);
-    solicitudes.penalizaciones_usd = Number(solicitudes.penalizaciones_usd);
-    solicitudes.utilidad_neta_usd = Math.round((solicitudes.ingresos_usd - solicitudes.gastos_usd) * 100) / 100;
-    res.json({ ok: true, data: solicitudes });
+    resumen.ingresos_usd = Number(resumen.ingresos_usd);
+    resumen.gastos_usd = Number(resumen.gastos_usd);
+    resumen.penalizaciones_usd = Number(resumen.penalizaciones_usd);
+    resumen.utilidad_neta_usd = Math.round((resumen.ingresos_usd - resumen.gastos_usd) * 100) / 100;
+    res.json({ ok: true, data: resumen });
   } catch (error) {
     console.error("Error al generar resumen administrativo:", error);
     res.status(500).json({ ok: false, error: "No se pudo generar el resumen." });
   }
 });
 
-router.get("/reservas", (req, res) => {
-  const reservas = db.prepare(`
+router.get("/reservas", async (req, res) => {
+  const reservas = (await db.prepare(`
     SELECT r.*, t.nombre AS hotel,
       COALESCE((SELECT SUM(m.monto_usd) FROM movimientos_financieros m WHERE m.solicitud_reserva_id = r.id AND m.tipo = 'ingreso'), 0) AS abonado_usd
     FROM solicitudes_reserva r
     JOIN tipos_habitacion t ON t.id = r.tipo_id
     ORDER BY r.created_at DESC
-  `).all().map((reserva) => ({ ...reserva, abonado_usd: Number(reserva.abonado_usd) }));
+  `).all()).map((reserva) => ({ ...reserva, abonado_usd: Number(reserva.abonado_usd) }));
   res.json({ ok: true, data: reservas });
 });
 
-router.patch("/reservas/:id", (req, res) => {
+router.patch("/reservas/:id", async (req, res) => {
   const id = Number(req.params.id);
   const estados = ["pendiente_confirmacion", "confirmada", "rechazada", "cancelada", "completada"];
   const estado = texto(req.body.estado, 40);
@@ -184,16 +184,16 @@ router.patch("/reservas/:id", (req, res) => {
   if (estado === "cancelada" && motivo.length < 3) return res.status(400).json({ ok: false, error: "Indica el motivo de cancelación." });
 
   try {
-    const reserva = db.prepare("SELECT id, codigo, estado FROM solicitudes_reserva WHERE id = ?").get(id);
+    const reserva = await db.prepare("SELECT id, codigo, estado FROM solicitudes_reserva WHERE id = ?").get(id);
     if (!reserva) return noEncontrado(res, "Reserva");
     if (reserva.estado === "cancelada" && estado !== "cancelada") {
       return res.status(409).json({ ok: false, error: "Una reserva cancelada no se puede reactivar desde el panel." });
     }
 
-    const actualizar = db.transaction(() => {
-      const pagos = db.prepare(`SELECT COALESCE(SUM(monto_usd), 0) AS total FROM movimientos_financieros WHERE solicitud_reserva_id = ? AND tipo = 'ingreso'`).get(id);
+    const penalizacion = await db.transaction(async (tx) => {
+      const pagos = await tx.prepare(`SELECT COALESCE(SUM(monto_usd), 0) AS total FROM movimientos_financieros WHERE solicitud_reserva_id = ? AND tipo = 'ingreso'`).get(id);
       const penalizacion = estado === "cancelada" ? Math.round(Number(pagos.total) * 100) / 100 : 0;
-      db.prepare(`
+      await tx.prepare(`
         UPDATE solicitudes_reserva
         SET estado = ?, nota_admin = ?,
             monto_penalizacion_usd = ?,
@@ -202,42 +202,42 @@ router.patch("/reservas/:id", (req, res) => {
         WHERE id = ?
       `).run(estado, notaAdmin || null, penalizacion, estado, estado, motivo || null, id);
       if (reserva.estado !== estado) {
-        registrarActividad({
+        await registrarActividad({
           tipoEvento: estado === "cancelada" ? "reserva_cancelada" : "reserva_estado_actualizado",
           entidad: "reserva", codigoEntidad: reserva.codigo,
           detalle: estado === "cancelada" ? `Motivo: ${motivo}` : "Estado de reserva actualizado.",
           estadoAnterior: reserva.estado, estadoNuevo: estado,
           montoUsd: estado === "cancelada" ? penalizacion : null, realizadoPor: req.admin.usuario,
-        });
+        }, tx);
       }
       return penalizacion;
     });
-    const penalizacion = actualizar();
-    res.json({ ok: true, penalizacionUsd: penalizacion, data: db.prepare("SELECT id, estado, monto_penalizacion_usd FROM solicitudes_reserva WHERE id = ?").get(id) });
+    const actualizada = await db.prepare("SELECT id, estado, monto_penalizacion_usd FROM solicitudes_reserva WHERE id = ?").get(id);
+    res.json({ ok: true, penalizacionUsd: penalizacion, data: actualizada });
   } catch (error) {
     console.error("Error al actualizar reserva:", error);
     res.status(500).json({ ok: false, error: "No se pudo actualizar la reserva." });
   }
 });
 
-router.post("/reservas/:id/pagos", (req, res) => {
+router.post("/reservas/:id/pagos", async (req, res) => {
   const id = Number(req.params.id);
   const monto = montoValido(req.body.montoUsd);
   const referencia = texto(req.body.referencia, 160);
   if (!Number.isInteger(id) || !monto) return res.status(400).json({ ok: false, error: "Indica un monto de pago válido." });
 
   try {
-    const reserva = db.prepare("SELECT id, codigo, subtotal_usd, estado FROM solicitudes_reserva WHERE id = ?").get(id);
+    const reserva = await db.prepare("SELECT id, codigo, subtotal_usd, estado FROM solicitudes_reserva WHERE id = ?").get(id);
     if (!reserva) return noEncontrado(res, "Reserva");
     if (["cancelada", "rechazada"].includes(reserva.estado)) return res.status(409).json({ ok: false, error: "No se registran pagos en una reserva cancelada o rechazada." });
-    const abonado = db.prepare("SELECT COALESCE(SUM(monto_usd), 0) AS total FROM movimientos_financieros WHERE solicitud_reserva_id = ? AND tipo = 'ingreso'").get(id).total;
+    const abonado = (await db.prepare("SELECT COALESCE(SUM(monto_usd), 0) AS total FROM movimientos_financieros WHERE solicitud_reserva_id = ? AND tipo = 'ingreso'").get(id)).total;
     if (Number(abonado) + monto > Number(reserva.subtotal_usd) + 0.001) return res.status(400).json({ ok: false, error: "El pago excede el total del hospedaje pendiente." });
 
-    const resultado = db.prepare(`
+    const resultado = await db.prepare(`
       INSERT INTO movimientos_financieros (tipo, categoria, descripcion, monto_usd, solicitud_reserva_id, creado_por)
       VALUES ('ingreso', 'Pago de hospedaje', ?, ?, ?, ?)
     `).run(`Pago ${reserva.codigo}${referencia ? ` · Ref. ${referencia}` : ""}`, monto, id, req.admin.usuario);
-    registrarActividad({
+    await registrarActividad({
       tipoEvento: "pago_registrado", entidad: "reserva", codigoEntidad: reserva.codigo,
       detalle: `Pago registrado${referencia ? ` · Ref. ${referencia}` : ""}.`, montoUsd: monto, realizadoPor: req.admin.usuario,
     });
@@ -248,8 +248,8 @@ router.post("/reservas/:id/pagos", (req, res) => {
   }
 });
 
-router.get("/cotizaciones", (req, res) => {
-  const cotizaciones = db.prepare(`
+router.get("/cotizaciones", async (req, res) => {
+  const cotizaciones = await db.prepare(`
     SELECT c.*, t.nombre AS hotel, e.nombre AS experiencia
     FROM solicitudes_cotizacion c
     LEFT JOIN tipos_habitacion t ON t.id = c.tipo_id
@@ -259,49 +259,49 @@ router.get("/cotizaciones", (req, res) => {
   res.json({ ok: true, data: cotizaciones });
 });
 
-router.patch("/cotizaciones/:id", (req, res) => {
+router.patch("/cotizaciones/:id", async (req, res) => {
   const id = Number(req.params.id);
   const estado = texto(req.body.estado, 40);
   const nota = texto(req.body.notaAdmin, 1200);
   if (!Number.isInteger(id) || !["pendiente", "en_revision", "cotizada", "aceptada", "rechazada", "generada_automatica", "estimado_parcial"].includes(estado)) {
     return res.status(400).json({ ok: false, error: "Estado de cotización no válido." });
   }
-  const anterior = db.prepare("SELECT codigo, estado FROM solicitudes_cotizacion WHERE id = ?").get(id);
+  const anterior = await db.prepare("SELECT codigo, estado FROM solicitudes_cotizacion WHERE id = ?").get(id);
   if (!anterior) return noEncontrado(res, "Cotización");
-  const result = db.prepare("UPDATE solicitudes_cotizacion SET estado = ?, nota_admin = ? WHERE id = ?").run(estado, nota || null, id);
+  const result = await db.prepare("UPDATE solicitudes_cotizacion SET estado = ?, nota_admin = ? WHERE id = ?").run(estado, nota || null, id);
   if (!result.changes) return noEncontrado(res, "Cotización");
-  if (anterior.estado !== estado) registrarActividad({
+  if (anterior.estado !== estado) await registrarActividad({
     tipoEvento: "cotizacion_estado_actualizado", entidad: "cotizacion", codigoEntidad: anterior.codigo,
     detalle: "Estado de cotización actualizado.", estadoAnterior: anterior.estado, estadoNuevo: estado, realizadoPor: req.admin.usuario,
   });
   res.json({ ok: true });
 });
 
-router.get("/contactos", (req, res) => {
-  const contactos = db.prepare("SELECT * FROM mensajes_contacto ORDER BY created_at DESC").all();
+router.get("/contactos", async (req, res) => {
+  const contactos = await db.prepare("SELECT * FROM mensajes_contacto ORDER BY created_at DESC").all();
   res.json({ ok: true, data: contactos });
 });
 
-router.patch("/contactos/:id", (req, res) => {
+router.patch("/contactos/:id", async (req, res) => {
   const id = Number(req.params.id);
   const estado = texto(req.body.estado, 40);
   const nota = texto(req.body.notaAdmin, 1200);
   if (!Number.isInteger(id) || !["nuevo", "en_revision", "resuelto"].includes(estado)) {
     return res.status(400).json({ ok: false, error: "Estado de contacto no válido." });
   }
-  const anterior = db.prepare("SELECT codigo, estado FROM mensajes_contacto WHERE id = ?").get(id);
+  const anterior = await db.prepare("SELECT codigo, estado FROM mensajes_contacto WHERE id = ?").get(id);
   if (!anterior) return noEncontrado(res, "Mensaje");
-  const result = db.prepare("UPDATE mensajes_contacto SET estado = ?, nota_admin = ? WHERE id = ?").run(estado, nota || null, id);
+  const result = await db.prepare("UPDATE mensajes_contacto SET estado = ?, nota_admin = ? WHERE id = ?").run(estado, nota || null, id);
   if (!result.changes) return noEncontrado(res, "Mensaje");
-  if (anterior.estado !== estado) registrarActividad({
+  if (anterior.estado !== estado) await registrarActividad({
     tipoEvento: "mensaje_estado_actualizado", entidad: "contacto", codigoEntidad: anterior.codigo,
     detalle: "Estado del mensaje actualizado.", estadoAnterior: anterior.estado, estadoNuevo: estado, realizadoPor: req.admin.usuario,
   });
   res.json({ ok: true });
 });
 
-router.get("/movimientos", (req, res) => {
-  const movimientos = db.prepare(`
+router.get("/movimientos", async (req, res) => {
+  const movimientos = await db.prepare(`
     SELECT m.*, r.codigo AS reserva_codigo
     FROM movimientos_financieros m
     LEFT JOIN solicitudes_reserva r ON r.id = m.solicitud_reserva_id
@@ -310,7 +310,7 @@ router.get("/movimientos", (req, res) => {
   res.json({ ok: true, data: movimientos });
 });
 
-router.post("/movimientos", (req, res) => {
+router.post("/movimientos", async (req, res) => {
   const tipo = texto(req.body.tipo, 20);
   const categoria = texto(req.body.categoria, 100);
   const descripcion = texto(req.body.descripcion, 500);
@@ -319,11 +319,11 @@ router.post("/movimientos", (req, res) => {
   if (!["ingreso", "egreso"].includes(tipo) || !categoria || !descripcion || !monto || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
     return res.status(400).json({ ok: false, error: "Completa tipo, categoría, descripción, fecha y un monto válido." });
   }
-  const resultado = db.prepare(`
+  const resultado = await db.prepare(`
     INSERT INTO movimientos_financieros (tipo, categoria, descripcion, monto_usd, fecha, creado_por)
     VALUES (?, ?, ?, ?, ?, ?)
   `).run(tipo, categoria, descripcion, monto, fecha, req.admin.usuario);
-  registrarActividad({
+  await registrarActividad({
     tipoEvento: tipo === "ingreso" ? "ingreso_registrado" : "gasto_registrado",
     entidad: "movimiento_financiero", codigoEntidad: String(resultado.lastInsertRowid),
     detalle: `${categoria}: ${descripcion}`, montoUsd: monto, realizadoPor: req.admin.usuario,
@@ -331,20 +331,42 @@ router.post("/movimientos", (req, res) => {
   res.status(201).json({ ok: true, id: resultado.lastInsertRowid });
 });
 
-router.get("/catalogo", (req, res) => {
-  const hoteles = db.prepare(`
+router.get("/catalogo", async (req, res) => {
+  const filas = await db.prepare(`
     SELECT t.id, t.nombre, t.descripcion, t.capacidad_minima, t.capacidad_maxima, t.servicios,
-      json_group_array(json_object('id', f.id, 'capacidad', f.capacidad_personas, 'precio_usd', f.precio_usd, 'temporada', f.temporada)) AS tarifas
+      f.id AS tarifa_id, f.capacidad_personas, f.precio_usd, f.temporada
     FROM tipos_habitacion t
     LEFT JOIN tarifas f ON f.tipo_id = t.id
-    GROUP BY t.id
     ORDER BY t.nombre
-  `).all().map((hotel) => ({ ...hotel, tarifas: JSON.parse(hotel.tarifas).filter((tarifa) => tarifa.id !== null) }));
-  const experiencias = db.prepare("SELECT * FROM experiencias ORDER BY id").all();
+  `).all();
+  const hotelesPorId = new Map();
+  for (const fila of filas) {
+    if (!hotelesPorId.has(fila.id)) {
+      hotelesPorId.set(fila.id, {
+        id: fila.id,
+        nombre: fila.nombre,
+        descripcion: fila.descripcion,
+        capacidad_minima: fila.capacidad_minima,
+        capacidad_maxima: fila.capacidad_maxima,
+        servicios: fila.servicios,
+        tarifas: [],
+      });
+    }
+    if (fila.tarifa_id !== null) {
+      hotelesPorId.get(fila.id).tarifas.push({
+        id: fila.tarifa_id,
+        capacidad: fila.capacidad_personas,
+        precio_usd: fila.precio_usd,
+        temporada: fila.temporada,
+      });
+    }
+  }
+  const hoteles = [...hotelesPorId.values()];
+  const experiencias = await db.prepare("SELECT * FROM experiencias ORDER BY id").all();
   res.json({ ok: true, data: { hoteles, experiencias } });
 });
 
-router.post("/hoteles", (req, res) => {
+router.post("/hoteles", async (req, res) => {
   const nombre = texto(req.body.nombre, 160);
   const descripcion = texto(req.body.descripcion, 1000);
   const servicios = texto(req.body.servicios, 800);
@@ -355,28 +377,27 @@ router.post("/hoteles", (req, res) => {
   }
 
   try {
-    const agencia = db.prepare("SELECT id FROM hoteles WHERE slug = 'wopa-travel-cartagena' LIMIT 1").get();
+    const agencia = await db.prepare("SELECT id FROM hoteles WHERE slug = 'wopa-travel-cartagena' LIMIT 1").get();
     if (!agencia) return res.status(409).json({ ok: false, error: "No se encontró el registro principal de WOPA Travel." });
-    const crear = db.transaction(() => {
-      const aliado = db.prepare(`
+    const id = await db.transaction(async (tx) => {
+      const aliado = await tx.prepare(`
         INSERT INTO tipos_habitacion (hotel_id, nombre, descripcion, capacidad_minima, capacidad_maxima, servicios)
         VALUES (?, ?, ?, 1, 4, ?)
       `).run(agencia.id, nombre, descripcion, servicios || null);
-      db.prepare(`INSERT INTO tarifas (tipo_id, capacidad_personas, precio_usd, temporada) VALUES (?, 2, ?, 'baja')`).run(aliado.lastInsertRowid, precioDos);
-      db.prepare(`INSERT INTO tarifas (tipo_id, capacidad_personas, precio_usd, temporada) VALUES (?, 4, ?, 'baja')`).run(aliado.lastInsertRowid, precioCuatro);
+      await tx.prepare(`INSERT INTO tarifas (tipo_id, capacidad_personas, precio_usd, temporada) VALUES (?, 2, ?, 'baja')`).run(aliado.lastInsertRowid, precioDos);
+      await tx.prepare(`INSERT INTO tarifas (tipo_id, capacidad_personas, precio_usd, temporada) VALUES (?, 4, ?, 'baja')`).run(aliado.lastInsertRowid, precioCuatro);
       return aliado.lastInsertRowid;
     });
-    const id = crear();
-    registrarActividad({ tipoEvento: "aliado_creado", entidad: "catalogo", codigoEntidad: String(id), detalle: `Aliado agregado: ${nombre}.`, realizadoPor: req.admin.usuario });
+    await registrarActividad({ tipoEvento: "aliado_creado", entidad: "catalogo", codigoEntidad: String(id), detalle: `Aliado agregado: ${nombre}.`, realizadoPor: req.admin.usuario });
     res.status(201).json({ ok: true, id });
   } catch (error) {
-    if (error.code === "SQLITE_CONSTRAINT_UNIQUE") return res.status(409).json({ ok: false, error: "Ya existe un aliado con ese nombre." });
+    if (["SQLITE_CONSTRAINT_UNIQUE", "23505"].includes(error.code)) return res.status(409).json({ ok: false, error: "Ya existe un aliado con ese nombre." });
     console.error("Error al crear hotel aliado:", error);
     res.status(500).json({ ok: false, error: "No se pudo crear el hotel aliado." });
   }
 });
 
-router.put("/hoteles/:id", (req, res) => {
+router.put("/hoteles/:id", async (req, res) => {
   const id = Number(req.params.id);
   const nombre = texto(req.body.nombre, 160);
   const descripcion = texto(req.body.descripcion, 1000);
@@ -386,16 +407,16 @@ router.put("/hoteles/:id", (req, res) => {
     return res.status(400).json({ ok: false, error: "Revisa el nombre, descripción y capacidad máxima (2 a 4 personas, según las tarifas publicadas)." });
   }
   try {
-    const result = db.prepare(`
+    const result = await db.prepare(`
       UPDATE tipos_habitacion
       SET nombre = ?, descripcion = ?, servicios = ?, capacidad_maxima = ?
       WHERE id = ?
     `).run(nombre, descripcion, servicios || null, capacidadMaxima, id);
     if (!result.changes) return noEncontrado(res, "Hotel aliado");
-    registrarActividad({ tipoEvento: "aliado_actualizado", entidad: "catalogo", codigoEntidad: String(id), detalle: `Ficha de aliado actualizada: ${nombre}.`, realizadoPor: req.admin.usuario });
+    await registrarActividad({ tipoEvento: "aliado_actualizado", entidad: "catalogo", codigoEntidad: String(id), detalle: `Ficha de aliado actualizada: ${nombre}.`, realizadoPor: req.admin.usuario });
     res.json({ ok: true });
   } catch (error) {
-    if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
+    if (["SQLITE_CONSTRAINT_UNIQUE", "23505"].includes(error.code)) {
       return res.status(409).json({ ok: false, error: "Ya existe un aliado con ese nombre." });
     }
     console.error("Error al actualizar hotel aliado:", error);
@@ -403,17 +424,17 @@ router.put("/hoteles/:id", (req, res) => {
   }
 });
 
-router.put("/tarifas/:id", (req, res) => {
+router.put("/tarifas/:id", async (req, res) => {
   const id = Number(req.params.id);
   const monto = montoValido(req.body.precioUsd);
   if (!Number.isInteger(id) || !monto) return res.status(400).json({ ok: false, error: "Indica un precio válido en USD." });
-  const result = db.prepare("UPDATE tarifas SET precio_usd = ? WHERE id = ?").run(monto, id);
+  const result = await db.prepare("UPDATE tarifas SET precio_usd = ? WHERE id = ?").run(monto, id);
   if (!result.changes) return noEncontrado(res, "Tarifa");
-  registrarActividad({ tipoEvento: "tarifa_actualizada", entidad: "catalogo", codigoEntidad: String(id), detalle: "Tarifa de hospedaje actualizada.", montoUsd: monto, realizadoPor: req.admin.usuario });
+  await registrarActividad({ tipoEvento: "tarifa_actualizada", entidad: "catalogo", codigoEntidad: String(id), detalle: "Tarifa de hospedaje actualizada.", montoUsd: monto, realizadoPor: req.admin.usuario });
   res.json({ ok: true });
 });
 
-router.put("/experiencias/:id", (req, res) => {
+router.put("/experiencias/:id", async (req, res) => {
   const id = Number(req.params.id);
   const nombre = texto(req.body.nombre, 140);
   const categoria = texto(req.body.categoria, 100);
@@ -426,15 +447,15 @@ router.put("/experiencias/:id", (req, res) => {
   if (!Number.isInteger(id) || !nombre || !categoria || !descripcion || !["persona", "grupo"].includes(unidadPrecio) || (req.body.precioUsd && !precio)) {
     return res.status(400).json({ ok: false, error: "Revisa el nombre, categoría, descripción y precio opcional." });
   }
-  const result = db.prepare(`
+  const result = await db.prepare(`
     UPDATE experiencias SET nombre = ?, categoria = ?, descripcion = ?, duracion = ?, imagen_url = ?, precio_usd = ?, unidad_precio = ?, activa = ? WHERE id = ?
   `).run(nombre, categoria, descripcion, duracion || null, imagen || null, precio, unidadPrecio, activa, id);
   if (!result.changes) return noEncontrado(res, "Experiencia");
-  registrarActividad({ tipoEvento: "tour_actualizado", entidad: "catalogo", codigoEntidad: String(id), detalle: `Tour actualizado: ${nombre}.`, montoUsd: precio, realizadoPor: req.admin.usuario });
+  await registrarActividad({ tipoEvento: "tour_actualizado", entidad: "catalogo", codigoEntidad: String(id), detalle: `Tour actualizado: ${nombre}.`, montoUsd: precio, realizadoPor: req.admin.usuario });
   res.json({ ok: true });
 });
 
-router.post("/experiencias", (req, res) => {
+router.post("/experiencias", async (req, res) => {
   const nombre = texto(req.body.nombre, 140);
   const categoria = texto(req.body.categoria, 100);
   const descripcion = texto(req.body.descripcion, 1000);
@@ -447,14 +468,14 @@ router.post("/experiencias", (req, res) => {
   }
   const slug = nombre.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   try {
-    const result = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO experiencias (slug, nombre, categoria, descripcion, duracion, imagen_url, precio_usd, unidad_precio, activa)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
     `).run(slug, nombre, categoria, descripcion, duracion || null, imagen || null, precio, unidadPrecio);
-    registrarActividad({ tipoEvento: "tour_creado", entidad: "catalogo", codigoEntidad: String(result.lastInsertRowid), detalle: `Tour agregado: ${nombre}.`, montoUsd: precio, realizadoPor: req.admin.usuario });
+    await registrarActividad({ tipoEvento: "tour_creado", entidad: "catalogo", codigoEntidad: String(result.lastInsertRowid), detalle: `Tour agregado: ${nombre}.`, montoUsd: precio, realizadoPor: req.admin.usuario });
     res.status(201).json({ ok: true, id: result.lastInsertRowid });
   } catch (error) {
-    if (error.code === "SQLITE_CONSTRAINT_UNIQUE") return res.status(409).json({ ok: false, error: "Ya existe una experiencia con ese nombre." });
+    if (["SQLITE_CONSTRAINT_UNIQUE", "23505"].includes(error.code)) return res.status(409).json({ ok: false, error: "Ya existe una experiencia con ese nombre." });
     console.error("Error al crear experiencia:", error);
     res.status(500).json({ ok: false, error: "No se pudo crear la experiencia." });
   }
@@ -470,7 +491,7 @@ router.get("/informe.xlsx", async (req, res) => {
     workbook.creator = "WOPA Travel";
     workbook.created = new Date();
 
-    const reservas = db.prepare(`
+    const reservas = await db.prepare(`
       SELECT r.codigo, t.nombre AS hotel, r.nombre AS cliente, r.correo, r.telefono, r.numero_personas AS personas,
         r.fecha_entrada, r.fecha_salida, r.noches, r.tarifa_noche_usd, r.subtotal_usd AS total_usd, r.anticipo_usd,
         r.estado,
@@ -480,7 +501,7 @@ router.get("/informe.xlsx", async (req, res) => {
       WHERE r.created_at >= ? AND r.created_at < ?
       ORDER BY r.created_at DESC
     `).all(desde, hasta);
-    const cancelaciones = db.prepare(`
+    const cancelaciones = await db.prepare(`
       SELECT r.codigo, r.nombre AS cliente, r.correo, r.telefono, t.nombre AS hotel,
         r.fecha_entrada, r.fecha_salida, r.subtotal_usd AS total_usd, r.fecha_cancelacion,
         r.motivo_cancelacion, r.monto_penalizacion_usd AS penalizacion_usd,
@@ -489,7 +510,7 @@ router.get("/informe.xlsx", async (req, res) => {
       WHERE r.estado = 'cancelada' AND r.fecha_cancelacion >= ? AND r.fecha_cancelacion < ?
       ORDER BY r.fecha_cancelacion DESC
     `).all(desde, hasta);
-    const cotizaciones = db.prepare(`
+    const cotizaciones = await db.prepare(`
       SELECT c.codigo, c.nombre AS cliente, c.correo, c.telefono, t.nombre AS hotel, e.nombre AS tour,
         c.numero_personas, c.fecha_entrada, c.fecha_salida, c.subtotal_hospedaje_usd,
         c.anticipo_hospedaje_usd, c.subtotal_experiencias_usd, c.unidad_experiencia, c.total_estimado_usd,
@@ -500,17 +521,17 @@ router.get("/informe.xlsx", async (req, res) => {
       WHERE c.created_at >= ? AND c.created_at < ?
       ORDER BY c.created_at DESC
     `).all(desde, hasta);
-    const contactos = db.prepare(`
+    const contactos = await db.prepare(`
       SELECT codigo, nombre, correo, telefono, asunto, mensaje, estado, nota_admin, created_at
       FROM mensajes_contacto WHERE created_at >= ? AND created_at < ? ORDER BY created_at DESC
     `).all(desde, hasta);
-    const movimientos = db.prepare(`
+    const movimientos = await db.prepare(`
       SELECT m.fecha AS fecha_contable, m.created_at AS registrado_el, m.tipo, m.categoria,
         m.descripcion, m.monto_usd, r.codigo AS reserva_codigo, m.creado_por
       FROM movimientos_financieros m LEFT JOIN solicitudes_reserva r ON r.id = m.solicitud_reserva_id
       WHERE m.created_at >= ? AND m.created_at < ? ORDER BY m.created_at DESC, m.id DESC
     `).all(desde, hasta);
-    const actividad = db.prepare(`
+    const actividad = await db.prepare(`
       SELECT created_at AS fecha_hora, tipo_evento, entidad, codigo_entidad, detalle,
         estado_anterior, estado_nuevo, monto_usd, realizado_por
       FROM actividad_sitio WHERE created_at >= ? AND created_at < ?
