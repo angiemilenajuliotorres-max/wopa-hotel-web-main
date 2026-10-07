@@ -91,6 +91,15 @@ app.get("/api/admin/test", (req, res) => {
 
 app.use("/api/habitaciones", habitacionesRouter);
 app.use("/api", solicitudesRouter);
+app.get("/api/admin-prueba", (req, res) => {
+  res.json({
+    ok: true,
+    mensaje: "La ruta API admin funciona directamente desde app.js"
+  });
+});
+
+app.use("/api/admin", adminRouter);
+
 app.use("/api/admin", adminRouter);
 
 // Servir archivos estáticos del frontend
