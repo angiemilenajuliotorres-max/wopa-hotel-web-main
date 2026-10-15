@@ -6,7 +6,7 @@ Lo que necesita una persona (cuentas, datos, validaciones) está en [POR-REVISAR
 
 Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (necesita una decisión o un acceso externo)
 
-**Fase actual:** 3 · Cobro del anticipo y lanzamiento (fase 2 cerrada en `release/v0.3.0`)
+**Fase actual:** 4 · Asistente con IA (fase 3 lista en `release/v1.0.0`; el lanzamiento espera los 🔴 de [POR-REVISAR.md](POR-REVISAR.md))
 **Lanzamiento:** Panamá, al cerrar la fase 3 (`v1.0.0`)
 
 ---
@@ -102,13 +102,16 @@ Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (nec
 
 | Ítem | Estado |
 |---|---|
-| Interfaz `ProveedorPago`, enrutador y webhooks idempotentes | ⬜ |
-| Adaptador Yappy | ⛔ Requiere cuenta Yappy Comercial en Banco General |
-| Adaptador de tarjetas (PagueloFacil o banco) | ⛔ Requiere la cotización y elegir el proveedor |
-| Anticipo, saldo en el hotel, devoluciones, asientos, conciliación y liquidaciones | ⬜ |
+| Interfaz `ProveedorPago`, enrutador por país con respaldo automático, webhooks idempotentes, comparación del monto, transiciones válidas ([ADR-014](decisiones.md)) | ✅ 11 pruebas |
+| Pasarela simulada con firma HMAC (desarrollo y pruebas) | ✅ Prueba de extremo a extremo (`npm run e2e:pagos`) |
+| Adaptador Yappy | 🟡 Implementado según la documentación pública; ⛔ falta verificarlo en UAT (credenciales, URL base y algoritmo del hash) |
+| Adaptador de tarjetas (PagueloFacil) | 🟡 Creación del enlace implementada; ⛔ falta verificar la API, la consulta de transacciones y los reembolsos en el sandbox |
+| Cobro del anticipo, saldo en el hotel, cancelación con reembolso según política, asientos de partida doble, conciliación de pendientes, liquidaciones (generar, aprobar, pagar), reembolsos manuales | ✅ |
+| Panel de pagos: cobros, saldos contables, liquidaciones y reembolsos pendientes | ✅ |
 | Validación fiscal de impuestos de hospedaje en Panamá | ⛔ Requiere un contador |
-| Cotización automática de tours con PDF (paridad con la web actual) | ⬜ Antes de reemplazar la web actual |
-| La web nueva reemplaza a `public/index.html` | ⬜ |
+| Cotización automática de hospedaje y tours con PDF (paridad con la web actual) | ✅ 3 pruebas |
+| La web nueva reemplaza a `public/index.html` | 🟡 Lista; los pasos están en [DESPLIEGUE.md](DESPLIEGUE.md); ⛔ requiere cambiar el Root Directory en Vercel y cerrar los 🔴 |
+| Retirar el código heredado (`server/`, `public/`, `api/`) | ⬜ Después del cambio en producción |
 
 ## Fase 4 · Asistente con IA 24/7 → `v1.1.0`
 

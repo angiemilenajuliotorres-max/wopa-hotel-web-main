@@ -3,6 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
+  aprobarLiquidacion,
+  completarReembolsoManual,
+  generarLiquidacion,
+  marcarLiquidacionPagada,
   aceptarHotel,
   aceptarSolicitud,
   rechazarSolicitud,
@@ -175,5 +179,29 @@ export async function responderTicketAccion(formulario: FormData): Promise<void>
       notaInterna: formulario.get("notaInterna") === "on",
       nuevoEstado: (texto(formulario, "nuevoEstado") || undefined) as "en_progreso" | "esperando_cliente" | "resuelto" | "cerrado" | undefined,
     });
+  });
+}
+
+export async function generarLiquidacionAccion(formulario: FormData): Promise<void> {
+  await ejecutar("/admin/pagos", async () => {
+    await generarLiquidacion(await exigirWopa(), { hotelId: texto(formulario, "hotelId"), desde: texto(formulario, "desde"), hasta: texto(formulario, "hasta") });
+  });
+}
+
+export async function aprobarLiquidacionAccion(formulario: FormData): Promise<void> {
+  await ejecutar("/admin/pagos", async () => {
+    await aprobarLiquidacion(await exigirWopa(), texto(formulario, "liquidacionId"));
+  });
+}
+
+export async function pagarLiquidacionAccion(formulario: FormData): Promise<void> {
+  await ejecutar("/admin/pagos", async () => {
+    await marcarLiquidacionPagada(await exigirWopa(), texto(formulario, "liquidacionId"), texto(formulario, "referencia"));
+  });
+}
+
+export async function completarReembolsoAccion(formulario: FormData): Promise<void> {
+  await ejecutar("/admin/pagos", async () => {
+    await completarReembolsoManual(await exigirWopa(), texto(formulario, "reembolsoId"), texto(formulario, "referencia"));
   });
 }

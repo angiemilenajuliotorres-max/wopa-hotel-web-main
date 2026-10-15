@@ -22,6 +22,8 @@ const MENSAJES: Record<string, string> = {
   CUPO_MENOR_A_VENDIDO: "El cupo no puede ser menor que lo ya vendido.",
   CORREO_INVALIDO: "El correo no es válido.",
   DATOS_INVALIDOS: "Revisa los datos del formulario.",
+  MONEDAS_MEZCLADAS: "Las reservas del periodo están en monedas distintas.",
+  REFERENCIA_OBLIGATORIA: "Escribe la referencia de la transferencia.",
 };
 
 export function codigoDeError(error: unknown): string {

@@ -26,6 +26,8 @@ Prioridad: 🔴 bloquea el lanzamiento · 🟠 necesario antes de producción ·
 | 🔴 | Crear `SECRETO_CIFRADO` en Vercel: 32 bytes aleatorios en base64 (comando en `.env.example`) |
 | 🟠 | Proteger las ramas `main` y `develop` en GitHub (requiere un administrador) |
 | 🟠 | Revisar en la vista previa de Vercel que la CSP no bloquee el mapa, las imágenes ni el panel |
+| 🔴 | Cambiar el Root Directory del proyecto de Vercel a `apps/web` en el momento del lanzamiento (ver [DESPLIEGUE.md](DESPLIEGUE.md)) |
+| 🟠 | Plan de Vercel: el cron cada minuto requiere Pro; si no, configurar un cron externo hacia `/api/cron` |
 | 🟠 | Abrir y aprobar el PR `release/v0.1.0` → `main` |
 
 ## Datos y negocio
@@ -50,4 +52,5 @@ Prioridad: 🔴 bloquea el lanzamiento · 🟠 necesario antes de producción ·
 | 🔴 | Auditoría de seguridad de la autenticación propia (ADR-012) antes del lanzamiento |
 | 🟠 | Impedir reutilizar un código TOTP dentro de su ventana de 30 s (guardar el último contador usado) |
 | 🟠 | Textos legales (términos, privacidad, cancelación) actualizados al cobro del anticipo, al margen y a la Ley 81 de 2019 de Panamá |
-| 🟠 | Verificar los adaptadores de Yappy y PagueloFacil contra la documentación y el sandbox oficiales cuando haya credenciales |
+| 🔴 | Verificar en UAT el adaptador de Yappy: URL base (`YAPPY_URL_API`), forma de las respuestas, unidad de `paymentDate` y algoritmo del Hash del IPN (hoy: HMAC-SHA256 de orderId+status+domain). Después, `YAPPY_VERIFICADO=1` |
+| 🔴 | Verificar en el sandbox de PagueloFacil: URL base, respuesta de `LinkDeamon`, consulta de transacciones (conciliación) y reembolsos. Después, `PAGUELOFACIL_VERIFICADO=1` |

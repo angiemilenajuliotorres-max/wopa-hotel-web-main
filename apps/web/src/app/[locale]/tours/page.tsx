@@ -32,7 +32,7 @@ export default async function PaginaTours({ params }: PageProps<"/[locale]/tours
                   ? `${dinero(tour.precio_centavos, tour.moneda, idioma)} ${tour.unidad_precio === "persona" ? (es ? "por persona" : "per person") : es ? "por grupo" : "per group"}`
                   : es ? "Precio a consultar" : "Price on request"}
               </strong>
-              <Link className="boton secundario" href={`/${idioma}/ayuda?asunto=${encodeURIComponent(tour.nombre)}#contacto`}>{es ? "Consultar" : "Ask about it"}</Link>
+              <Link className="boton secundario" href={`/${idioma}/cotizar?experiencia=${tour.codigo}`}>{es ? "Cotizar" : "Get a quote"}</Link>
             </div>
           </article>
         ))}

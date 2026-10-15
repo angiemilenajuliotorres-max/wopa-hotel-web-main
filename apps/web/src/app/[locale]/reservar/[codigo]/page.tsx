@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { consultarReserva } from "@wopa/servicios";
+import { consultarReserva, pagosDeReserva } from "@wopa/servicios";
 import { diccionario, mensajeError } from "@/i18n";
 import { reservasConAcceso } from "@/lib/acceso-reservas";
 import { dinero, fechaLarga } from "@/lib/formato";
@@ -23,6 +23,9 @@ export default async function PaginaReserva({ params, searchParams }: PageProps<
   const cancelable = ["retenida", "pendiente_pago", "solicitada", "confirmada"].includes(reserva.estado);
   const porPagar = ["retenida", "pendiente_pago"].includes(reserva.estado);
   const explicacion = t.reserva.explicacion[reserva.estado];
+  const pagos = await pagosDeReserva(reserva.id);
+  const ultimoPago = typeof parametros.pago === "string" ? pagos.find((p) => p.id === parametros.pago) : undefined;
+  const procesando = ultimoPago?.estado === "pendiente" && porPagar;
 
   return (
     <div className="contenedor pila" style={{ marginTop: 24, maxWidth: 820 }}>
@@ -37,7 +40,9 @@ export default async function PaginaReserva({ params, searchParams }: PageProps<
         </p>
       )}
       {error && <p className="aviso error" role="alert">{error}</p>}
-      {explicacion && <p className="aviso info">{explicacion}</p>}
+      {procesando && <p className="aviso info" role="status">{t.reserva.procesando}</p>}
+      {ultimoPago && ["fallido", "cancelado"].includes(ultimoPago.estado) && <p className="aviso error" role="alert">{t.reserva.pagoFallido}</p>}
+      {explicacion && !procesando && <p className="aviso info">{explicacion}</p>}
 
       <div className="rejilla-2" style={{ alignItems: "start" }}>
         <section className="tarjeta pila">
@@ -56,7 +61,17 @@ export default async function PaginaReserva({ params, searchParams }: PageProps<
         </section>
 
         <section className="pila">
-          {porPagar && <SeccionPago codigo={reserva.codigo} idioma={idioma} t={t} retenidaHasta={reserva.retenida_hasta} />}
+          {porPagar && (
+            <SeccionPago
+              codigo={reserva.codigo}
+              correo={correo}
+              idioma={idioma}
+              t={t}
+              retenidaHasta={reserva.retenida_hasta}
+              montoCentavos={(BigInt(reserva.anticipo) - BigInt(reserva.pagado)).toString()}
+              moneda={reserva.moneda}
+            />
+          )}
           <Link className="boton secundario" href={`/${idioma}/ayuda?reserva=${reserva.codigo}#contacto`}>{t.reserva.ayuda}</Link>
           {cancelable && (
             <details className="tarjeta">

@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { cancelarPorViajero, consultarReserva, crearReserva, crearTicket, ErrorNegocio, type Categoria } from "@wopa/servicios";
+import { cancelarConReembolso, consultarReserva, crearCotizacion, crearReserva, crearTicket, ErrorNegocio, iniciarPago, type Categoria, type MetodoPago } from "@wopa/servicios";
 import { darAccesoReserva, reservasConAcceso } from "@/lib/acceso-reservas";
 import { esIdioma, type Idioma } from "@/lib/formato";
 import { exigirMismoOrigen } from "@/lib/sesion";
@@ -75,7 +75,7 @@ export async function cancelarReservaAccion(formulario: FormData): Promise<void>
     destino = `/${idioma}/mi-reserva?error=RESERVA_NO_ENCONTRADA`;
   } else {
     try {
-      const { reembolsoCentavos } = await cancelarPorViajero({ codigo, correo, motivo: texto(formulario, "motivo") || undefined });
+      const { reembolsoCentavos } = await cancelarConReembolso({ codigo, correo, motivo: texto(formulario, "motivo") || undefined });
       destino = `/${idioma}/reservar/${codigo}?cancelada=1&reembolso=${reembolsoCentavos}`;
     } catch (error) {
       destino = `/${idioma}/reservar/${codigo}?error=${codigoDe(error)}`;
@@ -104,6 +104,55 @@ export async function crearTicketAccion(formulario: FormData): Promise<void> {
     destino = `/${idioma}/ayuda?enviado=${codigo}`;
   } catch (error) {
     destino = `/${idioma}/ayuda?error=${codigoDe(error)}${reservaCodigo ? `&reserva=${reservaCodigo}` : ""}#contacto`;
+  }
+  redirect(destino);
+}
+
+export async function iniciarPagoAccion(formulario: FormData): Promise<void> {
+  await exigirMismoOrigen();
+  const idioma = idiomaDe(formulario);
+  const codigo = texto(formulario, "codigo").toUpperCase();
+  const correo = (await reservasConAcceso())[codigo];
+  let destino: string;
+  if (!correo) {
+    destino = `/${idioma}/mi-reserva?error=RESERVA_NO_ENCONTRADA`;
+  } else {
+    try {
+      const resultado = await iniciarPago({
+        codigo,
+        correo,
+        metodo: texto(formulario, "metodo") as MetodoPago,
+        claveIdempotencia: texto(formulario, "claveIdempotencia"),
+        urlBase: process.env.URL_PUBLICA ?? "http://localhost:3100",
+      });
+      destino = resultado.tipo === "redireccion" ? resultado.url : `/${idioma}/reservar/${codigo}?error=METODO_NO_DISPONIBLE`;
+    } catch (error) {
+      destino = `/${idioma}/reservar/${codigo}?error=${codigoDe(error)}`;
+    }
+  }
+  redirect(destino);
+}
+
+export async function crearCotizacionAccion(formulario: FormData): Promise<void> {
+  await exigirMismoOrigen();
+  const idioma = idiomaDe(formulario);
+  let destino: string;
+  try {
+    const { codigo } = await crearCotizacion({
+      idioma,
+      nombre: texto(formulario, "nombre"),
+      correo: texto(formulario, "correo"),
+      telefono: texto(formulario, "telefono"),
+      personas: Number(texto(formulario, "personas")),
+      hotelSlug: texto(formulario, "hotel") || null,
+      experienciaCodigo: texto(formulario, "experiencia") || null,
+      entrada: texto(formulario, "entrada") || null,
+      salida: texto(formulario, "salida") || null,
+      notas: texto(formulario, "notas") || null,
+    });
+    destino = `/${idioma}/cotizar?codigo=${codigo}`;
+  } catch (error) {
+    destino = `/${idioma}/cotizar?error=${codigoDe(error)}`;
   }
   redirect(destino);
 }

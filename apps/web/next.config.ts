@@ -17,7 +17,7 @@ const csp = [
 const config: NextConfig = {
   // Los paquetes del monorepo se publican como TypeScript fuente.
   transpilePackages: ["@wopa/servicios", "@wopa/dominio", "@wopa/db"],
-  serverExternalPackages: ["pg"],
+  serverExternalPackages: ["pg", "pdfkit"],
   poweredByHeader: false,
   images: {
     remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }],

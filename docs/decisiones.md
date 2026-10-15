@@ -115,3 +115,16 @@ El chat lo atiende un asistente con la API de Claude y herramientas de solo lect
   - los mensajes de contacto pasan a tickets;
   - los movimientos financieros pasan a asientos de partida doble;
   - la actividad pasa a `auditoria.eventos`.
+
+## ADR-014 · Pasarelas activadas solo tras verificación en sandbox
+**Estado:** Aceptada · 2026-10-15
+
+**Contexto.** Sin credenciales, no se pudo probar Yappy ni PagueloFacil. La documentación pública de Yappy confirma el flujo general: validación del comercio, creación de la orden, e IPN por GET con `orderId`, `Hash` y `status` E/R/C. Pero no confirma el algoritmo del hash ni las URLs base.
+
+**Decisión.**
+- Cada adaptador real solo se ofrece si tiene credenciales **y** la marca `*_VERIFICADO=1`, que se pone después de probarlo en el sandbox oficial.
+- La confirmación de un pago nunca se toma de la URL de retorno del navegador. Solo cuentan una notificación con firma válida o la consulta del servidor al proveedor (conciliación).
+- **Pasarela simulada:** firma HMAC sobre la misma ruta de webhooks. Está disponible en desarrollo y nunca en producción, salvo `PAGOS_SIMULADOS=1`. Se usa en las pruebas de extremo a extremo.
+- **Reembolsos:** si el proveedor no permite reembolsar desde la API, el reembolso queda pendiente, con una alerta crítica, para que finanzas lo haga en el portal del proveedor y registre la referencia.
+- **Libro contable al cobrar:** se registran caja +anticipo, ingreso de margen −min(margen, anticipo) y deuda con el hotel −resto.
+- **Libro contable al cancelar con penalización:** WOPA retiene hasta su margen y el excedente se liquida al hotel.

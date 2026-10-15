@@ -1,4 +1,4 @@
-import { expirarRetenciones, procesarCorreosPendientes } from "@wopa/servicios";
+import { completarEstadias, conciliarPendientes, expirarRetenciones, procesarCorreosPendientes } from "@wopa/servicios";
 
 /**
  * Tareas periódicas (Vercel Cron, cada minuto): expira retenciones vencidas y envía la cola de correos.
@@ -10,6 +10,8 @@ export async function GET(request: Request) {
     return Response.json({ error: { code: "NO_AUTORIZADO" } }, { status: 401 });
   }
   const expiradas = await expirarRetenciones();
+  const conciliacion = await conciliarPendientes();
+  const completadas = await completarEstadias();
   const correos = await procesarCorreosPendientes();
-  return Response.json({ expiradas, correos });
+  return Response.json({ expiradas, conciliacion, completadas, correos });
 }

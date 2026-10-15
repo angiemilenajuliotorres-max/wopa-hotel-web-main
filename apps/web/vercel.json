@@ -1,0 +1,7 @@
+{
+  "framework": "nextjs",
+  "installCommand": "cd ../.. && npm ci",
+  "crons": [
+    { "path": "/api/cron", "schedule": "* * * * *" }
+  ]
+}

@@ -14,7 +14,8 @@ Horas trabajadas en el proyecto, por sesión. Hora local de Panamá (UTC−5).
 | Fase 0 · Estabilización (incluye Git Flow y documentación) | 0 h 10 min |
 | Fase 1 · Base: esquema, identidad y precio | 0 h 40 min |
 | Fase 2 · Web pública es/en, ayuda y soporte | 0 h 15 min |
-| **Total** | **1 h 55 min** |
+| Fase 3 · Cobro del anticipo, pagos y lanzamiento | 0 h 20 min |
+| **Total** | **2 h 15 min** |
 
 ## Detalle
 
@@ -30,3 +31,5 @@ Horas trabajadas en el proyecto, por sesión. Hora local de Panamá (UTC−5).
 | 2026-10-14 | 22:39 | 22:49 | 0:10 | Fase 1–2 | `@wopa/servicios`: identidad (login, 2FA, invitaciones), catálogo (alta, aceptación con margen, ajustes, tarifas, cupos), búsqueda con precio total, reservas (retención, expiración, solicitudes, cancelación); transacciones anidadas | David + Claude |
 | 2026-10-14 | 22:49 | 22:58 | 0:10 | Fase 1 | `apps/web` con Next.js 16: acceso con 2FA y QR, panel de WOPA (hoteles, márgenes, tarifas, cupos, invitaciones), extranet inicial; build de producción y prueba de extremo a extremo | David + Claude |
 | 2026-10-14 | 22:58 | 23:09 | 0:10 | Fase 2 | Web pública es/en (portada, buscador accesible, resultados, destinos, ficha, reserva, Mi reserva, cancelación, tours), centro de ayuda y tickets, panel de reservas/soporte/correos, cron, SEO; pruebas de extremo a extremo | David + Claude |
+| 2026-10-14 | 23:09 | 23:15 | 0:05 | Fase 3 | Investigación de la API de Yappy; contrato de pasarelas; adaptadores simulado, Yappy y PagueloFacil; servicio de pagos y pruebas | David + Claude |
+| 2026-10-15 | 07:03 | 07:18 | 0:15 | Fase 3 | Pagos en la web (métodos por país, pasarela simulada, webhooks), panel de pagos y liquidaciones, cotización con PDF, textos sin “impuestos incluidos”, guía de despliegue; pruebas de extremo a extremo de pagos | David + Claude |
