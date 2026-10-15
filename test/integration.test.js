@@ -1,12 +1,11 @@
 const assert = require("node:assert/strict");
 const crypto = require("node:crypto");
 const fs = require("node:fs");
-const os = require("node:os");
 const path = require("node:path");
 const { after, before, test } = require("node:test");
+const { crearBaseDePrueba } = require("./postgres-de-prueba");
 
-const temporal = fs.mkdtempSync(path.join(os.tmpdir(), "wopa-local-test-"));
-process.env.DB_PATH = path.join(temporal, "hotel-test.sqlite");
+// Vacía a propósito: dotenv no la sobrescribe, así un .env local nunca apunta las pruebas a Neon.
 process.env.DATABASE_URL = "";
 process.env.VERCEL = "";
 process.env.ADMIN_USER = "wopa-test-admin";
@@ -15,11 +14,13 @@ process.env.ADMIN_SESSION_SECRET = crypto.randomBytes(48).toString("base64url");
 
 const app = require("../server/app");
 const db = require("../server/db/conexion");
-const { PGlite } = require("@electric-sql/pglite");
+let base;
 let server;
 let baseUrl;
 
 before(async () => {
+  base = await crearBaseDePrueba();
+  process.env.DATABASE_URL = base.url;
   await db.inicializarBaseDatos();
   server = app.listen(0);
   baseUrl = `http://127.0.0.1:${server.address().port}`;
@@ -28,7 +29,7 @@ before(async () => {
 after(async () => {
   if (server) await new Promise((resolve) => server.close(resolve));
   await db.cerrar();
-  fs.rmSync(temporal, { recursive: true, force: true });
+  if (base) await base.eliminar();
 });
 
 test("API local conserva catálogo, solicitudes y autenticación administrativa", async () => {
@@ -104,41 +105,76 @@ test("API local conserva catálogo, solicitudes y autenticación administrativa"
   assert.equal(cancellation.penalizacionUsd, 10);
 });
 
-test("schema y seed PostgreSQL son válidos e idempotentes", async () => {
-  const postgres = new PGlite();
-  const executor = {
-    query: (sql, parameters) => postgres.query(sql, parameters),
-    async connect() {
-      return {
-        query: (sql, parameters) => postgres.query(sql, parameters),
-        release() {},
-      };
-    },
-  };
-  try {
-    await db.inicializarPostgres(executor);
-    await db.inicializarPostgres(executor);
-    const counts = await postgres.query(`
-      SELECT
-        (SELECT COUNT(*)::integer FROM tipos_habitacion) AS hoteles,
-        (SELECT COUNT(*)::integer FROM tarifas) AS tarifas,
-        (SELECT COUNT(*)::integer FROM experiencias) AS experiencias
-    `);
-    assert.deepEqual(counts.rows[0], { hoteles: 8, tarifas: 16, experiencias: 6 });
-
-    const postgresAdapter = db.crearAdaptador(executor, true);
-    const count = await postgresAdapter.prepare("SELECT COUNT(*) AS count FROM tipos_habitacion WHERE id = ?").get(1);
-    assert.equal(count.count, 1);
-    assert.equal(db.adaptarPostgres("SELECT * FROM tabla WHERE id = ? AND nombre = ?"), "SELECT * FROM tabla WHERE id = $1 AND nombre = $2");
-
-    const inserted = await postgresAdapter.transaction((tx) => tx.prepare(`
-      INSERT INTO mensajes_contacto (codigo, nombre, correo, asunto, mensaje)
-      VALUES (?, ?, ?, ?, ?)
-    `).run("WOPA-M-TEST", "Prueba", "pg@example.test", "Asunto", "Mensaje de prueba."));
-    assert.ok(inserted.lastInsertRowid > 0);
-    const messages = await postgresAdapter.prepare("SELECT COUNT(*) AS count FROM mensajes_contacto").get();
-    assert.equal(messages.count, 1);
-  } finally {
-    await postgres.close();
+test("fase 0: rutas de prueba retiradas, CORS cerrado, CSP activa y disponibilidad desactivada", async () => {
+  for (const ruta of ["/api/admin-test", "/api/no-existe"]) {
+    const response = await fetch(`${baseUrl}${ruta}`);
+    assert.equal(response.status, 404, ruta);
+    assert.match(response.headers.get("content-type"), /application\/json/, ruta);
   }
+
+  const directo = await fetch(`${baseUrl}/api/admin/test-directo`);
+  assert.equal(directo.status, 401);
+
+  const crossOrigin = await fetch(`${baseUrl}/api/health`, { headers: { origin: "https://sitio-ajeno.example" } });
+  assert.equal(crossOrigin.status, 200);
+  assert.equal(crossOrigin.headers.get("access-control-allow-origin"), null);
+
+  const csp = crossOrigin.headers.get("content-security-policy");
+  assert.match(csp, /default-src 'self'/);
+  assert.match(csp, /script-src 'self'/);
+  assert.match(csp, /frame-ancestors 'none'/);
+
+  const disponibilidad = await fetch(`${baseUrl}/api/habitaciones/disponibilidad`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ fechaEntrada: "2030-01-01", fechaSalida: "2030-01-03", numeroPersonas: 2 }),
+  });
+  assert.equal(disponibilidad.status, 410);
+
+  const estatico = await fetch(`${baseUrl}/`);
+  assert.equal(estatico.status, 200);
+  assert.equal(estatico.headers.get("ratelimit-policy"), null);
+});
+
+test("vercel.json aplica la misma CSP a los archivos estáticos", () => {
+  const vercel = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "vercel.json"), "utf8"));
+  const cabeceras = vercel.headers.find((regla) => regla.source === "/(.*)").headers;
+  const csp = cabeceras.find((cabecera) => cabecera.key === "Content-Security-Policy").value;
+  assert.match(csp, /script-src 'self'/);
+  assert.match(csp, /frame-ancestors 'none'/);
+});
+
+test("la inicialización PostgreSQL es idempotente y las transacciones funcionan", async () => {
+  await db.inicializarPostgres();
+  const counts = await db.prepare(`
+    SELECT
+      (SELECT COUNT(*) FROM tipos_habitacion) AS hoteles,
+      (SELECT COUNT(*) FROM tarifas) AS tarifas,
+      (SELECT COUNT(*) FROM experiencias) AS experiencias
+  `).get();
+  assert.deepEqual(counts, { hoteles: 8, tarifas: 16, experiencias: 6 });
+
+  const count = await db.prepare("SELECT COUNT(*) AS count FROM tipos_habitacion WHERE id = ?").get(1);
+  assert.equal(count.count, 1);
+  assert.equal(db.adaptarPostgres("SELECT * FROM tabla WHERE id = ? AND nombre = ?"), "SELECT * FROM tabla WHERE id = $1 AND nombre = $2");
+
+  const antes = (await db.prepare("SELECT COUNT(*) AS count FROM mensajes_contacto").get()).count;
+  const inserted = await db.transaction((tx) => tx.prepare(`
+    INSERT INTO mensajes_contacto (codigo, nombre, correo, asunto, mensaje)
+    VALUES (?, ?, ?, ?, ?)
+  `).run("WOPA-M-TEST", "Prueba", "pg@example.test", "Asunto", "Mensaje de prueba."));
+  assert.ok(inserted.lastInsertRowid > 0);
+  const despues = (await db.prepare("SELECT COUNT(*) AS count FROM mensajes_contacto").get()).count;
+  assert.equal(despues, antes + 1);
+
+  await assert.rejects(
+    db.transaction(async (tx) => {
+      await tx.prepare("INSERT INTO mensajes_contacto (codigo, nombre, correo, asunto, mensaje) VALUES (?, ?, ?, ?, ?)")
+        .run("WOPA-M-ROLLBACK", "Prueba", "pg@example.test", "Asunto", "No debe quedar.");
+      throw new Error("forzar rollback");
+    }),
+    /forzar rollback/,
+  );
+  const tras = (await db.prepare("SELECT COUNT(*) AS count FROM mensajes_contacto WHERE codigo = ?").get("WOPA-M-ROLLBACK")).count;
+  assert.equal(tras, 0);
 });

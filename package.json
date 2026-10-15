@@ -1,19 +1,33 @@
 {
   "name": "wopa-travel-web",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Sitio web y API de WOPA Travel",
   "main": "server/app.js",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "start": "node server/app.js",
-    "test": "node --test"
+    "test": "node --test \"test/**/*.test.js\" \"packages/*/test/**/*.test.ts\"",
+    "typecheck": "tsc -p tsconfig.json",
+    "db:migrar": "npm run migrar -w @wopa/db",
+    "admin:crear": "npm run admin:crear -w @wopa/db",
+    "db:importar-legado": "npm run importar-legado -w @wopa/db",
+    "web:dev": "npm run dev -w @wopa/web",
+    "web:build": "npm run build -w @wopa/web",
+    "web:start": "npm run start -w @wopa/web",
+    "e2e:acceso": "node apps/web/e2e/acceso.mjs .",
+    "e2e:publico": "node apps/web/e2e/publico.mjs",
+    "e2e:pagos": "node apps/web/e2e/pagos.mjs",
+    "e2e:extranet": "node apps/web/e2e/extranet.mjs .",
+    "e2e:resenas": "node apps/web/e2e/resenas.mjs"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22.18"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^0.10.4",
-    "better-sqlite3": "^11.10.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "exceljs": "^4.4.0",
@@ -22,9 +36,11 @@
     "express-rate-limit": "^7.5.0",
     "helmet": "^8.1.0",
     "pdfkit": "^0.20.2",
-    "ws": "^8.22.0"
+    "pg": "^8.23.1"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "^0.5.8"
+    "@types/node": "^22.15.0",
+    "@types/pg": "^8.23.1",
+    "typescript": "^5.8.3"
   }
 }

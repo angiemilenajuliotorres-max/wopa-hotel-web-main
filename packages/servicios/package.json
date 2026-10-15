@@ -1,0 +1,17 @@
+{
+  "name": "@wopa/servicios",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Servicios de aplicación de WOPA Travel sobre PostgreSQL (identidad, catálogo, reservas, pagos, soporte)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.134.0",
+    "@wopa/db": "0.1.0",
+    "@wopa/dominio": "0.1.0",
+    "pg": "^8.23.1"
+  }
+}

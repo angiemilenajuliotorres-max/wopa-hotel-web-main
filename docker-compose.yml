@@ -1,0 +1,24 @@
+# Postgres 18 local para desarrollo y pruebas (misma versión que Neon en producción).
+#   docker compose up -d
+#   DATABASE_URL=postgres://wopa:wopa_local@localhost:5433/wopa
+# Puerto 5433 para no chocar con otros Postgres locales en 5432.
+services:
+  postgres:
+    image: postgres:18
+    container_name: wopa-postgres
+    environment:
+      POSTGRES_USER: wopa
+      POSTGRES_PASSWORD: wopa_local   # solo desarrollo local
+      POSTGRES_DB: wopa
+    ports:
+      - "5433:5432"
+    volumes:
+      - wopa-postgres-datos:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wopa -d wopa"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  wopa-postgres-datos:
