@@ -6,7 +6,7 @@ Lo que necesita una persona (cuentas, datos, validaciones) está en [POR-REVISAR
 
 Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (necesita una decisión o un acceso externo)
 
-**Fase actual:** 6 · Expansión (fase 5 en `release/v1.2.0`; el lanzamiento espera los 🔴 de [POR-REVISAR.md](POR-REVISAR.md))
+**Fase actual:** todas las fases completas (fase 6 en `release/v1.3.0`); el lanzamiento espera los 🔴 de [POR-REVISAR.md](POR-REVISAR.md)
 **Lanzamiento:** Panamá, al cerrar la fase 3 (`v1.0.0`)
 
 ---
@@ -132,12 +132,16 @@ Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (nec
 | Revisión de cambios de contenido: el hotel propone y WOPA aprueba y publica, o rechaza con comentario | ✅ 4 pruebas |
 | Semáforo de salud por hotel y alertas diarias (sin cupo prolongado, ticket urgente vencido, falta inglés) con cron diario | ✅ |
 
-## Fase 6 · Expansión
+## Fase 6 · Expansión → `v1.3.0`
 
 | Ítem | Estado |
 |---|---|
-| Adaptador para Colombia (Wompi o PayU) | ⬜ |
-| Reseñas, paquetes hotel + tour, más idiomas | ⬜ |
+| Adaptador de Wompi para Colombia (COP, tarjeta, PSE y Nequi): firma de integridad, checksum de eventos, reglas de enrutamiento | 🟡 Probado con firmas de ejemplo; se activa con `WOMPI_VERIFICADO=1` tras verificar en sandbox |
+| Reseñas: solo de estadías completadas (la base lo exige), una por reserva, moderadas por WOPA en `/admin/resenas`, promedio y `AggregateRating` en la ficha, invitación por correo en el cron diario | ✅ Pruebas y recorrido de extremo a extremo (`npm run e2e:resenas`) |
+| Un código TOTP no se acepta dos veces (`totp_ultimo_paso`) | ✅ Prueba |
+| Más idiomas | ✅ Mecanismo listo: agregar la fila en `geo.idiomas`, el diccionario en `apps/web/src/i18n` y el código en `proxy.ts`; no hay un tercer idioma decidido |
+| Paquetes hotel + tour | ⬜ Trabajo futuro: hoy se reservan por separado |
+| Conexión con channel managers | ⬜ Trabajo futuro: cuando un hotel lo pida |
 
 ---
 

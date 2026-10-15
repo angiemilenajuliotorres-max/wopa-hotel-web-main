@@ -1,4 +1,4 @@
-import { generarAlertas } from "@wopa/servicios";
+import { generarAlertas, invitarAResenar } from "@wopa/servicios";
 
 /** Revisión diaria de supervisión (Vercel Cron): crea alertas para WOPA. */
 export async function GET(request: Request) {
@@ -6,5 +6,7 @@ export async function GET(request: Request) {
   if (!secreto || request.headers.get("authorization") !== `Bearer ${secreto}`) {
     return Response.json({ error: { code: "NO_AUTORIZADO" } }, { status: 401 });
   }
-  return Response.json({ alertas: await generarAlertas() });
+  const alertas = await generarAlertas();
+  const invitacionesResena = await invitarAResenar(process.env.URL_PUBLICA ?? "http://localhost:3100");
+  return Response.json({ alertas, invitacionesResena });
 }

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
+  moderarResena,
   resolverRevision,
   aprobarLiquidacion,
   completarReembolsoManual,
@@ -210,5 +211,11 @@ export async function completarReembolsoAccion(formulario: FormData): Promise<vo
 export async function resolverRevisionAccion(formulario: FormData): Promise<void> {
   await ejecutar("/admin/salud", async () => {
     await resolverRevision(await exigirWopa(), texto(formulario, "revisionId"), texto(formulario, "accion") === "aprobar", texto(formulario, "comentario") || null);
+  });
+}
+
+export async function moderarResenaAccion(formulario: FormData): Promise<void> {
+  await ejecutar("/admin/resenas", async () => {
+    await moderarResena(await exigirWopa(), texto(formulario, "resenaId"), texto(formulario, "accion") === "publicar");
   });
 }

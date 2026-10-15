@@ -9,10 +9,10 @@ import {
   generarToken,
   hashearClave,
   huellaToken,
+  pasoTotp,
   uriTotp,
   validarClave,
   verificarClave,
-  verificarTotp,
 } from "@wopa/dominio/identidad";
 import { registrarEvento } from "./auditoria.ts";
 import { db, enTransaccion, ErrorNegocio, type Consulta } from "./conexion.ts";
@@ -171,6 +171,17 @@ export async function iniciarConfiguracion2fa(token: string, cliente?: Consulta)
   return { secreto, uri: uriTotp(secreto, sesion.usuario.correo) };
 }
 
+/** Valida el código y lo marca como usado; un mismo código (o uno anterior) no se acepta dos veces. */
+async function consumirCodigo(conexion: Consulta, usuarioId: string, secreto: string, codigo: string): Promise<boolean> {
+  const paso = pasoTotp(secreto, codigo);
+  if (paso === null) return false;
+  const { rowCount } = await conexion.query(
+    "UPDATE identidad.credenciales SET totp_ultimo_paso = $2 WHERE usuario_id = $1 AND (totp_ultimo_paso IS NULL OR totp_ultimo_paso < $2)",
+    [usuarioId, paso],
+  );
+  return (rowCount ?? 0) > 0;
+}
+
 async function secretoDe(conexion: Consulta, usuarioId: string): Promise<string | null> {
   const { rows } = await conexion.query<{ totp_secreto_cifrado: string | null }>(
     "SELECT totp_secreto_cifrado FROM identidad.credenciales WHERE usuario_id = $1",
@@ -185,7 +196,7 @@ export async function confirmarConfiguracion2fa(token: string, codigo: string, c
     const sesion = await sesionObligatoria(token, tx);
     if (sesion.tiene2fa) throw new ErrorNegocio("2FA_YA_CONFIGURADA", "La verificación en dos pasos ya está activa.", { estado: 409 });
     const secreto = await secretoDe(tx, sesion.usuario.id);
-    if (!secreto || !verificarTotp(secreto, codigo.trim())) {
+    if (!secreto || !(await consumirCodigo(tx, sesion.usuario.id, secreto, codigo.trim()))) {
       throw new ErrorNegocio("CODIGO_INVALIDO", "El código no es válido. Revisa la hora de tu teléfono e inténtalo de nuevo.", { campo: "codigo" });
     }
     await tx.query("UPDATE identidad.credenciales SET totp_activado_en = now() WHERE usuario_id = $1", [sesion.usuario.id]);
@@ -201,7 +212,7 @@ export async function verificarSegundoFactor(token: string, codigo: string, ip?:
     throw new ErrorNegocio("ACCESO_BLOQUEADO", `Demasiados intentos. Espera ${VENTANA_BLOQUEO_MINUTOS} minutos.`, { estado: 429 });
   }
   const secreto = await secretoDe(conexion, sesion.usuario.id);
-  if (!sesion.tiene2fa || !secreto || !verificarTotp(secreto, codigo.trim())) {
+  if (!sesion.tiene2fa || !secreto || !(await consumirCodigo(conexion, sesion.usuario.id, secreto, codigo.trim()))) {
     await registrarIntento(conexion, sesion.usuario.correo, ip ?? null, false);
     throw new ErrorNegocio("CODIGO_INVALIDO", "El código no es válido.", { estado: 401, campo: "codigo" });
   }

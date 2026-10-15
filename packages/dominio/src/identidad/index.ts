@@ -8,6 +8,7 @@ export {
   generarSecretoTotp,
   generarToken,
   hashearClave,
+  pasoTotp,
   huellaToken,
   uriTotp,
   validarClave,

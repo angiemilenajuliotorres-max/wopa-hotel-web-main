@@ -26,6 +26,7 @@ export default async function LayoutAdmin({ children }: LayoutProps<"/admin">) {
               
               <Link href="/admin/soporte">Soporte</Link>
               <Link href="/admin/conversaciones">Asistente IA</Link>
+              <Link href="/admin/resenas">Reseñas</Link>
               <Link href="/admin/correos">Correos enviados</Link>
             </nav>
             <div className="pila chico" style={{ marginTop: 32, color: "#cdd6ea" }}>

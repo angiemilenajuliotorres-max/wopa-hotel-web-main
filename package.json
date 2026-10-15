@@ -21,7 +21,8 @@
     "e2e:acceso": "node apps/web/e2e/acceso.mjs .",
     "e2e:publico": "node apps/web/e2e/publico.mjs",
     "e2e:pagos": "node apps/web/e2e/pagos.mjs",
-    "e2e:extranet": "node apps/web/e2e/extranet.mjs ."
+    "e2e:extranet": "node apps/web/e2e/extranet.mjs .",
+    "e2e:resenas": "node apps/web/e2e/resenas.mjs"
   },
   "engines": {
     "node": ">=22.18"

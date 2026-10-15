@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { describirPolitica } from "@wopa/dominio/reservas";
-import { ErrorNegocio, fichaHotel } from "@wopa/servicios";
+import { ErrorNegocio, fichaHotel, resenasDeHotel } from "@wopa/servicios";
 import { diccionario, mensajeError } from "@/i18n";
 import { consultaDe, criteriosDeUrl } from "@/lib/busqueda-url";
 import { dinero, fechaCorta, hoyMas } from "@/lib/formato";
@@ -36,6 +36,7 @@ export default async function PaginaHotel({ params, searchParams }: PageProps<"/
   }
   if (!hotel) notFound();
   const mapa = `https://www.google.com/maps/search/?api=1&query=${hotel.latitud},${hotel.longitud}`;
+  const resenas = await resenasDeHotel(hotel.slug);
 
   // Datos estructurados para buscadores (schema.org/Hotel).
   const datosEstructurados = {
@@ -47,6 +48,7 @@ export default async function PaginaHotel({ params, searchParams }: PageProps<"/
     image: hotel.fotos,
     starRating: hotel.categoria ? { "@type": "Rating", ratingValue: hotel.categoria } : undefined,
     amenityFeature: hotel.servicios.map((s) => ({ "@type": "LocationFeatureSpecification", name: s.nombre, value: true })),
+    aggregateRating: resenas.cantidad > 0 ? { "@type": "AggregateRating", ratingValue: resenas.promedio, reviewCount: resenas.cantidad, bestRating: 5 } : undefined,
   };
 
   return (
@@ -78,6 +80,17 @@ export default async function PaginaHotel({ params, searchParams }: PageProps<"/
             <div>
               <h2>{t.hotel.servicios}</h2>
               <ul className="servicios">{hotel.servicios.map((s) => <li key={s.codigo}>{s.nombre}</li>)}</ul>
+            </div>
+          )}
+          {resenas.cantidad > 0 && (
+            <div className="pila" style={{ gap: 8 }}>
+              <h2>{idioma === "es" ? "Opiniones de huéspedes" : "Guest reviews"} · {resenas.promedio}/5 ({resenas.cantidad})</h2>
+              {resenas.ultimas.map((r, i) => (
+                <blockquote key={i} className="tarjeta" style={{ margin: 0 }}>
+                  <div className="chico">{"★".repeat(r.puntaje)}{"☆".repeat(5 - r.puntaje)} · {r.nombre_visible}</div>
+                  {r.comentario && <p style={{ margin: "6px 0 0" }} lang={r.idioma}>{r.comentario}</p>}
+                </blockquote>
+              ))}
             </div>
           )}
           <div>

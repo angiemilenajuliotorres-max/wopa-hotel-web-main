@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { cancelarConReembolso, consultarReserva, crearCotizacion, crearReserva, crearTicket, ErrorNegocio, iniciarPago, type Categoria, type MetodoPago } from "@wopa/servicios";
+import { cancelarConReembolso, consultarReserva, crearCotizacion, crearResena, crearReserva, crearTicket, ErrorNegocio, iniciarPago, type Categoria, type MetodoPago } from "@wopa/servicios";
 import { darAccesoReserva, reservasConAcceso } from "@/lib/acceso-reservas";
 import { esIdioma, type Idioma } from "@/lib/formato";
 import { exigirMismoOrigen } from "@/lib/sesion";
@@ -153,6 +153,27 @@ export async function crearCotizacionAccion(formulario: FormData): Promise<void>
     destino = `/${idioma}/cotizar?codigo=${codigo}`;
   } catch (error) {
     destino = `/${idioma}/cotizar?error=${codigoDe(error)}`;
+  }
+  redirect(destino);
+}
+
+export async function crearResenaAccion(formulario: FormData): Promise<void> {
+  await exigirMismoOrigen();
+  const idioma = idiomaDe(formulario);
+  const codigo = texto(formulario, "codigo").toUpperCase();
+  let destino: string;
+  try {
+    await crearResena({
+      codigo,
+      correo: texto(formulario, "correo"),
+      puntaje: Number(texto(formulario, "puntaje")),
+      comentario: texto(formulario, "comentario") || null,
+      nombreVisible: texto(formulario, "nombre"),
+      idioma,
+    });
+    destino = `/${idioma}/opinar?enviada=1`;
+  } catch (error) {
+    destino = `/${idioma}/opinar?codigo=${encodeURIComponent(codigo)}&error=${codigoDe(error)}`;
   }
   redirect(destino);
 }

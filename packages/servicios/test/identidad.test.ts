@@ -31,6 +31,11 @@ after(async () => {
   await db.close();
 });
 
+/** Las pruebas inician varias sesiones en el mismo intervalo de 30 s: se olvida el último código usado. */
+async function permitirNuevoCodigo(correo: string): Promise<void> {
+  await db.query("UPDATE identidad.credenciales SET totp_ultimo_paso = NULL WHERE usuario_id = (SELECT id FROM identidad.usuarios WHERE correo = $1)", [correo]);
+}
+
 /** Inicia sesión completa (configurando la 2FA la primera vez) y devuelve el token. */
 async function entrar(correo: string, clave = CLAVE): Promise<string> {
   const { token, siguientePaso } = await iniciarSesion({ correo, clave, ip: "10.0.0.1" }, db);
@@ -39,6 +44,7 @@ async function entrar(correo: string, clave = CLAVE): Promise<string> {
     secretos.set(correo, secreto);
     await confirmarConfiguracion2fa(token, codigoTotp(secreto), db);
   } else {
+    await permitirNuevoCodigo(correo);
     await verificarSegundoFactor(token, codigoTotp(secretos.get(correo)!), "10.0.0.1", db);
   }
   return token;
@@ -67,8 +73,18 @@ describe("inicio de sesión con verificación en dos pasos obligatoria", () => {
     const { token, siguientePaso } = await iniciarSesion({ correo: "admin@wopa.test", clave: CLAVE }, db);
     assert.equal(siguientePaso, "verificar_2fa");
     await assert.rejects(verificarSegundoFactor(token, "123456", null, db), { codigo: "CODIGO_INVALIDO" });
+    await permitirNuevoCodigo("admin@wopa.test");
     await verificarSegundoFactor(token, codigoTotp(secretos.get("admin@wopa.test")!), null, db);
     assert.equal((await obtenerSesion(token, db))?.segundoFactorOk, true);
+  });
+
+  test("un código ya usado no sirve para otra sesión", async () => {
+    await permitirNuevoCodigo("admin@wopa.test");
+    const primera = await iniciarSesion({ correo: "admin@wopa.test", clave: CLAVE }, db);
+    const segunda = await iniciarSesion({ correo: "admin@wopa.test", clave: CLAVE }, db);
+    const codigo = codigoTotp(secretos.get("admin@wopa.test")!, Date.now() + 30_000); // paso siguiente: nunca usado antes
+    await verificarSegundoFactor(primera.token, codigo, null, db);
+    await assert.rejects(verificarSegundoFactor(segunda.token, codigo, null, db), { codigo: "CODIGO_INVALIDO" });
   });
 
   test("correo inexistente y clave incorrecta dan el mismo error", async () => {

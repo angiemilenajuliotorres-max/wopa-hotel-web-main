@@ -17,7 +17,8 @@ Horas trabajadas en el proyecto, por sesión. Hora local de Panamá (UTC−5).
 | Fase 3 · Cobro del anticipo, pagos y lanzamiento | 0 h 20 min |
 | Fase 4 · Asistente con IA 24/7 | 0 h 05 min |
 | Fase 5 · Extranet de hoteles y supervisión | 0 h 10 min |
-| **Total** | **2 h 30 min** |
+| Fase 6 · Expansión | 0 h 10 min |
+| **Total** | **2 h 40 min** |
 
 ## Detalle
 
@@ -37,3 +38,4 @@ Horas trabajadas en el proyecto, por sesión. Hora local de Panamá (UTC−5).
 | 2026-10-15 | 07:03 | 07:18 | 0:15 | Fase 3 | Pagos en la web (métodos por país, pasarela simulada, webhooks), panel de pagos y liquidaciones, cotización con PDF, textos sin “impuestos incluidos”, guía de despliegue; pruebas de extremo a extremo de pagos | David + Claude |
 | 2026-10-15 | 07:18 | 07:24 | 0:05 | Fase 4 | Asistente con Claude (herramientas, historial que solo crece al final, respaldo ante rechazos, límites), modo sin IA, widget accesible, API de chat, panel de conversaciones; pruebas | David + Claude |
 | 2026-10-15 | 07:24 | 07:28 | 0:10 | Fase 5 | Extranet de hoteles (calendario, tarifas, cupos, reservas, liquidaciones, soporte), revisión de contenido, semáforo de salud, alertas diarias; pruebas de extremo a extremo | David + Claude |
+| 2026-10-15 | 07:28 | 07:37 | 0:10 | Fase 6 | Adaptador de Wompi (Colombia), reseñas moderadas con invitación y calificación para buscadores, código TOTP de un solo uso; pruebas y recorrido de extremo a extremo | David + Claude |

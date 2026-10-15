@@ -11,6 +11,7 @@ import { encolarCorreo } from "../notificaciones.ts";
 import { confirmarReserva, consultarReserva, formatoDinero, marcarPendientePago } from "../reservas.ts";
 import { ProveedorPagueloFacil } from "./proveedores/paguelofacil.ts";
 import { ProveedorSimulado } from "./proveedores/simulado.ts";
+import { ProveedorWompi } from "./proveedores/wompi.ts";
 import { ProveedorYappy } from "./proveedores/yappy.ts";
 import { ErrorFirmaInvalida, ErrorProveedor, type EstadoPago, type EventoPago, type MetodoPago, type NotificacionEntrante, type ProveedorPago, type ResultadoCreacion } from "./tipos.ts";
 
@@ -25,7 +26,7 @@ let registro: Map<string, ProveedorPago> | undefined;
 
 export function proveedores(): Map<string, ProveedorPago> {
   registro ??= new Map<string, ProveedorPago>(
-    [new ProveedorSimulado(process.env.URL_PUBLICA ?? "http://localhost:3100"), new ProveedorYappy(), new ProveedorPagueloFacil()].map((p) => [p.codigo, p]),
+    [new ProveedorSimulado(process.env.URL_PUBLICA ?? "http://localhost:3100"), new ProveedorYappy(), new ProveedorPagueloFacil(), new ProveedorWompi()].map((p) => [p.codigo, p]),
   );
   return registro;
 }

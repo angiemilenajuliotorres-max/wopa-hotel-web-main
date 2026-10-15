@@ -108,13 +108,23 @@ export function codigoTotp(secretoBase32: string, momentoMs: number = Date.now()
   return String(binario % 10 ** digitos).padStart(digitos, "0");
 }
 
+/**
+ * Paso de tiempo (número de ventana de 30 s) que coincide con el código, aceptando un paso antes o después
+ * por desfase de reloj. null si no coincide. Guardar el último paso usado impide reutilizar un código.
+ */
+export function pasoTotp(secretoBase32: string, codigo: string, momentoMs: number = Date.now()): number | null {
+  if (!/^\d{6}$/.test(codigo)) return null;
+  for (const desfase of [-1, 0, 1]) {
+    const momento = momentoMs + desfase * 30_000;
+    const esperado = Buffer.from(codigoTotp(secretoBase32, momento));
+    if (timingSafeEqual(esperado, Buffer.from(codigo))) return Math.floor(momento / 30_000);
+  }
+  return null;
+}
+
 /** Acepta el código actual y el de un paso antes o después (desfase de reloj). */
 export function verificarTotp(secretoBase32: string, codigo: string, momentoMs: number = Date.now()): boolean {
-  if (!/^\d{6}$/.test(codigo)) return false;
-  return [-1, 0, 1].some((desfase) => {
-    const esperado = Buffer.from(codigoTotp(secretoBase32, momentoMs + desfase * 30_000));
-    return timingSafeEqual(esperado, Buffer.from(codigo));
-  });
+  return pasoTotp(secretoBase32, codigo, momentoMs) !== null;
 }
 
 export function uriTotp(secretoBase32: string, correo: string, emisor = "WOPA Travel"): string {
