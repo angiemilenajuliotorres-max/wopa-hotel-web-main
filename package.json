@@ -18,7 +18,8 @@
     "web:dev": "npm run dev -w @wopa/web",
     "web:build": "npm run build -w @wopa/web",
     "web:start": "npm run start -w @wopa/web",
-    "e2e:acceso": "node apps/web/e2e/acceso.mjs ."
+    "e2e:acceso": "node apps/web/e2e/acceso.mjs .",
+    "e2e:publico": "node apps/web/e2e/publico.mjs"
   },
   "engines": {
     "node": ">=22.18"

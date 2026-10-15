@@ -67,3 +67,12 @@ export async function procesarCorreosPendientes(limite = 20, cliente?: Consulta)
   }
   return conteo;
 }
+
+/** Últimos correos de la bandeja de salida (para revisar los simulados mientras no hay proveedor). */
+export async function listarCorreos(limite = 100, cliente?: Consulta) {
+  const { rows } = await db(cliente).query<{ id: string; para: string; asunto: string; cuerpo_texto: string; plantilla: string; estado: string; creado_en: Date }>(
+    "SELECT id, para, asunto, cuerpo_texto, plantilla, estado, creado_en FROM notificaciones.correos ORDER BY creado_en DESC LIMIT $1",
+    [limite],
+  );
+  return rows;
+}

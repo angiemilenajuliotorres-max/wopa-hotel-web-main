@@ -13,8 +13,8 @@ Horas trabajadas en el proyecto, por sesión. Hora local de Panamá (UTC−5).
 | Análisis y arquitectura | 0 h 50 min |
 | Fase 0 · Estabilización (incluye Git Flow y documentación) | 0 h 10 min |
 | Fase 1 · Base: esquema, identidad y precio | 0 h 40 min |
-| Fase 2 · Web pública (servicios de búsqueda y reservas) | 0 h 05 min |
-| **Total** | **1 h 45 min** |
+| Fase 2 · Web pública es/en, ayuda y soporte | 0 h 15 min |
+| **Total** | **1 h 55 min** |
 
 ## Detalle
 
@@ -29,3 +29,4 @@ Horas trabajadas en el proyecto, por sesión. Hora local de Panamá (UTC−5).
 | 2026-10-14 | 22:30 | 22:40 | 0:10 | Fase 1 | Preguntas de decisión; migraciones 0008–0012 (credenciales, pagos con partida doble, soporte, notificaciones, experiencias, auditoría); seguridad de identidad; importador de datos heredados; lista por revisar | David + Claude |
 | 2026-10-14 | 22:39 | 22:49 | 0:10 | Fase 1–2 | `@wopa/servicios`: identidad (login, 2FA, invitaciones), catálogo (alta, aceptación con margen, ajustes, tarifas, cupos), búsqueda con precio total, reservas (retención, expiración, solicitudes, cancelación); transacciones anidadas | David + Claude |
 | 2026-10-14 | 22:49 | 22:58 | 0:10 | Fase 1 | `apps/web` con Next.js 16: acceso con 2FA y QR, panel de WOPA (hoteles, márgenes, tarifas, cupos, invitaciones), extranet inicial; build de producción y prueba de extremo a extremo | David + Claude |
+| 2026-10-14 | 22:58 | 23:09 | 0:10 | Fase 2 | Web pública es/en (portada, buscador accesible, resultados, destinos, ficha, reserva, Mi reserva, cancelación, tours), centro de ayuda y tickets, panel de reservas/soporte/correos, cron, SEO; pruebas de extremo a extremo | David + Claude |

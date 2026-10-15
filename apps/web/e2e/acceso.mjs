@@ -77,9 +77,19 @@ comprobar(ficha.estado === 200 && ficha.html.includes("Márgenes de WOPA"), "la 
 
 const ajuste = await enviar(enlace, {
   ...camposDelFormulario(ficha.html, 'id="motivo-ajuste"'),
-  margenTipo: "porcentaje", margenValor: "35", desde: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10), hasta: "", planTarifaId: "", motivo: "Prueba de temporada alta",
+  margenTipo: "porcentaje", margenValor: "35", desde: new Date(Date.now() + (60 + Math.floor((Date.now() - Date.UTC(2026, 9, 15)) / 60000)) * 86400000).toISOString().slice(0, 10), hasta: "", planTarifaId: "", motivo: "Prueba de temporada alta",
 });
 comprobar(ajuste.destino?.includes("ok=1"), `WOPA ajusta el margen desde el panel (${ajuste.destino})`);
 const fichaDespues = await obtener(enlace);
 comprobar(fichaDespues.html.includes("Prueba de temporada alta") && fichaDespues.html.includes("35 %"), "el ajuste aparece en el historial");
+const reservas = await obtener("/admin/reservas");
+comprobar(reservas.estado === 200 && /WP-[A-Z0-9]{6}/.test(reservas.html), "el panel lista las reservas");
+const soporte = await obtener("/admin/soporte?todos=1");
+const enlaceTicket = /href="(\/admin\/soporte\/[0-9a-f-]{36})"/.exec(soporte.html)?.[1];
+comprobar(soporte.estado === 200 && Boolean(enlaceTicket), "el panel lista los tickets");
+const ticket = await obtener(enlaceTicket);
+const respuesta = await enviar(enlaceTicket, { ...camposDelFormulario(ticket.html, 'id="contenido"'), contenido: "Sí, coordinamos traslados. Te escribimos con opciones.", nuevoEstado: "resuelto" });
+comprobar(respuesta.destino?.includes("ok=1"), "el equipo responde un ticket");
+const correos = await obtener("/admin/correos");
+comprobar(correos.html.includes("Respuesta a tu consulta"), "la respuesta queda en la bandeja de correos");
 console.log("Recorrido completo sin errores.");

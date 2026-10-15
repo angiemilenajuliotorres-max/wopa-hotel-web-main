@@ -315,3 +315,27 @@ export async function cancelarPorViajero(
     return { penalizacionCentavos, reembolsoCentavos, reservaId: reserva.id };
   }, cliente);
 }
+
+// ---------------------------------------------------------------- panel
+
+export async function listarReservasAdmin(
+  sesion: SesionActiva,
+  filtro: { estado?: string; hotelOrganizaciones?: string[] } = {},
+  cliente?: Consulta,
+) {
+  const organizaciones = esWopa(sesion, ["wopa_admin", "wopa_operaciones", "wopa_soporte", "wopa_finanzas"]) ? null : hotelesDe(sesion);
+  if (organizaciones && organizaciones.length === 0) throw new ErrorNegocio("SIN_PERMISO", "No tienes acceso a reservas.", { estado: 403 });
+  const { rows } = await db(cliente).query<{
+    id: string; codigo: string; estado: string; hotel: string; fecha_entrada: string; fecha_salida: string; titular_nombre: string;
+    titular_correo: string; titular_telefono: string; total: string; anticipo: string; moneda: string; creado_en: Date; retenida_hasta: Date | null;
+  }>(
+    `SELECT r.id, r.codigo, r.estado, h.nombre AS hotel, r.fecha_entrada::text, r.fecha_salida::text, r.titular_nombre, r.titular_correo,
+       r.titular_telefono, r.total_venta_centavos AS total, r.anticipo_centavos AS anticipo, r.moneda_codigo AS moneda, r.creado_en, r.retenida_hasta
+     FROM reservas.reservas r JOIN catalogo.hoteles h ON h.id = r.hotel_id
+     WHERE ($1::text IS NULL OR r.estado = $1) AND ($2::uuid[] IS NULL OR h.organizacion_id = ANY($2::uuid[]))
+     ORDER BY CASE r.estado WHEN 'solicitada' THEN 0 WHEN 'pendiente_pago' THEN 1 WHEN 'confirmada' THEN 2 ELSE 3 END, r.fecha_entrada
+     LIMIT 300`,
+    [filtro.estado ?? null, organizaciones],
+  );
+  return rows;
+}

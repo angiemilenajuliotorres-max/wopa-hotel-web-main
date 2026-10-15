@@ -14,6 +14,7 @@ Prioridad: 🔴 bloquea el lanzamiento · 🟠 necesario antes de producción ·
 | 🟠 | Resend: cuenta y dominio verificado | Correos de reservas, invitaciones y tickets | `RESEND_API_KEY`, `CORREO_REMITENTE` |
 | 🟠 | Upstash Redis | Límite de peticiones compartido entre instancias | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
 | 🟢 | Sentry | Monitoreo de errores | `SENTRY_DSN` |
+| 🟠 | Cloudflare R2 o Vercel Blob | Subir fotos de hoteles desde el panel | `BLOB_READ_WRITE_TOKEN` o credenciales de R2 |
 | 🟢 | PayPal (opcional) | Método extra para viajeros de EE. UU. y Europa | `PAYPAL_CLIENT_ID`, `PAYPAL_SECRET` |
 
 ## Infraestructura y accesos
@@ -21,6 +22,7 @@ Prioridad: 🔴 bloquea el lanzamiento · 🟠 necesario antes de producción ·
 | Prioridad | Qué |
 |---|---|
 | 🔴 | Confirmar que el proyecto de Neon está en **Postgres 18** (el esquema usa `uuidv7()`) |
+| 🔴 | Crear `CRON_SECRET` en Vercel y programar `/api/cron` cada minuto (Vercel Cron) |
 | 🔴 | Crear `SECRETO_CIFRADO` en Vercel: 32 bytes aleatorios en base64 (comando en `.env.example`) |
 | 🟠 | Proteger las ramas `main` y `develop` en GitHub (requiere un administrador) |
 | 🟠 | Revisar en la vista previa de Vercel que la CSP no bloquee el mapa, las imágenes ni el panel |
@@ -34,7 +36,8 @@ Prioridad: 🔴 bloquea el lanzamiento · 🟠 necesario antes de producción ·
 | 🟠 | Márgenes de los 8 hoteles de Cartagena | Se importaron con un 30 % supuesto (ADR-013); WOPA debe ajustarlos con cada hotel |
 | 🟠 | Dirección y ubicación exacta de cada hotel importado | Hoy tienen la ubicación del centro de Cartagena y “dirección por completar” |
 | 🟠 | Cupos de los hoteles importados | Quedaron en modo solicitud; para cobrar el anticipo en línea hay que cargar cupos y pasarlos a `anticipo_en_linea` |
-| 🟠 | Traducciones al inglés de los hoteles y tours importados | Solo existe el texto en español |
+| 🟠 | Traducciones al inglés de los hoteles y tours importados | Solo existe el texto en español; la web muestra el español con un aviso |
+| 🟠 | Revisar los textos de los 5 artículos de ayuda (es/en) | Redactados como borrador; WOPA debe validarlos |
 | 🟠 | Hoteles de Panamá para el lanzamiento | Ciudades cargadas (Ciudad de Panamá, Boquete, Bocas del Toro); faltan hoteles |
 | 🟢 | Panel y extranet solo en español | El equipo de WOPA y los hoteles de Panamá operan en español; la web pública sí es es/en |
 | 🟢 | Reservas de varias habitaciones a la vez | Hoy una reserva es de una habitación con capacidad para todos los huéspedes |

@@ -21,7 +21,7 @@ export default async function LayoutAdmin({ children }: LayoutProps<"/admin">) {
               <Link href="/admin">Hoteles</Link>
               <Link href="/admin/hoteles/nuevo">Nuevo hotel</Link>
               <Link href="/admin/reservas">Reservas</Link>
-              <Link href="/admin/pagos">Pagos</Link>
+              
               <Link href="/admin/soporte">Soporte</Link>
               <Link href="/admin/correos">Correos enviados</Link>
             </nav>

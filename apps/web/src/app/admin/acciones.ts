@@ -4,6 +4,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
   aceptarHotel,
+  aceptarSolicitud,
+  rechazarSolicitud,
+  responderTicket,
   ajustarMargen,
   atenderAlerta,
   cargarCupos,
@@ -148,5 +151,29 @@ export async function invitarAccion(formulario: FormData): Promise<void> {
 export async function atenderAlertaAccion(formulario: FormData): Promise<void> {
   await ejecutar("/admin", async () => {
     await atenderAlerta(await exigirWopa(), texto(formulario, "alertaId"), texto(formulario, "accion") === "descartar");
+  });
+}
+
+export async function aceptarSolicitudAccion(formulario: FormData): Promise<void> {
+  await ejecutar("/admin/reservas", async () => {
+    await aceptarSolicitud(await exigirWopa(), texto(formulario, "reservaId"), urlBase());
+  });
+}
+
+export async function rechazarSolicitudAccion(formulario: FormData): Promise<void> {
+  await ejecutar("/admin/reservas", async () => {
+    await rechazarSolicitud(await exigirWopa(), texto(formulario, "reservaId"), "Sin disponibilidad");
+  });
+}
+
+export async function responderTicketAccion(formulario: FormData): Promise<void> {
+  const ticketId = texto(formulario, "ticketId");
+  await ejecutar(`/admin/soporte/${ticketId}`, async () => {
+    await responderTicket(await exigirWopa(), {
+      ticketId,
+      contenido: texto(formulario, "contenido"),
+      notaInterna: formulario.get("notaInterna") === "on",
+      nuevoEstado: (texto(formulario, "nuevoEstado") || undefined) as "en_progreso" | "esperando_cliente" | "resuelto" | "cerrado" | undefined,
+    });
   });
 }

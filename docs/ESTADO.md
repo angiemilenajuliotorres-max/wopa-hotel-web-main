@@ -6,7 +6,7 @@ Lo que necesita una persona (cuentas, datos, validaciones) está en [POR-REVISAR
 
 Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (necesita una decisión o un acceso externo)
 
-**Fase actual:** 2 · Web pública es/en (fase 1 cerrada en `release/v0.2.0`)
+**Fase actual:** 3 · Cobro del anticipo y lanzamiento (fase 2 cerrada en `release/v0.3.0`)
 **Lanzamiento:** Panamá, al cerrar la fase 3 (`v1.0.0`)
 
 ---
@@ -87,11 +87,16 @@ Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (nec
 | Ítem | Estado |
 |---|---|
 | `@wopa/servicios/busqueda`: autocompletado tolerante a tildes, resultados con precio total, anticipo y saldo, ficha con opciones | ✅ |
-| Inicio, destinos, búsqueda, ficha de hotel, tours (es/en, SEO) | ⬜ Pantallas |
+| Portada, destinos, búsqueda con autocompletado accesible, ficha de hotel, tours, en es/en | ✅ Prueba de extremo a extremo (`npm run e2e:publico`) |
+| SEO: metadatos por página, hreflang, canonical, sitemap con alternativas, robots, datos estructurados de hotel | ✅ |
+| Formulario de reserva con “pagas hoy / pagas en el hotel”, estado de la reserva, Mi reserva sin cuenta, cancelación | ✅ |
 | `@wopa/servicios/reservas`: precio congelado, retención de 15 min sin sobreventa, expiración, solicitudes aceptadas o rechazadas, consulta y cancelación con política | ✅ 9 pruebas |
-| Centro de ayuda y tickets (formulario + panel) | ⬜ |
+| Centro de ayuda (5 artículos es/en) y tickets: formulario, plazos por categoría, panel con respuestas y notas internas | ✅ 5 pruebas |
+| Panel: reservas (aceptar o rechazar solicitudes), soporte, bandeja de correos simulados | ✅ |
+| Endpoint de cron (`/api/cron`): expira retenciones y envía correos | ✅ (falta programarlo en Vercel al lanzar) |
 | Correos transaccionales: bandeja de salida con envío por Resend o simulado | ✅ (plantillas en texto; falta HTML) |
-| Fotos en almacenamiento propio | ⬜ |
+| Fotos en almacenamiento propio | ⛔ Requiere cuenta de R2 o Vercel Blob; hoy se usan enlaces https |
+| Correos en HTML con diseño de marca | ⬜ Hoy se envían en texto plano |
 
 ## Fase 3 · Cobro del anticipo y lanzamiento en Panamá → `v1.0.0`
 
@@ -102,6 +107,7 @@ Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (nec
 | Adaptador de tarjetas (PagueloFacil o banco) | ⛔ Requiere la cotización y elegir el proveedor |
 | Anticipo, saldo en el hotel, devoluciones, asientos, conciliación y liquidaciones | ⬜ |
 | Validación fiscal de impuestos de hospedaje en Panamá | ⛔ Requiere un contador |
+| Cotización automática de tours con PDF (paridad con la web actual) | ⬜ Antes de reemplazar la web actual |
 | La web nueva reemplaza a `public/index.html` | ⬜ |
 
 ## Fase 4 · Asistente con IA 24/7 → `v1.1.0`
