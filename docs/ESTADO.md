@@ -6,7 +6,7 @@ Lo que necesita una persona (cuentas, datos, validaciones) está en [POR-REVISAR
 
 Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (necesita una decisión o un acceso externo)
 
-**Fase actual:** 5 · Extranet de hoteles (fase 4 en `release/v1.1.0`; el lanzamiento espera los 🔴 de [POR-REVISAR.md](POR-REVISAR.md))
+**Fase actual:** 6 · Expansión (fase 5 en `release/v1.2.0`; el lanzamiento espera los 🔴 de [POR-REVISAR.md](POR-REVISAR.md))
 **Lanzamiento:** Panamá, al cerrar la fase 3 (`v1.0.0`)
 
 ---
@@ -128,8 +128,9 @@ Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (nec
 
 | Ítem | Estado |
 |---|---|
-| Ficha, habitaciones y calendario de tarifa neta y cupos | ⬜ |
-| Cola de revisión, semáforo de salud y alertas | ⬜ |
+| Extranet: mis hoteles (cada hotel solo ve el suyo), calendario de 21 días con neta por ocupación, cupos y cierres, cambios de tarifa por rango (solo hotel_admin), reservas con aceptar o rechazar solicitudes y “saldo cobrado”, liquidaciones, escribir a WOPA | ✅ Prueba de extremo a extremo (`npm run e2e:extranet`) |
+| Revisión de cambios de contenido: el hotel propone y WOPA aprueba y publica, o rechaza con comentario | ✅ 4 pruebas |
+| Semáforo de salud por hotel y alertas diarias (sin cupo prolongado, ticket urgente vencido, falta inglés) con cron diario | ✅ |
 
 ## Fase 6 · Expansión
 

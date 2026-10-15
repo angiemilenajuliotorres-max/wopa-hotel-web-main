@@ -2,6 +2,13 @@
   "framework": "nextjs",
   "installCommand": "cd ../.. && npm ci",
   "crons": [
-    { "path": "/api/cron", "schedule": "* * * * *" }
+    {
+      "path": "/api/cron",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/diario",
+      "schedule": "0 11 * * *"
+    }
   ]
 }

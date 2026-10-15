@@ -22,6 +22,9 @@ const MENSAJES: Record<string, string> = {
   CUPO_MENOR_A_VENDIDO: "El cupo no puede ser menor que lo ya vendido.",
   CORREO_INVALIDO: "El correo no es válido.",
   DATOS_INVALIDOS: "Revisa los datos del formulario.",
+  DESCRIPCION_CORTA: "La descripción debe tener al menos 20 caracteres.",
+  ASUNTO_INVALIDO: "Escribe un asunto.",
+  MENSAJE_INVALIDO: "Escribe el mensaje.",
   MONEDAS_MEZCLADAS: "Las reservas del periodo están en monedas distintas.",
   REFERENCIA_OBLIGATORIA: "Escribe la referencia de la transferencia.",
 };

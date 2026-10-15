@@ -20,6 +20,7 @@ export default async function LayoutAdmin({ children }: LayoutProps<"/admin">) {
             <nav aria-label="Panel">
               <Link href="/admin">Hoteles</Link>
               <Link href="/admin/hoteles/nuevo">Nuevo hotel</Link>
+              <Link href="/admin/salud">Supervisión</Link>
               <Link href="/admin/reservas">Reservas</Link>
               <Link href="/admin/pagos">Pagos</Link>
               
