@@ -1,0 +1,47 @@
+# Lista por revisar
+
+Lo que necesita una persona: decisiones, cuentas, accesos o validaciones que el código no puede resolver solo. Se actualiza en cada PR. Cuando un ítem se resuelve, se marca ✅ con la fecha.
+
+Prioridad: 🔴 bloquea el lanzamiento · 🟠 necesario antes de producción · 🟢 mejora
+
+## Cuentas y credenciales (los servicios funcionan hoy con simuladores)
+
+| Prioridad | Qué | Para qué | Variables |
+|---|---|---|---|
+| 🔴 | Yappy Comercial (Banco General): cuenta y botón de pago | Cobrar anticipos con Yappy | `YAPPY_MERCHANT_ID`, `YAPPY_SECRET` |
+| 🔴 | PagueloFacil (o un banco adquirente): cotización, contrato y credenciales | Cobrar con tarjeta | `PAGUELOFACIL_CCLW`, `PAGUELOFACIL_TOKEN` |
+| 🟠 | Anthropic: clave de la API | Asistente con IA 24/7 | `ANTHROPIC_API_KEY` |
+| 🟠 | Resend: cuenta y dominio verificado | Correos de reservas, invitaciones y tickets | `RESEND_API_KEY`, `CORREO_REMITENTE` |
+| 🟠 | Upstash Redis | Límite de peticiones compartido entre instancias | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
+| 🟢 | Sentry | Monitoreo de errores | `SENTRY_DSN` |
+| 🟢 | PayPal (opcional) | Método extra para viajeros de EE. UU. y Europa | `PAYPAL_CLIENT_ID`, `PAYPAL_SECRET` |
+
+## Infraestructura y accesos
+
+| Prioridad | Qué |
+|---|---|
+| 🔴 | Confirmar que el proyecto de Neon está en **Postgres 18** (el esquema usa `uuidv7()`) |
+| 🔴 | Crear `SECRETO_CIFRADO` en Vercel: 32 bytes aleatorios en base64 (comando en `.env.example`) |
+| 🟠 | Proteger las ramas `main` y `develop` en GitHub (requiere un administrador) |
+| 🟠 | Revisar en la vista previa de Vercel que la CSP no bloquee el mapa, las imágenes ni el panel |
+| 🟠 | Abrir y aprobar el PR `release/v0.1.0` → `main` |
+
+## Datos y negocio
+
+| Prioridad | Qué | Situación |
+|---|---|---|
+| 🔴 | Impuestos de hospedaje en Panamá y Colombia (tasas y base de cálculo) | La tabla `tarifas.impuestos` existe vacía; la tasa debe validarla un contador |
+| 🟠 | Márgenes de los 8 hoteles de Cartagena | Se importaron con un 30 % supuesto (ADR-013); WOPA debe ajustarlos con cada hotel |
+| 🟠 | Dirección y ubicación exacta de cada hotel importado | Hoy tienen la ubicación del centro de Cartagena y “dirección por completar” |
+| 🟠 | Cupos de los hoteles importados | Quedaron en modo solicitud; para cobrar el anticipo en línea hay que cargar cupos y pasarlos a `anticipo_en_linea` |
+| 🟠 | Traducciones al inglés de los hoteles y tours importados | Solo existe el texto en español |
+| 🟠 | Hoteles de Panamá para el lanzamiento | Ciudades cargadas (Ciudad de Panamá, Boquete, Bocas del Toro); faltan hoteles |
+| 🟢 | Frecuencia de liquidación, anticipo y horario de tickets | Valores por defecto aplicados: cada quincena, 25 % y de 8:00 a 20:00 |
+
+## Seguridad y legal
+
+| Prioridad | Qué |
+|---|---|
+| 🔴 | Auditoría de seguridad de la autenticación propia (ADR-012) antes del lanzamiento |
+| 🟠 | Textos legales (términos, privacidad, cancelación) actualizados al cobro del anticipo, al margen y a la Ley 81 de 2019 de Panamá |
+| 🟠 | Verificar los adaptadores de Yappy y PagueloFacil contra la documentación y el sandbox oficiales cuando haya credenciales |

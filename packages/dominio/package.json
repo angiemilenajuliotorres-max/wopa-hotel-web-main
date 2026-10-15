@@ -5,6 +5,7 @@
   "description": "Reglas de negocio de WOPA Travel, sin dependencias de infraestructura",
   "type": "module",
   "exports": {
-    "./tarifas": "./src/tarifas/index.ts"
+    "./tarifas": "./src/tarifas/index.ts",
+    "./identidad": "./src/identidad/index.ts"
   }
 }

@@ -6,6 +6,7 @@ Punto de entrada de la documentación técnica y de producto. Mantén estos arch
 |---|---|
 | [ESTADO.md](ESTADO.md) | Qué está hecho y qué falta, fase por fase. Se actualiza en cada PR. |
 | [GITFLOW.md](GITFLOW.md) | Ramas, commits, pull requests, versiones y entornos. |
+| [POR-REVISAR.md](POR-REVISAR.md) | Lista de lo que necesita una persona: cuentas, datos, validaciones. |
 | [HORAS.md](HORAS.md) | Registro de horas trabajadas, por sesión y por fase. |
 | [decisiones.md](decisiones.md) | Registro de decisiones de arquitectura y negocio (ADR). |
 | [arquitectura/01-vision-y-alcance.md](arquitectura/01-vision-y-alcance.md) | Producto, públicos y lanzamiento en Panamá. |

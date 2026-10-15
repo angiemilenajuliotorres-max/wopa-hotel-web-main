@@ -6,6 +6,8 @@ import { migrar, type Ejecutor } from "../src/index.ts";
 const URL_SERVIDOR = process.env.PRUEBAS_DATABASE_URL ?? "postgres://wopa:wopa_local@localhost:5433/wopa";
 
 export interface BaseDePrueba extends Ejecutor {
+  /** Cadena de conexión de la base temporal. */
+  url: string;
   query<Fila = Record<string, unknown>>(sql: string, parametros?: unknown[]): Promise<{ rows: Fila[]; rowCount: number }>;
   /** Cierra la conexión y elimina la base temporal. */
   close(): Promise<void>;
@@ -38,6 +40,7 @@ export async function crearBaseVacia(): Promise<BaseDePrueba> {
   const cliente = await conectar(url.toString());
 
   return {
+    url: url.toString(),
     exec: (sql) => cliente.query(sql),
     async query<Fila>(sql: string, parametros?: unknown[]) {
       const resultado = await cliente.query(sql, parametros);

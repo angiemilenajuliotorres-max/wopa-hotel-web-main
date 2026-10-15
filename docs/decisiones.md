@@ -87,3 +87,31 @@ El chat lo atiende un asistente con la API de Claude y herramientas de solo lect
   - se guarda una huella de cada archivo, y el migrador falla si una migración ya publicada fue editada.
 - **Drizzle no se usa por ahora.** Se evaluará en la fase 2, solo como generador de consultas tipadas, sin que genere el esquema.
 - **Ubicación:** latitud y longitud con validaciones, en lugar de PostGIS. Alcanza para mapas y autocompletado; si hace falta búsqueda por distancia, se agrega `earthdistance` o PostGIS en una migración nueva.
+
+## ADR-012 · Autenticación propia sobre el esquema `identidad`
+**Estado:** Aceptada · 2026-10-14 (reemplaza la propuesta de usar Better Auth)
+
+**Contexto.** Better Auth y Auth.js imponen sus propias tablas, que duplicarían `identidad.usuarios`, `organizaciones`, `membresias` e `invitaciones`. Además, el negocio necesita reglas propias: roles por tipo de organización, cuentas creadas solo por WOPA y verificación en dos pasos obligatoria.
+
+**Decisión.** Autenticación propia, construida solo con `node:crypto` (`@wopa/dominio/identidad`):
+- **Contraseñas:** scrypt (N = 2^15, sal de 16 bytes), mínimo 12 caracteres.
+- **Sesiones:** token aleatorio de 256 bits en una cookie `HttpOnly`, `Secure` y `SameSite=Lax`. En la base solo se guarda su sha256 (`identidad.sesiones`). Duran 12 horas y se revocan al cerrar sesión.
+- **Segundo factor:** TOTP (RFC 6238), obligatorio para todo usuario de WOPA y de hotel. El secreto se guarda cifrado con AES-256-GCM, usando la clave `SECRETO_CIFRADO`.
+- **Fuerza bruta:** los intentos se registran en `identidad.intentos_acceso`, y se bloquea por correo y por IP.
+- **Invitaciones:** token de un solo uso con vigencia de 72 h; en la base solo se guarda su sha256.
+
+**Consecuencias.** Tenemos más código de seguridad propio, así que se agrega a la lista por revisar una auditoría de seguridad antes del lanzamiento.
+
+## ADR-013 · Importación de los datos de la web heredada
+**Estado:** Aceptada · 2026-10-14
+
+`npm run db:importar-legado` copia las tablas de `public` (web heredada) al esquema nuevo, en una sola transacción y de forma idempotente.
+- **Hoteles:** cada fila de `tipos_habitacion` pasa a ser un hotel en Cartagena con su organización, plan `base`, habitación `estandar`, foto y servicios normalizados.
+- **Precios:** la tarifa neta es el precio heredado ÷ 1,30, con un margen del 30 %, aprobado por WOPA. Se verifica que la neta más el margen reproduzca exactamente el precio al público. Se generan 365 días de precios.
+- **Modo y política:** los hoteles quedan publicados en **modo solicitud**, sin cupos, como funcionan hoy. La política heredada retiene el anticipo, que es el 25 % del total.
+- **Resto de los datos:**
+  - las solicitudes pasan a ser reservas y conservan su código `WOPA-R-…` (migración 0012);
+  - las cotizaciones pasan a cotizaciones con líneas;
+  - los mensajes de contacto pasan a tickets;
+  - los movimientos financieros pasan a asientos de partida doble;
+  - la actividad pasa a `auditoria.eventos`.

@@ -8,9 +8,12 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "migrar": "node src/cli.ts"
+    "migrar": "node src/cli.ts",
+    "admin:crear": "node src/cli-admin.ts",
+    "importar-legado": "node src/cli-importar.ts"
   },
   "dependencies": {
-    "pg": "^8.23.1"
+    "pg": "^8.23.1",
+    "@wopa/dominio": "0.1.0"
   }
 }

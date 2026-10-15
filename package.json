@@ -11,7 +11,9 @@
     "start": "node server/app.js",
     "test": "node --test \"test/**/*.test.js\" \"packages/*/test/**/*.test.ts\"",
     "typecheck": "tsc -p tsconfig.json",
-    "db:migrar": "npm run migrar -w @wopa/db"
+    "db:migrar": "npm run migrar -w @wopa/db",
+    "admin:crear": "npm run admin:crear -w @wopa/db",
+    "db:importar-legado": "npm run importar-legado -w @wopa/db"
   },
   "engines": {
     "node": ">=22.18"

@@ -231,3 +231,98 @@ describe("identidad y catálogo", () => {
     assert.deepEqual(rows.map((fila) => fila.nombre), ["Ciudad de Panamá"]);
   });
 });
+
+describe("pagos, soporte y auditoría", () => {
+  async function reservaConfirmable(slug: string) {
+    const datos = await crearHotelDePrueba(db, slug);
+    const reserva = await insertar(
+      db,
+      `INSERT INTO reservas.reservas (codigo, hotel_id, estado, fecha_entrada, fecha_salida, idioma_codigo, moneda_codigo,
+         total_venta_centavos, anticipo_centavos, titular_nombre, titular_correo, titular_telefono, politica_cancelacion)
+       VALUES ($1, $2, 'pendiente_pago', '2026-12-01', '2026-12-03', 'es', 'USD', 26000, 6500, 'Luis Gómez', 'luis@example.test', '+5076111111', '{}')
+       RETURNING id`,
+      [`WP-${slug.slice(0, 6).toUpperCase().padEnd(6, "Z")}`, datos.hotel],
+    );
+    return { ...datos, reserva };
+  }
+
+  test("un webhook repetido no se registra dos veces", async () => {
+    const insertarEvento = "INSERT INTO pagos.eventos_pasarela (proveedor_codigo, evento_id, tipo, payload) VALUES ('simulado', 'evt_1', 'pago.capturado', '{}') ON CONFLICT DO NOTHING";
+    const primero = await db.query(insertarEvento);
+    const segundo = await db.query(insertarEvento);
+    assert.equal(primero.rowCount, 1);
+    assert.equal(segundo.rowCount, 0);
+  });
+
+  test("los asientos de una operación deben cuadrar", async () => {
+    await assert.rejects(
+      db.query(
+        "INSERT INTO pagos.asientos (operacion_id, cuenta, monto_centavos, moneda_codigo, descripcion) VALUES (gen_random_uuid(), 'gasto_operativo', 1000, 'USD', 'Solo un lado')",
+      ),
+      /no cuadra/,
+    );
+  });
+
+  test("los asientos contables no se editan ni se borran", async () => {
+    const { rows } = await db.query<{ id: string }>(
+      `INSERT INTO pagos.asientos (operacion_id, cuenta, monto_centavos, moneda_codigo, descripcion)
+       SELECT op, cuenta, monto, 'USD', 'Pago de luz' FROM (SELECT gen_random_uuid() AS op) o,
+       (VALUES ('gasto_operativo', 1000), ('caja_proveedor', -1000)) AS v (cuenta, monto)
+       RETURNING id`,
+    );
+    const asiento = rows[0].id;
+    await assert.rejects(db.query("UPDATE pagos.asientos SET monto_centavos = 1 WHERE id = $1", [asiento]), /no se editan/);
+    await assert.rejects(db.query("DELETE FROM pagos.asientos WHERE id = $1", [asiento]), /no se editan/);
+  });
+
+  test("el pago registra su historial y una reserva se liquida una sola vez", async () => {
+    const { reserva, hotel, usuarioWopa } = await reservaConfirmable("liquida");
+    const pago = await insertar(
+      db,
+      "INSERT INTO pagos.pagos (reserva_id, proveedor_codigo, metodo, concepto, monto_centavos, moneda_codigo, clave_idempotencia) VALUES ($1, 'simulado', 'tarjeta', 'anticipo', 6500, 'USD', gen_random_uuid()) RETURNING id",
+      [reserva],
+    );
+    await db.query("UPDATE pagos.pagos SET estado = 'capturado' WHERE id = $1", [pago]);
+    const historial = await db.query<{ estado_nuevo: string }>("SELECT estado_nuevo FROM pagos.historial_estados WHERE pago_id = $1 ORDER BY creado_en, id", [pago]);
+    assert.deepEqual(historial.rows.map((fila) => fila.estado_nuevo), ["pendiente", "capturado"]);
+
+    const crearLiquidacion = (desde: string) =>
+      insertar(
+        db,
+        "INSERT INTO pagos.liquidaciones (hotel_id, periodo_desde, periodo_hasta, moneda_codigo, creado_por) VALUES ($1, $2, $2::date + 14, 'USD', $3) RETURNING id",
+        [hotel, desde, usuarioWopa],
+      );
+    const primera = await crearLiquidacion("2026-12-01");
+    const segunda = await crearLiquidacion("2026-12-16");
+    await db.query("INSERT INTO pagos.liquidacion_lineas (liquidacion_id, reserva_id, monto_centavos) VALUES ($1, $2, 500)", [primera, reserva]);
+    await assert.rejects(
+      db.query("INSERT INTO pagos.liquidacion_lineas (liquidacion_id, reserva_id, monto_centavos) VALUES ($1, $2, 500)", [segunda, reserva]),
+      /duplicate key/,
+    );
+  });
+
+  test("las reglas de enrutamiento no se duplican aunque tengan países vacíos", async () => {
+    await assert.rejects(
+      db.query("INSERT INTO pagos.reglas_enrutamiento (proveedor_codigo, metodo, moneda_codigo) VALUES ('paguelofacil', 'tarjeta', 'USD')"),
+      /duplicate key/,
+    );
+  });
+
+  test("el ticket registra su historial y exige fecha de resolución al resolverse", async () => {
+    const ticket = await insertar(
+      db,
+      `INSERT INTO soporte.tickets (codigo, categoria_codigo, origen, asunto, idioma_codigo, solicitante_nombre, solicitante_correo, vence_sla_en)
+       VALUES ('TK-000001', 'pago', 'asistente', 'No veo mi pago', 'es', 'Ana', 'ana@example.test', now() + interval '4 hours') RETURNING id`,
+    );
+    await assert.rejects(db.query("UPDATE soporte.tickets SET estado = 'resuelto' WHERE id = $1", [ticket]), /check/i);
+    await db.query("UPDATE soporte.tickets SET estado = 'resuelto', resuelto_en = now() WHERE id = $1", [ticket]);
+    const historial = await db.query<{ estado_nuevo: string }>("SELECT estado_nuevo FROM soporte.historial_estados WHERE ticket_id = $1 ORDER BY creado_en, id", [ticket]);
+    assert.deepEqual(historial.rows.map((fila) => fila.estado_nuevo), ["abierto", "resuelto"]);
+  });
+
+  test("solo hay una alerta abierta por tipo y entidad", async () => {
+    const alerta = "INSERT INTO auditoria.alertas (tipo, severidad, entidad, entidad_id) VALUES ('precio_anomalo', 'advertencia', 'hotel', 'h-1')";
+    await db.query(alerta);
+    await assert.rejects(db.query(alerta), /duplicate key/);
+  });
+});

@@ -2,6 +2,8 @@
 
 Tablero de lo que **ya se tiene** y lo que **falta**, por fase. Se actualiza en el mismo PR que completa cada ítem.
 
+Lo que necesita una persona (cuentas, datos, validaciones) está en [POR-REVISAR.md](POR-REVISAR.md).
+
 Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (necesita una decisión o un acceso externo)
 
 **Fase actual:** 1 · Base: esquema, identidad y precio (fase 0 cerrada en `release/v0.1.0`)
@@ -66,14 +68,17 @@ Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (nec
 | Datos de referencia: PA y CO, USD y COP, es y en, Ciudad de Panamá, Boquete, Bocas del Toro, Cartagena, 16 servicios (0007) | ✅ |
 | Reglas en la base: margen obligatorio para publicar, sin solape de márgenes, sin sobreventa, coherencia entre hoteles, historial de estados | ✅ 20 pruebas |
 | Cálculo de precio: neta + margen por hotel + redondeo + anticipo + liquidación (`@wopa/dominio/tarifas`) | ✅ 16 pruebas |
-| Esquemas `pagos`, `soporte`, `experiencias`, `auditoria` | ⬜ Siguiente |
-| Script de migración de los datos actuales al esquema nuevo | ⬜ Necesita, por cada hotel de Cartagena, separar la tarifa neta del margen |
+| Esquemas `pagos` (libro de partida doble que debe cuadrar), `soporte`, `notificaciones`, `experiencias`, `auditoria` (0009–0011) | ✅ |
+| Credenciales, sesiones e intentos de acceso; corrección de 3FN en `usuarios` (0008) | ✅ |
+| Seguridad de identidad: scrypt, tokens, TOTP (RFC 6238) y AES-256-GCM ([ADR-012](decisiones.md)) | ✅ 14 pruebas |
+| `npm run admin:crear`: primer administrador de WOPA | ✅ |
+| Importador de la web heredada (`npm run db:importar-legado`), idempotente, con margen del 30 % ([ADR-013](decisiones.md)) | ✅ 5 pruebas |
 | `apps/web`: Next.js + TypeScript, es/en | ⬜ |
-| Identidad: autenticación (Better Auth), invitaciones, roles y verificación en dos pasos | 🟡 Tablas listas; falta la librería y las pantallas |
+| Identidad: inicio de sesión, invitaciones, roles y verificación en dos pasos | 🟡 Tablas y primitivas listas; faltan el servicio web y las pantallas |
 | Aceptación de hotel con margen obligatorio (servicio y pantalla) | 🟡 La regla ya está en la base; falta el servicio y el panel |
 | Sistema de diseño (tokens y componentes base) | ⬜ |
 | Sentry | ⬜ |
-| Confirmar que el proyecto de Neon está en Postgres 18 | ⛔ Necesita acceso a la consola de Neon |
+| Confirmar que el proyecto de Neon está en Postgres 18 | ⛔ Ver [POR-REVISAR.md](POR-REVISAR.md) |
 
 ## Fase 2 · Web pública es/en y centro de ayuda → `v0.3.0`
 
