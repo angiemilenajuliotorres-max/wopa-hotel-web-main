@@ -36,6 +36,7 @@ Prioridad: 🔴 bloquea el lanzamiento · 🟠 necesario antes de producción ·
 | 🟠 | Cupos de los hoteles importados | Quedaron en modo solicitud; para cobrar el anticipo en línea hay que cargar cupos y pasarlos a `anticipo_en_linea` |
 | 🟠 | Traducciones al inglés de los hoteles y tours importados | Solo existe el texto en español |
 | 🟠 | Hoteles de Panamá para el lanzamiento | Ciudades cargadas (Ciudad de Panamá, Boquete, Bocas del Toro); faltan hoteles |
+| 🟢 | Reservas de varias habitaciones a la vez | Hoy una reserva es de una habitación con capacidad para todos los huéspedes |
 | 🟢 | Frecuencia de liquidación, anticipo y horario de tickets | Valores por defecto aplicados: cada quincena, 25 % y de 8:00 a 20:00 |
 
 ## Seguridad y legal
@@ -43,5 +44,6 @@ Prioridad: 🔴 bloquea el lanzamiento · 🟠 necesario antes de producción ·
 | Prioridad | Qué |
 |---|---|
 | 🔴 | Auditoría de seguridad de la autenticación propia (ADR-012) antes del lanzamiento |
+| 🟠 | Impedir reutilizar un código TOTP dentro de su ventana de 30 s (guardar el último contador usado) |
 | 🟠 | Textos legales (términos, privacidad, cancelación) actualizados al cobro del anticipo, al margen y a la Ley 81 de 2019 de Panamá |
 | 🟠 | Verificar los adaptadores de Yappy y PagueloFacil contra la documentación y el sandbox oficiales cuando haya credenciales |

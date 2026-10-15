@@ -5,7 +5,8 @@
   "description": "Esquema, migraciones SQL y datos de referencia de WOPA Travel",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./pruebas": "./src/pruebas.ts"
   },
   "scripts": {
     "migrar": "node src/cli.ts",

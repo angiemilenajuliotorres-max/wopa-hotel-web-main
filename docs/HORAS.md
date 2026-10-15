@@ -12,8 +12,9 @@ Horas trabajadas en el proyecto, por sesión. Hora local de Panamá (UTC−5).
 |---|---|
 | Análisis y arquitectura | 0 h 50 min |
 | Fase 0 · Estabilización (incluye Git Flow y documentación) | 0 h 10 min |
-| Fase 1 · Base: esquema, identidad y precio | 0 h 25 min |
-| **Total** | **1 h 25 min** |
+| Fase 1 · Base: esquema, identidad y precio | 0 h 35 min |
+| Fase 2 · Web pública (servicios de búsqueda y reservas) | 0 h 05 min |
+| **Total** | **1 h 40 min** |
 
 ## Detalle
 
@@ -26,3 +27,4 @@ Horas trabajadas en el proyecto, por sesión. Hora local de Panamá (UTC−5).
 | 2026-10-14 | 21:56 | 22:07 | 0:10 | Fase 0 | Lanzamiento en Panamá, Git Flow, documentación en `docs/`, estabilización de la API, CI y registro de horas | David + Claude |
 | 2026-10-14 | 22:08 | 22:25 | 0:15 | Fase 1 | Push de `develop` y `release/v0.1.0`; monorepo; cálculo de precio; migraciones 0001–0007; paso a PostgreSQL 18 único (Docker), sin SQLite | David + Claude |
 | 2026-10-14 | 22:30 | 22:40 | 0:10 | Fase 1 | Preguntas de decisión; migraciones 0008–0012 (credenciales, pagos con partida doble, soporte, notificaciones, experiencias, auditoría); seguridad de identidad; importador de datos heredados; lista por revisar | David + Claude |
+| 2026-10-14 | 22:39 | 22:49 | 0:15 | Fase 1–2 | `@wopa/servicios`: identidad (login, 2FA, invitaciones), catálogo (alta, aceptación con margen, ajustes, tarifas, cupos), búsqueda con precio total, reservas (retención, expiración, solicitudes, cancelación); transacciones anidadas | David + Claude |

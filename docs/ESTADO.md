@@ -74,8 +74,10 @@ Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (nec
 | `npm run admin:crear`: primer administrador de WOPA | ✅ |
 | Importador de la web heredada (`npm run db:importar-legado`), idempotente, con margen del 30 % ([ADR-013](decisiones.md)) | ✅ 5 pruebas |
 | `apps/web`: Next.js + TypeScript, es/en | ⬜ |
-| Identidad: inicio de sesión, invitaciones, roles y verificación en dos pasos | 🟡 Tablas y primitivas listas; faltan el servicio web y las pantallas |
-| Aceptación de hotel con margen obligatorio (servicio y pantalla) | 🟡 La regla ya está en la base; falta el servicio y el panel |
+| `@wopa/servicios/identidad`: inicio de sesión, 2FA obligatoria, sesiones, invitaciones, permisos y bloqueo por fuerza bruta | ✅ 8 pruebas |
+| Pantallas de acceso (login, 2FA, invitación) | ⬜ Con `apps/web` |
+| `@wopa/servicios/catalogo`: crear hotel, aceptar con margen, ajustar margen con historial, habitaciones, tarifa neta y cupos por rango, alerta de precio anómalo | ✅ |
+| Panel de WOPA para hoteles y márgenes | ⬜ Con `apps/web` |
 | Sistema de diseño (tokens y componentes base) | ⬜ |
 | Sentry | ⬜ |
 | Confirmar que el proyecto de Neon está en Postgres 18 | ⛔ Ver [POR-REVISAR.md](POR-REVISAR.md) |
@@ -84,10 +86,12 @@ Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (nec
 
 | Ítem | Estado |
 |---|---|
-| Inicio, destinos, búsqueda, ficha de hotel, tours (es/en, SEO) | ⬜ |
-| Retención de cupo y máquina de estados de la reserva | ⬜ |
+| `@wopa/servicios/busqueda`: autocompletado tolerante a tildes, resultados con precio total, anticipo y saldo, ficha con opciones | ✅ |
+| Inicio, destinos, búsqueda, ficha de hotel, tours (es/en, SEO) | ⬜ Pantallas |
+| `@wopa/servicios/reservas`: precio congelado, retención de 15 min sin sobreventa, expiración, solicitudes aceptadas o rechazadas, consulta y cancelación con política | ✅ 9 pruebas |
 | Centro de ayuda y tickets (formulario + panel) | ⬜ |
-| Correos transaccionales (Resend) y fotos en almacenamiento propio | ⬜ |
+| Correos transaccionales: bandeja de salida con envío por Resend o simulado | ✅ (plantillas en texto; falta HTML) |
+| Fotos en almacenamiento propio | ⬜ |
 
 ## Fase 3 · Cobro del anticipo y lanzamiento en Panamá → `v1.0.0`
 
