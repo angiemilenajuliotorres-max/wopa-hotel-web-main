@@ -29,7 +29,7 @@ Prioridad: 🔴 bloquea el lanzamiento · 🟠 necesario antes de producción ·
 | 🟠 | Revisar en la vista previa de Vercel que la CSP no bloquee el mapa, las imágenes ni el panel |
 | 🔴 | Cambiar el Root Directory del proyecto de Vercel a `apps/web` en el momento del lanzamiento (ver [DESPLIEGUE.md](DESPLIEGUE.md)) |
 | 🟠 | Plan de Vercel: el cron cada minuto requiere Pro; si no, configurar un cron externo hacia `/api/cron` |
-| 🟠 | Abrir y aprobar el PR `release/v0.1.0` → `main` |
+| 🟠 | Revisar y aprobar el PR #1 (`release/v1.3.0` → `main`), que incluye las fases 0 a 6 |
 
 ## Datos y negocio
 
