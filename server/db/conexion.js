@@ -1,7 +1,17 @@
-const { Pool, neonConfig } = require("@neondatabase/serverless");
-const WebSocket = require("ws");
+const { Pool, types } = require("pg");
 const path = require("path");
 const fs = require("fs");
+
+/*
+ * La API heredada usa únicamente PostgreSQL (ADR-010):
+ * - local: Postgres 18 en Docker (docker compose up -d)
+ * - Vercel: Neon, con la cadena de conexión pooled
+ */
+
+// numeric e int8 llegan como texto en pg; la API heredada espera números.
+for (const oid of [20, 1700]) {
+  types.setTypeParser(oid, (valor) => (valor === null ? null : Number(valor)));
+}
 
 const columnasNuevas = [
   ["solicitudes_reserva", "nota_admin", "TEXT"],
@@ -28,25 +38,25 @@ const tiposIniciales = [
   ["Hotel Regatta", "Experiencia premium frente al Caribe", "WiFi, Piscina infinita, Spa de lujo, Restaurante 5 estrellas, Concierge", "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80", 160, 240],
 ];
 
-const usarPostgres = Boolean(process.env.DATABASE_URL);
-const faltaUrlEnVercel = Boolean(process.env.VERCEL && !usarPostgres);
-let sqlite;
 let pool;
 let inicializacion;
-let colaSQLite = Promise.resolve();
 
-if (usarPostgres) {
-  neonConfig.webSocketConstructor = WebSocket;
-  pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 1, idleTimeoutMillis: 10000 });
-  pool.on("error", (error) => console.error("Error inesperado en la conexión PostgreSQL."));
-} else if (!faltaUrlEnVercel) {
-  const Database = require("better-sqlite3");
-  const dbPath = process.env.DB_PATH || path.join(__dirname, "hotel.db");
-  if (dbPath !== ":memory:") {
-    fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+function obtenerPool() {
+  if (!process.env.DATABASE_URL) {
+    throw new Error(
+      "Falta DATABASE_URL. En local levanta Postgres con `docker compose up -d` y usa " +
+        "postgres://wopa:wopa_local@localhost:5433/wopa (ver .env.example).",
+    );
   }
-  sqlite = new Database(dbPath);
-  sqlite.pragma("foreign_keys = ON");
+  if (!pool) {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      max: process.env.VERCEL ? 1 : 5,
+      idleTimeoutMillis: 10000,
+    });
+    pool.on("error", () => console.error("Error inesperado en la conexión PostgreSQL."));
+  }
+  return pool;
 }
 
 function adaptarPostgres(sql) {
@@ -54,27 +64,10 @@ function adaptarPostgres(sql) {
   return sql.replace(/\?/g, () => `$${++parametro}`);
 }
 
-function crearAdaptador(ejecutor, postgres = usarPostgres) {
+function crearAdaptador(obtenerEjecutor) {
   const ejecutar = async (sql, parametros = []) => {
-    if (postgres) {
-      const consulta = adaptarPostgres(sql);
-      const resultado = await ejecutor.query(consulta, parametros);
-      const filas = resultado.rows.map((fila) => {
-        for (const campo of resultado.fields || []) {
-          if ([20, 700, 701, 1700].includes(campo.dataTypeID) && typeof fila[campo.name] === "string") {
-            const numero = Number(fila[campo.name]);
-            if (Number.isFinite(numero)) fila[campo.name] = numero;
-          }
-        }
-        return fila;
-      });
-      return { rows: filas, rowCount: resultado.rowCount ?? resultado.affectedRows ?? filas.length };
-    }
-    const statement = ejecutor.prepare(sql);
-    const esLectura = /^\s*(SELECT|WITH|PRAGMA)\b/i.test(sql);
-    if (esLectura) return { rows: statement.all(...parametros), rowCount: 0 };
-    const resultado = statement.run(...parametros);
-    return { rows: [], rowCount: resultado.changes, lastInsertRowid: resultado.lastInsertRowid };
+    const resultado = await obtenerEjecutor().query(adaptarPostgres(sql), parametros);
+    return { rows: resultado.rows, rowCount: resultado.rowCount ?? resultado.rows.length };
   };
 
   return {
@@ -83,51 +76,33 @@ function crearAdaptador(ejecutor, postgres = usarPostgres) {
         all: async (...parametros) => (await ejecutar(sql, parametros)).rows,
         get: async (...parametros) => (await ejecutar(sql, parametros)).rows[0],
         run: async (...parametros) => {
-          if (postgres && /^\s*INSERT\b/i.test(sql) && !/\bRETURNING\b/i.test(sql)) {
+          if (/^\s*INSERT\b/i.test(sql) && !/\bRETURNING\b/i.test(sql)) {
             const resultado = await ejecutar(`${sql.trim().replace(/;$/, "")} RETURNING id`, parametros);
             return { changes: resultado.rowCount, lastInsertRowid: resultado.rows[0]?.id };
           }
           const resultado = await ejecutar(sql, parametros);
-          return { changes: resultado.rowCount, lastInsertRowid: resultado.lastInsertRowid ?? resultado.rows[0]?.id };
+          return { changes: resultado.rowCount, lastInsertRowid: resultado.rows[0]?.id };
         },
       };
     },
     async transaction(callback) {
-      if (postgres) {
-        const client = await ejecutor.connect();
-        try {
-          await client.query("BEGIN");
-          const resultado = await callback(crearAdaptador(client, true));
-          await client.query("COMMIT");
-          return resultado;
-        } catch (error) {
-          await client.query("ROLLBACK");
-          throw error;
-        } finally {
-          client.release();
-        }
-      }
-
-      let liberar;
-      const anterior = colaSQLite;
-      colaSQLite = new Promise((resolve) => { liberar = resolve; });
-      await anterior;
+      const client = await obtenerPool().connect();
       try {
-        ejecutor.exec("BEGIN IMMEDIATE");
-        const resultado = await callback(crearAdaptador(ejecutor, false));
-        ejecutor.exec("COMMIT");
+        await client.query("BEGIN");
+        const resultado = await callback(crearAdaptador(() => client));
+        await client.query("COMMIT");
         return resultado;
       } catch (error) {
-        ejecutor.exec("ROLLBACK");
+        await client.query("ROLLBACK");
         throw error;
       } finally {
-        liberar();
+        client.release();
       }
     },
   };
 }
 
-const db = crearAdaptador(usarPostgres ? pool : sqlite);
+const db = crearAdaptador(obtenerPool);
 
 function adaptarEsquemaPostgres(schema) {
   return schema
@@ -136,27 +111,7 @@ function adaptarEsquemaPostgres(schema) {
     .replace(/DEFAULT \(date\('now'\)\)/gi, "DEFAULT CURRENT_DATE");
 }
 
-async function inicializarSQLite() {
-  const schema = fs.readFileSync(path.join(__dirname, "esquema.sql"), "utf8");
-  for (const sentencia of schema.split(";").map((item) => item.trim()).filter(Boolean)) sqlite.exec(sentencia);
-
-  for (const [tabla, columna, definicion] of columnasNuevas) {
-    const existentes = sqlite.prepare(`PRAGMA table_info(${tabla})`).all();
-    if (!existentes.some((item) => item.name === columna)) sqlite.exec(`ALTER TABLE ${tabla} ADD COLUMN ${columna} ${definicion}`);
-  }
-
-  sqlite.prepare("UPDATE hoteles SET correo = ? WHERE slug = 'wopa-travel-cartagena'").run("wondersofpty@gmail.com");
-  const cantidad = sqlite.prepare("SELECT COUNT(*) AS count FROM tipos_habitacion").get().count;
-  if (cantidad === 0) {
-    const seed = fs.readFileSync(path.join(__dirname, "datos_iniciales.sql"), "utf8");
-    sqlite.transaction(() => {
-      for (const sentencia of seed.split(";").map((item) => item.trim()).filter(Boolean)) sqlite.exec(sentencia);
-    })();
-  }
-  sqlite.exec(fs.readFileSync(path.join(__dirname, "experiencias_iniciales.sql"), "utf8"));
-}
-
-async function inicializarPostgres(pgPool = pool) {
+async function inicializarPostgres(pgPool = obtenerPool()) {
   const schemaOriginal = fs.readFileSync(path.join(__dirname, "esquema.sql"), "utf8");
   const schema = adaptarEsquemaPostgres(schemaOriginal);
   for (const sentencia of schema.split(";").map((item) => item.trim()).filter(Boolean)) await pgPool.query(sentencia);
@@ -194,24 +149,23 @@ async function inicializarPostgres(pgPool = pool) {
 }
 
 db.inicializarBaseDatos = () => {
-  if (process.env.VERCEL && !process.env.DATABASE_URL) {
-    return Promise.reject(new Error("DATABASE_URL es obligatorio en Vercel."));
-  }
   if (!inicializacion) {
-    inicializacion = (usarPostgres ? inicializarPostgres() : inicializarSQLite()).catch((error) => {
-      inicializacion = null;
-      throw error;
-    });
+    inicializacion = Promise.resolve()
+      .then(() => inicializarPostgres())
+      .catch((error) => {
+        inicializacion = null;
+        throw error;
+      });
   }
   return inicializacion;
 };
-db.esPostgres = usarPostgres;
+db.esPostgres = true;
 db.inicializarPostgres = inicializarPostgres;
-db.crearAdaptador = crearAdaptador;
 db.adaptarPostgres = adaptarPostgres;
 db.cerrar = async () => {
-  if (usarPostgres) await pool.end();
-  else if (sqlite) sqlite.close();
+  if (pool) await pool.end();
+  pool = undefined;
+  inicializacion = undefined;
 };
 
 module.exports = db;

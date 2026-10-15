@@ -1,0 +1,16 @@
+{
+  "name": "@wopa/db",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Esquema, migraciones SQL y datos de referencia de WOPA Travel",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "migrar": "node src/cli.ts"
+  },
+  "dependencies": {
+    "pg": "^8.23.1"
+  }
+}

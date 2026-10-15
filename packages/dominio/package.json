@@ -1,0 +1,10 @@
+{
+  "name": "@wopa/dominio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reglas de negocio de WOPA Travel, sin dependencias de infraestructura",
+  "type": "module",
+  "exports": {
+    "./tarifas": "./src/tarifas/index.ts"
+  }
+}

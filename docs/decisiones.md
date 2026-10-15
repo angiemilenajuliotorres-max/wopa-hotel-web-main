@@ -26,7 +26,7 @@ Cada decisión tiene un estado: **Aceptada**, **Propuesta** (falta confirmar) o 
 Un solo despliegue en Vercel, organizado en módulos con fronteras estrictas (`identidad`, `geo`, `catalogo`, `tarifas`, `reservas`, `pagos`, `soporte`, `experiencias`, `auditoria`). Cada módulo es dueño de un esquema de Postgres. Next.js (App Router) para la web pública, la extranet y el panel. El código Express actual (`server/`, `public/`) sigue en producción hasta que la fase 2 lo reemplace (patrón *strangler*).
 
 ## ADR-003 · PostgreSQL como único motor, con migraciones versionadas
-**Estado:** Aceptada
+**Estado:** Reemplazada en parte por ADR-010 (pruebas y driver) y ADR-011 (herramienta de migraciones)
 
 Se elimina el adaptador doble SQLite/Postgres. Neon en producción y vista previa; PGlite en las pruebas. Drizzle ORM con migraciones SQL versionadas. No hay cambios de esquema al arrancar la aplicación.
 
@@ -63,3 +63,27 @@ Ejemplo: neta 50.000 + margen 15.000 = 65.000 al público. Se cobra un anticipo 
 **Estado:** Aceptada
 
 El chat lo atiende un asistente con la API de Claude y herramientas de solo lectura, en español e inglés, a cualquier hora. Si no resuelve, crea un ticket con un resumen y el equipo responde por correo. No hay agentes humanos en vivo ni WhatsApp por ahora; el modelo de datos permite agregarlos después.
+
+## ADR-010 · Un solo proveedor: PostgreSQL 18, con Docker en local
+**Estado:** Aceptada · 2026-10-14
+
+**Contexto.** La web heredada usaba SQLite en local y Neon en producción, con dos drivers (`better-sqlite3` y `@neondatabase/serverless`). Las pruebas usaban SQLite y PGlite. SQLite provocaba cierres abruptos intermitentes en las pruebas, y mantener dos motores obligaba a traducir el SQL.
+
+**Decisión.** Un solo proveedor: **PostgreSQL 18**.
+- **Local:** Postgres 18 en Docker (`docker compose up -d`, puerto 5433).
+- **Producción y vista previa:** Neon. El proyecto de Neon debe estar en **Postgres 18**, porque el esquema usa `uuidv7()`.
+- **Driver único:** `pg` (node-postgres), tanto para la API heredada como para el esquema nuevo.
+- **Pruebas:** crean una base temporal en ese mismo Postgres y la eliminan al terminar. En CI, un servicio `postgres:18`.
+- Se eliminan SQLite, PGlite, `@neondatabase/serverless` y `ws`.
+
+**Consecuencias.** Hace falta Docker para desarrollar y probar. Las pruebas corren sobre el mismo motor que producción.
+
+## ADR-011 · Migraciones SQL escritas a mano y ubicación sin PostGIS
+**Estado:** Aceptada · 2026-10-14
+
+- Las migraciones son archivos `packages/db/migraciones/NNNN_nombre.sql`. Las aplica un migrador propio (`npm run db:migrar`):
+  - cada migración corre en su propia transacción;
+  - un bloqueo impide dos ejecuciones a la vez;
+  - se guarda una huella de cada archivo, y el migrador falla si una migración ya publicada fue editada.
+- **Drizzle no se usa por ahora.** Se evaluará en la fase 2, solo como generador de consultas tipadas, sin que genere el esquema.
+- **Ubicación:** latitud y longitud con validaciones, en lugar de PostGIS. Alcanza para mapas y autocompletado; si hace falta búsqueda por distancia, se agrega `earthdistance` o PostGIS en una migración nueva.

@@ -5,7 +5,7 @@
 | Necesidad | Servicio | Estado |
 |---|---|---|
 | Hosting y funciones | Vercel | En uso |
-| Base de datos | Neon Postgres, con una rama por entorno | En uso |
+| Base de datos | PostgreSQL 18: Docker en local y en CI, Neon en vista previa y producción | En uso |
 | Autenticación | Better Auth: organizaciones, invitaciones, verificación en dos pasos | Fase 1 |
 | Límite de peticiones y caché | Upstash Redis | Pendiente (hoy el límite vive en memoria) |
 | Fotos | Cloudflare R2 o Vercel Blob | Fase 2 |
@@ -19,7 +19,7 @@
 
 | Entorno | Rama Git | Vercel | Neon | Pasarelas |
 |---|---|---|---|---|
-| Local | cualquiera | `npm start` | SQLite (legado) o PGlite / Postgres local | Pruebas |
+| Local | cualquiera | `npm start` | Postgres 18 en Docker (`localhost:5433`) | Pruebas |
 | Vista previa | `develop`, PRs | Preview | rama `develop` o una por PR | Pruebas |
 | Producción | `main` | Production | rama `main` | Reales |
 
@@ -35,4 +35,4 @@
 
 ## CI
 
-GitHub Actions (`.github/workflows/ci.yml`): `npm ci` + `npm test` en cada push y en cada PR a `develop` y `main`.
+GitHub Actions (`.github/workflows/ci.yml`), con Node 22 y 24 y un servicio `postgres:18`, en cada push y en cada PR a `develop` y `main`. Ejecuta `npm ci`, `npm run typecheck` y `npm test`.

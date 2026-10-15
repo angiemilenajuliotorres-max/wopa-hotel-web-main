@@ -1,6 +1,6 @@
 # 03 · Base de datos
 
-PostgreSQL ([ADR-003](../decisiones.md)). En producción, Neon. En pruebas, PGlite.
+**PostgreSQL 18** como único proveedor ([ADR-010](../decisiones.md)): Docker en local y en las pruebas, Neon en producción. Las migraciones están en `packages/db/migraciones/` ([ADR-011](../decisiones.md)).
 
 ## Normas de diseño
 
@@ -52,9 +52,9 @@ PostgreSQL ([ADR-003](../decisiones.md)). En producción, Neon. En pruebas, PGli
 | `experiencias` | experiencias, experiencia_traducciones, cotizaciones, cotizacion_lineas |
 | `auditoria` | eventos, alertas |
 
-Extensiones: `citext`, `pg_trgm`, `unaccent`, `btree_gist` y `postgis`.
+Extensiones: `citext`, `pg_trgm`, `unaccent` y `btree_gist`. La ubicación se guarda como latitud y longitud, sin PostGIS ([ADR-011](../decisiones.md)).
 
-El DDL completo de las tablas clave está en el artifact de arquitectura. El definitivo vivirá en `packages/db/migraciones/` a partir de la fase 1.
+El DDL definitivo está en `packages/db/migraciones/`. Ya existen `geo`, `identidad`, `catalogo`, `tarifas` y `reservas`; `pagos`, `soporte`, `experiencias` y `auditoria` siguen pendientes (ver [ESTADO.md](../ESTADO.md)).
 
 ## Tablas clave (resumen)
 

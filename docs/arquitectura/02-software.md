@@ -31,11 +31,12 @@ wopa-hotel-web-main/
 ├─ public/                   # (legado) web y panel actuales
 ├─ test/                     # (legado) pruebas de integración actuales
 ├─ docs/                     # esta documentación
+├─ docker-compose.yml        # Postgres 18 local
 ├─ apps/                     # (fase 1+) aplicaciones nuevas
 │  └─ web/                   # Next.js: web pública, extranet, panel y API v1
-├─ packages/                 # (fase 1+) código compartido
-│  ├─ db/                    # esquema Drizzle, migraciones SQL, seeds
-│  ├─ dominio/               # módulos: identidad, geo, catalogo, tarifas, …
+├─ packages/                 # código compartido (npm workspaces, TypeScript sin compilar)
+│  ├─ db/                    # ✅ migraciones SQL, migrador y datos de referencia
+│  ├─ dominio/               # ✅ tarifas (cálculo de precio); faltan los demás módulos
 │  ├─ pagos/                 # interfaz ProveedorPago + adaptadores
 │  └─ ui/                    # sistema de diseño
 └─ .github/                  # CI y plantillas

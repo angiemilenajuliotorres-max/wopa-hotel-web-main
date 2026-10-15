@@ -274,11 +274,7 @@ if (require.main === module) {
         );
 
         console.log(
-          `🏨 Base de datos: ${
-            db.esPostgres
-              ? "Neon PostgreSQL"
-              : process.env.DB_PATH || "./server/db/hotel.db"
-          }`
+          `🏨 Base de datos: PostgreSQL (${new URL(process.env.DATABASE_URL).host})`
         );
       });
     })

@@ -1,19 +1,22 @@
 {
   "name": "wopa-travel-web",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Sitio web y API de WOPA Travel",
   "main": "server/app.js",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "start": "node server/app.js",
-    "test": "node --test"
+    "test": "node --test \"test/**/*.test.js\" \"packages/*/test/**/*.test.ts\"",
+    "typecheck": "tsc -p tsconfig.json",
+    "db:migrar": "npm run migrar -w @wopa/db"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22.18"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^0.10.4",
-    "better-sqlite3": "^11.10.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "exceljs": "^4.4.0",
@@ -22,9 +25,11 @@
     "express-rate-limit": "^7.5.0",
     "helmet": "^8.1.0",
     "pdfkit": "^0.20.2",
-    "ws": "^8.22.0"
+    "pg": "^8.23.1"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "^0.5.8"
+    "@types/node": "^22.15.0",
+    "@types/pg": "^8.23.1",
+    "typescript": "^5.8.3"
   }
 }
