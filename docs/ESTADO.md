@@ -44,8 +44,13 @@ Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (nec
 | CI en GitHub Actions (`npm ci` + `npm test`, Node 20 y 22) | ✅ Se verá en verde después del primer push |
 | Pruebas de los cambios de seguridad | ✅ 4 pruebas en verde |
 | Lint (ESLint) | ⬜ Se agrega con el monorepo en la fase 1 |
+| Registro de horas en `docs/HORAS.md` | ✅ |
 | Límite de peticiones compartido entre instancias (Upstash Redis) | ⛔ Requiere crear una cuenta de Upstash y configurar `UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN` en Vercel |
 | Protección de ramas en GitHub | ⛔ Requiere permisos de administrador del repositorio |
+
+> **Importante al bajar la fase 0:** `node_modules/` y `server/db/hotel.db` dejaron de versionarse. Al hacer `git pull`, git los borra de tu copia local. Después del pull:
+> 1. Ejecuta `npm ci`.
+> 2. Si necesitas tu base SQLite local, recupérala con `git show fd1a7f5:server/db/hotel.db > server/db/hotel.db`, o deja que el servidor la cree vacía con los datos iniciales.
 
 ## Fase 1 · Base: esquema, identidad y precio → `v0.2.0`
 
