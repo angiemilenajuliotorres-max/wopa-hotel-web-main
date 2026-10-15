@@ -49,18 +49,44 @@ app.use(async (req, res, next) => {
 /*
  * SEGURIDAD
  */
+/*
+ * Las mismas directivas se repiten en vercel.json para los archivos
+ * estáticos, que Vercel sirve sin pasar por Express.
+ */
 app.use(
   helmet({
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        "default-src": ["'self'"],
+        "script-src": ["'self'"],
+        "style-src": ["'self'", "'unsafe-inline'"],
+        "img-src": ["'self'", "data:", "https://images.unsplash.com"],
+        "frame-src": ["https://www.google.com"],
+        "connect-src": ["'self'"],
+        "object-src": ["'none'"],
+        "base-uri": ["'self'"],
+        "form-action": ["'self'"],
+        "frame-ancestors": ["'none'"],
+      },
+    },
   })
 );
 
 /*
  * CORS
+ *
+ * Sin FRONTEND_URL solo se acepta el mismo origen: la web y la API
+ * se publican juntas. FRONTEND_URL admite varios orígenes separados por coma.
  */
+const origenesPermitidos = (process.env.FRONTEND_URL || "")
+  .split(",")
+  .map((origen) => origen.trim())
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || true,
+    origin: origenesPermitidos.length ? origenesPermitidos : false,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     credentials: true,
   })
@@ -68,8 +94,13 @@ app.use(
 
 /*
  * RATE LIMIT
+ *
+ * Solo para la API: los archivos estáticos no cuentan.
+ * En memoria por ahora; pasa a Upstash Redis cuando exista la cuenta
+ * (ver docs/ESTADO.md, fase 0).
  */
 app.use(
+  "/api",
   rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
@@ -133,8 +164,6 @@ const habitacionesRouter = require("./rutas/habitaciones");
 const solicitudesRouter = require("./rutas/solicitudes");
 const adminRouter = require("./rutas/admin");
 
-console.log("ADMIN ROUTER CARGADO:", typeof adminRouter);
-
 /*
  * Habitaciones
  */
@@ -154,28 +183,10 @@ app.use("/api", solicitudesRouter);
 app.use("/api/admin", adminRouter);
 
 /*
- * ==========================================
- * PRUEBA ADMIN
- * ==========================================
- *
- * Esta ruta NO requiere contraseña.
- * Sirve para comprobar que Vercel está llegando
- * correctamente al router /api/admin.
+ * Cualquier otra ruta /api responde 404 en JSON, no con el index.html.
  */
-
-app.get("/api/admin-test", (req, res) => {
-  res.json({
-    ok: true,
-    mensaje: "La API de administración está funcionando.",
-    ruta: "/api/admin-test",
-  });
-});
-
-app.get("/api/admin/test-directo", (req, res) => {
-  res.json({
-    ok: true,
-    mensaje: "La ruta directa de admin funciona.",
-  });
+app.use("/api", (req, res) => {
+  res.status(404).json({ ok: false, error: "Ruta no encontrada." });
 });
 
 /*

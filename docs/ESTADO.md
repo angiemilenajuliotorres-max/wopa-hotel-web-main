@@ -34,14 +34,16 @@ Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (nec
 |---|---|
 | Git Flow: rama `develop`, convenciones y plantilla de PR | ✅ |
 | Documentación de arquitectura y decisiones en `docs/` | ✅ |
-| Quitar rutas de prueba (`/api/admin-test`, `/api/admin/test-directo`) y logs de depuración | ⬜ |
-| CORS restringido a `FRONTEND_URL` (sin esa variable, solo el mismo origen) | ⬜ |
-| CSP activa en la API (helmet) y en los archivos estáticos (`vercel.json`) | ⬜ |
-| Límite de peticiones solo en `/api` (hoy afecta también a los archivos estáticos) | ⬜ |
-| Desactivar `POST /api/habitaciones/disponibilidad` (consulta una columna que no existe) | ⬜ |
-| Sacar `server/db/hotel.db` del repositorio | ⬜ |
-| CI en GitHub Actions (`npm ci` + `npm test`) | ⬜ |
-| Pruebas de los cambios de seguridad | ⬜ |
+| Quitar rutas de prueba (`/api/admin-test`, `/api/admin/test-directo`) y logs de depuración | ✅ |
+| Rutas `/api` desconocidas responden 404 en JSON (antes devolvían el HTML de la web) | ✅ |
+| CORS restringido a `FRONTEND_URL` (sin esa variable, solo el mismo origen) | ✅ |
+| CSP activa en la API (helmet) y en los archivos estáticos (`vercel.json`) | ✅ Falta revisar en la vista previa de Vercel que el mapa, las imágenes y el panel se vean bien |
+| Límite de peticiones solo en `/api` (antes afectaba también a los archivos estáticos) | ✅ |
+| Desactivar `POST /api/habitaciones/disponibilidad` (responde 410; ninguna pantalla lo usa) | ✅ |
+| Sacar `server/db/hotel.db` y `node_modules/` del repositorio (estaban versionados pese a `.gitignore`) | ✅ |
+| CI en GitHub Actions (`npm ci` + `npm test`, Node 20 y 22) | ✅ Se verá en verde después del primer push |
+| Pruebas de los cambios de seguridad | ✅ 4 pruebas en verde |
+| Lint (ESLint) | ⬜ Se agrega con el monorepo en la fase 1 |
 | Límite de peticiones compartido entre instancias (Upstash Redis) | ⛔ Requiere crear una cuenta de Upstash y configurar `UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN` en Vercel |
 | Protección de ramas en GitHub | ⛔ Requiere permisos de administrador del repositorio |
 

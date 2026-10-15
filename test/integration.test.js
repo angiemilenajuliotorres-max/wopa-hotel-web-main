@@ -104,6 +104,45 @@ test("API local conserva catálogo, solicitudes y autenticación administrativa"
   assert.equal(cancellation.penalizacionUsd, 10);
 });
 
+test("fase 0: rutas de prueba retiradas, CORS cerrado, CSP activa y disponibilidad desactivada", async () => {
+  for (const ruta of ["/api/admin-test", "/api/no-existe"]) {
+    const response = await fetch(`${baseUrl}${ruta}`);
+    assert.equal(response.status, 404, ruta);
+    assert.match(response.headers.get("content-type"), /application\/json/, ruta);
+  }
+
+  const directo = await fetch(`${baseUrl}/api/admin/test-directo`);
+  assert.equal(directo.status, 401);
+
+  const crossOrigin = await fetch(`${baseUrl}/api/health`, { headers: { origin: "https://sitio-ajeno.example" } });
+  assert.equal(crossOrigin.status, 200);
+  assert.equal(crossOrigin.headers.get("access-control-allow-origin"), null);
+
+  const csp = crossOrigin.headers.get("content-security-policy");
+  assert.match(csp, /default-src 'self'/);
+  assert.match(csp, /script-src 'self'/);
+  assert.match(csp, /frame-ancestors 'none'/);
+
+  const disponibilidad = await fetch(`${baseUrl}/api/habitaciones/disponibilidad`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ fechaEntrada: "2030-01-01", fechaSalida: "2030-01-03", numeroPersonas: 2 }),
+  });
+  assert.equal(disponibilidad.status, 410);
+
+  const estatico = await fetch(`${baseUrl}/`);
+  assert.equal(estatico.status, 200);
+  assert.equal(estatico.headers.get("ratelimit-policy"), null);
+});
+
+test("vercel.json aplica la misma CSP a los archivos estáticos", () => {
+  const vercel = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "vercel.json"), "utf8"));
+  const cabeceras = vercel.headers.find((regla) => regla.source === "/(.*)").headers;
+  const csp = cabeceras.find((cabecera) => cabecera.key === "Content-Security-Policy").value;
+  assert.match(csp, /script-src 'self'/);
+  assert.match(csp, /frame-ancestors 'none'/);
+});
+
 test("schema y seed PostgreSQL son válidos e idempotentes", async () => {
   const postgres = new PGlite();
   const executor = {
