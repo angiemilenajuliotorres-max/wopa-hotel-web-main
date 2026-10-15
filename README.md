@@ -10,7 +10,9 @@ La única base de datos es **PostgreSQL 18**: en local, en Docker; en producció
 3. Copia `.env.example` como `.env` (ya trae la `DATABASE_URL` local).
 4. Ejecuta `npm ci`.
 5. Aplica el esquema nuevo: `npm run db:migrar`.
-6. Ejecuta `npm start` y abre `http://localhost:3000`.
+6. Ejecuta `npm start` y abre `http://localhost:3000` (web actual).
+7. Web nueva (Next.js): copia `.env.example` como `apps/web/.env.local`, completa `SECRETO_CIFRADO` y ejecuta `npm run web:dev` (`http://localhost:3100`).
+8. Primer administrador: `ADMIN_CORREO=… ADMIN_NOMBRE=… ADMIN_CLAVE=… npm run admin:crear`. Datos de la web actual: `ADMIN_CORREO=… npm run db:importar-legado`.
 
 Las tablas de la web actual y su catálogo inicial se crean al iniciar el servidor. El esquema nuevo (`packages/db`) se aplica con `npm run db:migrar`. La documentación técnica está en [docs/](docs/README.md).
 

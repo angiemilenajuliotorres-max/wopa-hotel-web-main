@@ -3,7 +3,7 @@
  * alta de hoteles (ADR-004), aceptación con margen obligatorio y ajustes de margen (ADR-008),
  * habitaciones, planes, tarifa neta y cupos por rango de fechas.
  */
-import { crearSlug } from "@wopa/db";
+import { crearSlug } from "@wopa/dominio/texto";
 import { crearAlerta, registrarEvento } from "./auditoria.ts";
 import { db, enTransaccion, ErrorNegocio, type Consulta } from "./conexion.ts";
 import { esWopa, hotelesDe, type SesionActiva } from "./identidad.ts";
@@ -353,4 +353,72 @@ export async function listarCiudades(idioma: "es" | "en" = "es", cliente?: Consu
     [idioma],
   );
   return rows;
+}
+
+export async function detalleHotelAdmin(sesion: SesionActiva, hotelId: string, cliente?: Consulta) {
+  const conexion = db(cliente);
+  await exigirAccesoHotel(sesion, hotelId, conexion, ["hotel_admin", "hotel_recepcion"]);
+  const hotel = (await conexion.query<{
+    id: string; slug: string; nombre: string; estado: string; modo_reserva: string; moneda: string; direccion: string;
+    organizacion_id: string; ciudad: string; aceptado_en: Date | null; registro_turismo: string | null; correo_reservas: string | null; telefono: string | null;
+  }>(
+    `SELECT h.id, h.slug, h.nombre, h.estado, h.modo_reserva, h.moneda_codigo AS moneda, h.direccion, h.organizacion_id, ct.nombre AS ciudad,
+       h.aceptado_en, h.registro_turismo, h.correo_reservas, h.telefono
+     FROM catalogo.hoteles h JOIN geo.ciudad_traducciones ct ON ct.ciudad_id = h.ciudad_id AND ct.idioma_codigo = 'es'
+     WHERE h.id = $1`,
+    [hotelId],
+  )).rows[0];
+  if (!hotel) return null;
+  const habitaciones = (await conexion.query<{ id: string; codigo: string; nombre: string; capacidad_maxima: number; esta_activo: boolean }>(
+    `SELECT t.id, t.codigo, coalesce(tt.nombre, t.codigo) AS nombre, t.capacidad_maxima, t.esta_activo
+     FROM catalogo.tipos_habitacion t LEFT JOIN catalogo.tipo_habitacion_traducciones tt ON tt.tipo_habitacion_id = t.id AND tt.idioma_codigo = 'es'
+     WHERE t.hotel_id = $1 ORDER BY t.creado_en`,
+    [hotelId],
+  )).rows;
+  const planes = (await conexion.query<{ id: string; codigo: string; nombre: string; anticipo_bp: number }>(
+    `SELECT p.id, p.codigo, coalesce(pt.nombre, p.codigo) AS nombre, p.anticipo_bp
+     FROM tarifas.planes_tarifa p LEFT JOIN tarifas.plan_tarifa_traducciones pt ON pt.plan_tarifa_id = p.id AND pt.idioma_codigo = 'es'
+     WHERE p.hotel_id = $1 AND p.esta_activo ORDER BY p.creado_en`,
+    [hotelId],
+  )).rows;
+  const equipo = (await conexion.query<{ nombre: string; correo: string; rol: string }>(
+    `SELECT u.nombre, u.correo, m.rol FROM identidad.membresias m JOIN identidad.usuarios u ON u.id = m.usuario_id
+     WHERE m.organizacion_id = $1 ORDER BY u.nombre`,
+    [hotel.organizacion_id],
+  )).rows;
+  const invitaciones = (await conexion.query<{ correo: string; rol: string; expira_en: Date }>(
+    "SELECT correo, rol, expira_en FROM identidad.invitaciones WHERE organizacion_id = $1 AND aceptada_en IS NULL AND expira_en > now() ORDER BY creado_en DESC",
+    [hotel.organizacion_id],
+  )).rows;
+  const proximosPrecios = (await conexion.query<{ habitacion: string; plan: string; ocupacion: number; desde: string; hasta: string; neto: string; dias: number }>(
+    `SELECT coalesce(tt.nombre, t.codigo) AS habitacion, p.codigo AS plan, pd.ocupacion, min(pd.fecha)::text AS desde, max(pd.fecha)::text AS hasta,
+       pd.monto_neto_centavos AS neto, count(*)::int AS dias
+     FROM tarifas.precios_dia pd
+     JOIN catalogo.tipos_habitacion t ON t.id = pd.tipo_habitacion_id
+     LEFT JOIN catalogo.tipo_habitacion_traducciones tt ON tt.tipo_habitacion_id = t.id AND tt.idioma_codigo = 'es'
+     JOIN tarifas.planes_tarifa p ON p.id = pd.plan_tarifa_id
+     WHERE pd.hotel_id = $1 AND pd.fecha >= current_date
+     GROUP BY tt.nombre, t.codigo, p.codigo, pd.ocupacion, pd.monto_neto_centavos
+     ORDER BY habitacion, plan, ocupacion, desde LIMIT 50`,
+    [hotelId],
+  )).rows;
+  return { ...hotel, habitaciones, planes, equipo, invitaciones, proximosPrecios };
+}
+
+export async function alertasAbiertas(sesion: SesionActiva, cliente?: Consulta) {
+  exigirWopa(sesion, ["wopa_admin", "wopa_operaciones", "wopa_soporte", "wopa_finanzas"]);
+  const { rows } = await db(cliente).query<{ id: string; tipo: string; severidad: string; hotel: string | null; hotel_id: string | null; detalle: Record<string, unknown>; creado_en: Date }>(
+    `SELECT a.id, a.tipo, a.severidad, h.nombre AS hotel, a.hotel_id, a.detalle, a.creado_en
+     FROM auditoria.alertas a LEFT JOIN catalogo.hoteles h ON h.id = a.hotel_id
+     WHERE a.estado = 'abierta' ORDER BY CASE a.severidad WHEN 'critica' THEN 0 WHEN 'advertencia' THEN 1 ELSE 2 END, a.creado_en DESC LIMIT 100`,
+  );
+  return rows;
+}
+
+export async function atenderAlerta(sesion: SesionActiva, alertaId: string, descartar: boolean, cliente?: Consulta): Promise<void> {
+  exigirWopa(sesion, ["wopa_admin", "wopa_operaciones", "wopa_soporte", "wopa_finanzas"]);
+  await db(cliente).query(
+    "UPDATE auditoria.alertas SET estado = $2, atendida_por = $3, atendida_en = now() WHERE id = $1 AND estado = 'abierta'",
+    [alertaId, descartar ? "descartada" : "atendida", sesion.usuario.id],
+  );
 }

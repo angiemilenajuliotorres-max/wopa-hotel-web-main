@@ -4,3 +4,10 @@ server/db/*.db
 server/db/*.db-shm
 server/db/*.db-wal
 npm-debug.log*
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+.env*.local

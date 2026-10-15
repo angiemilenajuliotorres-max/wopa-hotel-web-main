@@ -7,6 +7,7 @@
   "exports": {
     "./tarifas": "./src/tarifas/index.ts",
     "./identidad": "./src/identidad/index.ts",
-    "./reservas": "./src/reservas/index.ts"
+    "./reservas": "./src/reservas/index.ts",
+    "./texto": "./src/texto/index.ts"
   }
 }

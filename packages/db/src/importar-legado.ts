@@ -8,6 +8,9 @@
  * - La política heredada retiene el anticipo (25 % del total) al cancelar.
  */
 import { calcularNoche } from "@wopa/dominio/tarifas";
+import { crearSlug, normalizar } from "@wopa/dominio/texto";
+
+export { crearSlug, normalizar };
 
 export interface ClienteSql {
   query<Fila = Record<string, any>>(sql: string, parametros?: unknown[]): Promise<{ rows: Fila[]; rowCount: number | null }>;
@@ -79,14 +82,6 @@ const ESTADOS_COTIZACION: Record<string, string> = {
 };
 
 const ESTADOS_TICKET: Record<string, string> = { nuevo: "abierto", en_revision: "en_progreso", resuelto: "resuelto" };
-
-export function normalizar(texto: string): string {
-  return texto.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
-}
-
-export function crearSlug(texto: string): string {
-  return normalizar(texto).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80);
-}
 
 /** Neta más alta cuyo precio al público (30 % + redondeo a 1 USD) no supera el precio heredado. */
 export function netaDesdePrecioPublico(precioCentavos: bigint): bigint {

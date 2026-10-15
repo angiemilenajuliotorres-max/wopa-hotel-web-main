@@ -160,6 +160,9 @@ export async function iniciarConfiguracion2fa(token: string, cliente?: Consulta)
   const conexion = db(cliente);
   const sesion = await sesionObligatoria(token, conexion);
   if (sesion.tiene2fa) throw new ErrorNegocio("2FA_YA_CONFIGURADA", "La verificación en dos pasos ya está activa.", { estado: 409 });
+  // Si ya hay un secreto pendiente (la página se recargó), se reutiliza para no invalidar el QR escaneado.
+  const pendiente = await secretoDe(conexion, sesion.usuario.id);
+  if (pendiente) return { secreto: pendiente, uri: uriTotp(pendiente, sesion.usuario.correo) };
   const secreto = generarSecretoTotp();
   await conexion.query("UPDATE identidad.credenciales SET totp_secreto_cifrado = $2 WHERE usuario_id = $1", [
     sesion.usuario.id,

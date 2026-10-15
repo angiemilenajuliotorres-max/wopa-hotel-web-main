@@ -36,6 +36,7 @@ Prioridad: 🔴 bloquea el lanzamiento · 🟠 necesario antes de producción ·
 | 🟠 | Cupos de los hoteles importados | Quedaron en modo solicitud; para cobrar el anticipo en línea hay que cargar cupos y pasarlos a `anticipo_en_linea` |
 | 🟠 | Traducciones al inglés de los hoteles y tours importados | Solo existe el texto en español |
 | 🟠 | Hoteles de Panamá para el lanzamiento | Ciudades cargadas (Ciudad de Panamá, Boquete, Bocas del Toro); faltan hoteles |
+| 🟢 | Panel y extranet solo en español | El equipo de WOPA y los hoteles de Panamá operan en español; la web pública sí es es/en |
 | 🟢 | Reservas de varias habitaciones a la vez | Hoy una reserva es de una habitación con capacidad para todos los huéspedes |
 | 🟢 | Frecuencia de liquidación, anticipo y horario de tickets | Valores por defecto aplicados: cada quincena, 25 % y de 8:00 a 20:00 |
 

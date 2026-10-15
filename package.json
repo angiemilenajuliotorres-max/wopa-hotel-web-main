@@ -5,7 +5,8 @@
   "description": "Sitio web y API de WOPA Travel",
   "main": "server/app.js",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "scripts": {
     "start": "node server/app.js",
@@ -13,7 +14,11 @@
     "typecheck": "tsc -p tsconfig.json",
     "db:migrar": "npm run migrar -w @wopa/db",
     "admin:crear": "npm run admin:crear -w @wopa/db",
-    "db:importar-legado": "npm run importar-legado -w @wopa/db"
+    "db:importar-legado": "npm run importar-legado -w @wopa/db",
+    "web:dev": "npm run dev -w @wopa/web",
+    "web:build": "npm run build -w @wopa/web",
+    "web:start": "npm run start -w @wopa/web",
+    "e2e:acceso": "node apps/web/e2e/acceso.mjs ."
   },
   "engines": {
     "node": ">=22.18"

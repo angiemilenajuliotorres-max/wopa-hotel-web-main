@@ -6,7 +6,7 @@ Lo que necesita una persona (cuentas, datos, validaciones) está en [POR-REVISAR
 
 Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (necesita una decisión o un acceso externo)
 
-**Fase actual:** 1 · Base: esquema, identidad y precio (fase 0 cerrada en `release/v0.1.0`)
+**Fase actual:** 2 · Web pública es/en (fase 1 cerrada en `release/v0.2.0`)
 **Lanzamiento:** Panamá, al cerrar la fase 3 (`v1.0.0`)
 
 ---
@@ -73,13 +73,13 @@ Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (nec
 | Seguridad de identidad: scrypt, tokens, TOTP (RFC 6238) y AES-256-GCM ([ADR-012](decisiones.md)) | ✅ 14 pruebas |
 | `npm run admin:crear`: primer administrador de WOPA | ✅ |
 | Importador de la web heredada (`npm run db:importar-legado`), idempotente, con margen del 30 % ([ADR-013](decisiones.md)) | ✅ 5 pruebas |
-| `apps/web`: Next.js + TypeScript, es/en | ⬜ |
+| `apps/web`: Next.js 16 + React 19 + TypeScript, CSP y cabeceras de seguridad, `proxy` de idioma | ✅ Compila en producción |
 | `@wopa/servicios/identidad`: inicio de sesión, 2FA obligatoria, sesiones, invitaciones, permisos y bloqueo por fuerza bruta | ✅ 8 pruebas |
-| Pantallas de acceso (login, 2FA, invitación) | ⬜ Con `apps/web` |
+| Pantallas de acceso: login, configuración de 2FA con QR, verificación, activación de invitación, cierre de sesión | ✅ Probadas de extremo a extremo (`npm run e2e:acceso`) |
 | `@wopa/servicios/catalogo`: crear hotel, aceptar con margen, ajustar margen con historial, habitaciones, tarifa neta y cupos por rango, alerta de precio anómalo | ✅ |
-| Panel de WOPA para hoteles y márgenes | ⬜ Con `apps/web` |
-| Sistema de diseño (tokens y componentes base) | ⬜ |
-| Sentry | ⬜ |
+| Panel de WOPA: hoteles, alertas, alta de hotel, aceptación con margen, ajustes con historial, habitaciones, tarifa neta, cupos, invitaciones | ✅ |
+| Sistema de diseño: tokens de marca (azul y dorado), componentes base, accesibilidad (foco visible, zonas táctiles de 44 px) | ✅ |
+| Sentry | ⛔ Requiere cuenta (ver [POR-REVISAR.md](POR-REVISAR.md)) |
 | Confirmar que el proyecto de Neon está en Postgres 18 | ⛔ Ver [POR-REVISAR.md](POR-REVISAR.md) |
 
 ## Fase 2 · Web pública es/en y centro de ayuda → `v0.3.0`
