@@ -10,7 +10,7 @@ Prioridad: 🔴 bloquea el lanzamiento · 🟠 necesario antes de producción ·
 |---|---|---|---|
 | 🔴 | Yappy Comercial (Banco General): cuenta y botón de pago | Cobrar anticipos con Yappy | `YAPPY_MERCHANT_ID`, `YAPPY_SECRET` |
 | 🔴 | PagueloFacil (o un banco adquirente): cotización, contrato y credenciales | Cobrar con tarjeta | `PAGUELOFACIL_CCLW`, `PAGUELOFACIL_TOKEN` |
-| 🟠 | Anthropic: clave de la API | Asistente con IA 24/7 | `ANTHROPIC_API_KEY` |
+| 🟠 | Anthropic: clave de la API (sin ella, el chat funciona en modo básico sin IA) | Asistente con IA 24/7 | `ANTHROPIC_API_KEY` |
 | 🟠 | Resend: cuenta y dominio verificado | Correos de reservas, invitaciones y tickets | `RESEND_API_KEY`, `CORREO_REMITENTE` |
 | 🟠 | Upstash Redis | Límite de peticiones compartido entre instancias | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
 | 🟢 | Sentry | Monitoreo de errores | `SENTRY_DSN` |
@@ -40,6 +40,7 @@ Prioridad: 🔴 bloquea el lanzamiento · 🟠 necesario antes de producción ·
 | 🟠 | Cupos de los hoteles importados | Quedaron en modo solicitud; para cobrar el anticipo en línea hay que cargar cupos y pasarlos a `anticipo_en_linea` |
 | 🟠 | Traducciones al inglés de los hoteles y tours importados | Solo existe el texto en español; la web muestra el español con un aviso |
 | 🟠 | Revisar los textos de los 5 artículos de ayuda (es/en) | Redactados como borrador; WOPA debe validarlos |
+| 🟠 | Probar el asistente con IA con conversaciones reales antes de abrirlo al público | Con la clave puesta: revisar respuestas, tono y uso de herramientas en `/admin/conversaciones`; ajustar instrucciones si hace falta |
 | 🟠 | Hoteles de Panamá para el lanzamiento | Ciudades cargadas (Ciudad de Panamá, Boquete, Bocas del Toro); faltan hoteles |
 | 🟢 | Panel y extranet solo en español | El equipo de WOPA y los hoteles de Panamá operan en español; la web pública sí es es/en |
 | 🟢 | Reservas de varias habitaciones a la vez | Hoy una reserva es de una habitación con capacidad para todos los huéspedes |

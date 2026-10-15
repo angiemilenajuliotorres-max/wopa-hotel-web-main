@@ -6,7 +6,7 @@ Lo que necesita una persona (cuentas, datos, validaciones) está en [POR-REVISAR
 
 Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (necesita una decisión o un acceso externo)
 
-**Fase actual:** 4 · Asistente con IA (fase 3 lista en `release/v1.0.0`; el lanzamiento espera los 🔴 de [POR-REVISAR.md](POR-REVISAR.md))
+**Fase actual:** 5 · Extranet de hoteles (fase 4 en `release/v1.1.0`; el lanzamiento espera los 🔴 de [POR-REVISAR.md](POR-REVISAR.md))
 **Lanzamiento:** Panamá, al cerrar la fase 3 (`v1.0.0`)
 
 ---
@@ -117,9 +117,12 @@ Leyenda: ✅ hecho · 🟡 en curso o parcial · ⬜ falta · ⛔ bloqueado (nec
 
 | Ítem | Estado |
 |---|---|
-| Widget, API de chat con streaming y herramientas | ⬜ |
-| Creación de tickets con resumen | ⬜ |
-| Panel de conversaciones y valoraciones | ⬜ |
+| Asistente (`@wopa/servicios/asistente`): Claude Opus 5.5 con esfuerzo bajo, respaldo del servidor ante rechazos, 7 herramientas, historial exacto que solo crece al final, límites por conversación e IP | ✅ 5 pruebas |
+| Modo sin IA cuando no hay `ANTHROPIC_API_KEY`: ayuda, destinos o enlace para escribir al equipo | ✅ |
+| Widget de ayuda accesible en todas las páginas públicas (es/en) y API `/api/v1/chat` con control de origen | ✅ Probado de extremo a extremo |
+| Respuestas en streaming dentro del widget | ⬜ Mejora: hoy se responde el mensaje completo |
+| Creación de tickets con resumen desde el chat (prioridad urgente si el huésped está en el hotel) | ✅ |
+| Panel de conversaciones con herramientas usadas, porcentaje que termina en ticket y valoración promedio | ✅ |
 
 ## Fase 5 · Extranet de hoteles y supervisión → `v1.2.0`
 

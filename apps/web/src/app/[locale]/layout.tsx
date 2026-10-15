@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ChatAyuda } from "@/componentes/ChatAyuda";
 import { diccionario } from "@/i18n";
 import "@/estilos/globales.css";
 
@@ -37,6 +38,7 @@ export default async function LayoutPublico({ children, params }: LayoutProps<"/
           </div>
         </header>
         <main id="contenido">{children}</main>
+        <ChatAyuda idioma={idioma} />
         <footer className="pie">
           <div className="contenedor fila entre">
             <span>{t.pie.texto}</span>

@@ -8,3 +8,4 @@ export * from "./reservas.ts";
 export * from "./soporte.ts";
 export * from "./experiencias.ts";
 export * from "./pagos/index.ts";
+export * from "./asistente.ts";

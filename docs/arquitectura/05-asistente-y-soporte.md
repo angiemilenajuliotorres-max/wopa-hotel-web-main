@@ -12,6 +12,16 @@ Decisión: [ADR-009](../decisiones.md). El chat lo atiende **solo IA, 24/7**, en
   - Respaldo del servidor (`fallbacks: "default"`) si el modelo rechaza una petición.
 - **Límites**: tope de mensajes por conversación y por IP. Si no resuelve en 3 intentos, ofrece abrir un ticket.
 
+### Implementación
+
+- `packages/servicios/src/asistente.ts`: bucle manual con `client.beta.messages.create`, la cabecera `server-side-fallback-2026-07-01` y `fallbacks: "default"`. Las herramientas se ejecutan en paralelo y todos sus resultados vuelven en un solo mensaje.
+- El historial se guarda en `soporte.conversaciones.historial_api` exactamente como lo devuelve la API, incluidos los bloques de razonamiento, y solo se agrega al final, como exigen los modelos actuales.
+- Las instrucciones son fijas y se guardan en caché; la fecha del día va en un bloque aparte.
+- Sin `ANTHROPIC_API_KEY`, el chat funciona en modo sin IA:
+  - enlaza al destino si el texto nombra una ciudad u hotel;
+  - si no, responde con un artículo del centro de ayuda;
+  - si tampoco hay un artículo adecuado, invita a escribir al equipo.
+
 ### Herramientas
 
 | Herramienta | Tipo | Nota |

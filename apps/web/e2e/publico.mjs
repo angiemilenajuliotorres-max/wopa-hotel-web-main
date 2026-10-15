@@ -87,4 +87,9 @@ comprobar(/enviado=TK-\d{6}/.test(ticket.destino ?? ""), "el formulario de ayuda
 
 const sitemap = await (await fetch(`${base}/sitemap.xml`)).text();
 comprobar(sitemap.includes("/hotel/hotel-regatta") && sitemap.includes('hreflang="en"'), "el sitemap incluye hoteles con alternativa en inglés");
+comprobar(portada.html.includes("chat-boton"), "el botón de ayuda del asistente está en todas las páginas públicas");
+const chat = await (await fetch(`${base}/api/v1/chat`, { method: "POST", headers: { "content-type": "application/json", origin: base }, body: JSON.stringify({ texto: "busco hotel en cartagena", idioma: "es" }) })).json();
+comprobar(Boolean(chat.conversacionId) && /destinos\/cartagena|hotel\//.test(chat.respuesta), "el asistente responde con un enlace al destino");
+const ajeno = await fetch(`${base}/api/v1/chat`, { method: "POST", headers: { "content-type": "application/json", origin: "https://sitio-ajeno.example" }, body: JSON.stringify({ texto: "hola", idioma: "es" }) });
+comprobar(ajeno.status === 403, "el chat rechaza peticiones de otros sitios");
 console.log("Recorrido público completo sin errores.");
